@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="#fff"
+        android:gravity="center_vertical"
+        android:padding="6dip" >
+
+        <FrameLayout
+            android:id="@+id/barber_item_layout_avatar"
+            android:layout_width="77dip"
+            android:layout_height="77dip"
+            android:layout_marginRight="10dip" >
+
+            <ImageView
+                android:id="@+id/barber_item_iv_avatar"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:scaleType="fitXY"/>
+
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="@drawable/bglistitem_selector_session_select"
+                android:duplicateParentState="true"
+                android:scaleType="fitXY" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/barber_item_layout_avatar"
+            android:gravity="center_vertical"
+            android:orientation="vertical" >
+                <com.blackswan.fake.view.HandyTextView
+                    android:id="@+id/barber_item_htv_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="曲靖"
+                    android:textColor="@color/text_color"
+                    android:textSize="17sp" />
+
+               <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
+
+                        <com.blackswan.fake.view.HandyTextView
+                            android:id="@+id/textView3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="简介："
+                            android:textColor="@color/black3"
+                            android:textSize="12sp" />
+
+                        <com.blackswan.fake.view.HandyTextView
+                            android:id="@+id/textView4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="从业五年，曾被评为山东省最优秀年轻美发师"
+                            android:layout_marginLeft="1dp"
+                            android:textSize="12sp"
+                            android:singleLine="true"
+                            android:textColor="@color/black3" />
+
+                    </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="3dip"
+                android:layout_weight="1"
+                android:focusable="false"
+                android:gravity="left|center"
+                android:orientation="horizontal" >
+
+                <LinearLayout
+                    android:id="@+id/barber_item_layout_gender"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dip"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingBottom="2dip"
+                    android:paddingLeft="5dip"
+                    android:paddingRight="5dip"
+                    android:paddingTop="2dip" >
+
+                    <ImageView
+                        android:id="@+id/barber_item_iv_gender"
+                        android:layout_width="8dip"
+                        android:layout_height="8dip"
+                        android:scaleType="fitXY" />
+                </LinearLayout>
+
+                <com.blackswan.fake.view.HandyTextView
+                    android:id="@+id/barber_item_htv_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/font_value"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
+
+                    <com.blackswan.fake.view.HandyTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" | "
+                        android:textColor="@color/font_value"
+                        android:textSize="12sp" />
+
+                    <com.blackswan.fake.view.HandyTextView
+                        android:id="@+id/barber_item_htv_time"
+                        android:layout_width="0dip"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/font_value"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <com.blackswan.fake.view.HandyTextView
+                    android:id="@+id/barber_item_tv_addup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/addup"
+                    android:gravity="center"
+                    android:textSize="10sp" />
+                 <com.blackswan.fake.view.HandyTextView
+				                android:id="@+id/tv_barberaddup"
+				                android:layout_width="wrap_content"
+				                android:layout_height="wrap_content"
+				                android:text="45"
+				                android:textSize="11sp"
+				                android:textColor="@color/maincolor"
+				                android:layout_marginBottom="2dp"
+				                android:layout_marginLeft="5dp"
+				                android:gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" >
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/barberappraise"
+                    android:textSize="11sp" />
+                 <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginBottom="2dp"
+                            android:src="@drawable/ic_rating_star_small_on" />
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginBottom="2dp"
+                            android:src="@drawable/ic_rating_star_small_on" />
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginBottom="2dp"
+                            android:src="@drawable/ic_rating_star_small_on" />
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginBottom="2dp"
+                            android:src="@drawable/ic_rating_star_small_on" />
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginBottom="2dp"
+                            android:src="@drawable/ic_rating_star_small_on" />
+
+                        <com.blackswan.fake.view.HandyTextView
+                            android:id="@+id/textView2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/distance"
+                            android:textSize="12sp"
+                            android:layout_marginLeft="30dp" />
+                        <com.blackswan.fake.view.HandyTextView
+				                android:id="@+id/tv_distancecount"
+				                android:layout_width="wrap_content"
+				                android:layout_height="wrap_content"
+				                android:text="0.2km"
+				                android:textSize="11sp"
+				                android:textColor="@color/maincolor"
+				                android:layout_marginBottom="2dp"
+				                android:layout_marginLeft="5dp"
+				                android:gravity="center"/>
+
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>
