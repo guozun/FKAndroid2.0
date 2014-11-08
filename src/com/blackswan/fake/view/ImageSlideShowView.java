@@ -1,5 +1,6 @@
 package com.blackswan.fake.view;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -7,6 +8,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -24,10 +26,18 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
 import com.blackswan.fake.R;
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.blackswan.fake.util.FileUtils;
+import com.nostra13.universalimageloader.cache.disc.impl.ext.LruDiscCache;
+import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
+import com.nostra13.universalimageloader.core.display.SimpleBitmapDisplayer;
+import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 
 /**
  * ViewPager实现的轮播图广告自定义视图，如京东首页的广告轮播图效果； 既支持自动轮播页面也支持手势滑动切换页面
@@ -37,9 +47,9 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 public class ImageSlideShowView extends FrameLayout {
 
-	// 使用universal-image-loader插件读取网络图片，需要工程导入universal-image-loader-1.8.6-with-sources.jar
 	private ImageLoader imageLoader = ImageLoader.getInstance();
-
+	// 显示图片用的配置
+	private DisplayImageOptions displayImageOptions;
 	// 轮播图图片数量
 	private final static int IMAGE_COUNT = 5;
 	// 自动轮播的时间间隔
@@ -85,6 +95,23 @@ public class ImageSlideShowView extends FrameLayout {
 		super(context, attrs, defStyle);
 		this.context = context;
 		initImageLoader(context);
+
+		displayImageOptions = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.imageslider_default) // resource or
+														// drawable
+				.showImageForEmptyUri(R.drawable.imageslider_default) // resource or
+															// drawable
+				.showImageOnFail(R.drawable.imageslider_default) // resource or
+														// drawable
+				.resetViewBeforeLoading(false) // default
+				
+				.cacheInMemory(true) // default
+				.cacheOnDisk(true) // default
+				.considerExifParams(false) // default
+				.imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2) // default
+				.bitmapConfig(Bitmap.Config.RGB_565) // default
+				.displayer(new SimpleBitmapDisplayer()) // default
+				.build();
 		initData();
 		if (isAutoPlay) {
 			startPlay();
@@ -171,7 +198,7 @@ public class ImageSlideShowView extends FrameLayout {
 		public Object instantiateItem(View container, int position) {
 			ImageView imageView = imageViewsList.get(position);
 
-			imageLoader.displayImage(imageView.getTag() + "", imageView);
+			imageLoader.displayImage(imageView.getTag() + "", imageView,displayImageOptions);
 
 			((ViewPager) container).addView(imageViewsList.get(position));
 			return imageViewsList.get(position);
@@ -308,10 +335,10 @@ public class ImageSlideShowView extends FrameLayout {
 				// 这里一般调用服务端接口获取一组轮播图片，下面是从百度找的几个图片
 
 				imageUrls = new String[] {
-						"http://image.zcool.com.cn/56/35/1303967876491.jpg",
-						"http://image.zcool.com.cn/59/54/m_1303967870670.jpg",
-						"http://image.zcool.com.cn/47/19/1280115949992.jpg",
-						"http://image.zcool.com.cn/59/11/m_1303967844788.jpg" };
+						"http://img2.imgtn.bdimg.com/it/u=318344986,440289376&fm=15&gp=0.jpg",
+						"http://img4.imgtn.bdimg.com/it/u=4018453288,1043235808&fm=15&gp=0.jpg",
+						"http://img4.imgtn.bdimg.com/it/u=515781013,1720396803&fm=15&gp=0.jpg",
+						"http://img1.imgtn.bdimg.com/it/u=3533422861,846355294&fm=15&gp=0.jpg" };
 				return true;
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -339,17 +366,60 @@ public class ImageSlideShowView extends FrameLayout {
 		// or you can create default configuration by
 		// ImageLoaderConfiguration.createDefault(this);
 		// method.
+		// ImageLoaderConfiguration config = new
+		// ImageLoaderConfiguration.Builder(
+		// context).threadPriority(Thread.NORM_PRIORITY - 2)
+		// .denyCacheImageMultipleSizesInMemory()
+		// .discCacheFileNameGenerator(new Md5FileNameGenerator())
+		// .tasksProcessingOrder(QueueProcessingType.LIFO)
+		// .writeDebugLogs() // Remove
+		// // for
+		// // release
+		// // app
+		// .build();
+
+		int memoryCacheSize = IMAGE_COUNT * 100 * 1024;
+		int diskcacheSize = IMAGE_COUNT * 200 * 1024;
+		LruDiscCache diskcache = null;
+		try {
+			diskcache = new LruDiscCache(FileUtils.getDiskCacheDir(context,
+					"bitmap"), new HashCodeFileNameGenerator(), diskcacheSize);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			diskcacheSize = 0;
+		}
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-				context).threadPriority(Thread.NORM_PRIORITY - 2)
-				.denyCacheImageMultipleSizesInMemory()
-				.discCacheFileNameGenerator(new Md5FileNameGenerator())
+				context)
+
+				.memoryCacheExtraOptions(480, 180)
+				// default = device screen
+				// dimensions
+				.diskCacheExtraOptions(480, 180, null)
+				// .taskExecutor()
+				// .taskExecutorForCachedImages(...)
+				.threadPoolSize(2)
+				// default
+				.threadPriority(Thread.NORM_PRIORITY - 2)
+				// default
 				.tasksProcessingOrder(QueueProcessingType.LIFO)
-				.writeDebugLogs() // Remove
-									// for
-									// release
-									// app
-				.build();
+				// default
+				.denyCacheImageMultipleSizesInMemory()
+				.memoryCache(new LruMemoryCache(memoryCacheSize))
+				.memoryCacheSize(memoryCacheSize)
+				// .memoryCacheSizePercentage(1)
+				// default
+				.diskCache(diskcache)
+				// default
+				.diskCacheSize(diskcacheSize).diskCacheFileCount(IMAGE_COUNT)
+				.diskCacheFileNameGenerator(new HashCodeFileNameGenerator()) // default
+				.imageDownloader(new BaseImageDownloader(context)) // default
+				.imageDecoder(new BaseImageDecoder(false)) // default
+				.defaultDisplayImageOptions(DisplayImageOptions.createSimple()) // default
+				.writeDebugLogs().build();
+
 		// Initialize ImageLoader with configuration.
 		ImageLoader.getInstance().init(config);
+
 	}
 }

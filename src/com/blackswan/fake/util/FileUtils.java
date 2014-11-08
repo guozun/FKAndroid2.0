@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Environment;
 
@@ -139,4 +142,35 @@ public class FileUtils {
 		}
 		return fileSizeString;
 	}
+	/**
+	 * 获取Disk缓存目录
+	 * 
+	 * @param uniqueName 不同类型的数据进行区分而设定的一个唯一值
+	 * @return
+	 */
+	public static File getDiskCacheDir(Context context, String uniqueName) {  
+	    String cachePath;  
+	    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())  
+	            || !Environment.isExternalStorageRemovable()) {  
+	        cachePath = context.getExternalCacheDir().getPath();  
+	    } else {  
+	        cachePath = context.getCacheDir().getPath();  
+	    }  
+	    return new File(cachePath + File.separator + uniqueName);  
+	}  
+	/**
+	 * 获取软件版本号
+	 * 
+	 * @param context
+	 * @return 版本号
+	 */
+	public static int getAppVersion(Context context) {  
+	    try {  
+	        PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);  
+	        return info.versionCode;  
+	    } catch (NameNotFoundException e) {  
+	        e.printStackTrace();  
+	    }  
+	    return 1;  
+	} 
 }
