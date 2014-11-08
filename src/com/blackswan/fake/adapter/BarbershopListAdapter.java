@@ -1,70 +1,98 @@
 package com.blackswan.fake.adapter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import com.blackswan.fake.R;
-
+import java.util.List;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
+import com.blackswan.fake.R;
+import com.blackswan.fake.bean.NearBarberShop;
+import com.blackswan.fake.view.HandyTextView;
 
 public class BarbershopListAdapter extends BaseAdapter
 {
-	private Context context;
-	private ArrayList<HashMap<String,Object>> data;
+	private LayoutInflater mInflater;
+	private List<NearBarberShop> items;
+
+	private ViewHolder holder;
+
+	public void ContentAdapter(Context context, List<NearBarberShop> list) {
+		mInflater = LayoutInflater.from(context);
+
+		items = list;
+	}
 
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
-		return data.size();
+		return items.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		// TODO Auto-generated method stub
-		return data.get(position);
+		return items.get(position);
 	}
 
 	@Override
 	public long getItemId(int position) {
-		// TODO Auto-generated method stub
 		return position;
 	}
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		DataList dl = new DataList();
-//		convertView = LayoutInflater.from(context).inflate(R.layout.listitem_barber, null);
-//		dl.iv_name = (ImageView) convertView.findViewById(R.id.iv_name);
-//		//dl.iv_shangjia_image = (ImageView) convertView.findViewById(R.id.iv_shangjia_image);
-//		dl.tv_shangjia_name = (TextView) convertView.findViewById(R.id.tv_shangjia_name);
-//		dl.tv_youhuijia = (TextView) convertView.findViewById(R.id.tv_youhuijia);
-//		dl.tv_price = (TextView) convertView.findViewById(R.id.tv_price);
-//		dl.tv_qi = (TextView) convertView.findViewById(R.id.tv_qi);
-//		dl.tv_address = (TextView) convertView.findViewById(R.id.tv_address);
-//		dl.tv_category = (TextView) convertView.findViewById(R.id.tv_category);
-//		dl.tv_distance = (TextView) convertView.findViewById(R.id.tv_distance);
-//		
+	@SuppressLint("InflateParams") @Override
+	public View getView(final int position, View convertView,
+			ViewGroup parent) {
+
+		if (convertView == null) {
+			convertView = mInflater.inflate(R.layout.listitem_barbershop, null);
+			holder = new ViewHolder();
+			
+			holder.barbershopname = (HandyTextView) convertView.findViewById(R.id.tv_barbershopname);
+			holder.barbershop_discontent = (HandyTextView) convertView.findViewById(R.id.tv_barbershop_discontent);
+			holder.servicestarcount = (HandyTextView) convertView.findViewById(R.id.tv_servicestarcount);
+			holder.pricestarcount = (HandyTextView) convertView.findViewById(R.id.tv_pricestarconut);
+			holder.addupcount = (HandyTextView) convertView.findViewById(R.id.tv_addupcount);
+			holder.distancecount= (HandyTextView) convertView.findViewById(R.id.tv_distancecount);
+			holder.servicestar = (ImageView) convertView.findViewById(R.id.iv_servicestar);
+			holder.pricestar = (ImageView) convertView.findViewById(R.id.iv_pricestar);
+			holder.barbershopavatar = (ImageView) convertView.findViewById(R.id.iv_barbershopavatar);
+			
+			convertView.setTag(holder);
+		} else {
+			holder = (ViewHolder) convertView.getTag();
+		}
+
+		// 向视图填充数据
+		holder.barbershopname.setText((String) items.get(position).getSName() + "");
+		holder.barbershop_discontent.setText((String) items.get(position).getSDis() + "");
+		holder.servicestarcount.setText((float) items.get(position).getServiceStar() + "");
+		holder.pricestarcount.setText((float) items.get(position).getPriceStar() + "");
+		holder.addupcount.setText((float) items.get(position).getOrderAddup() + "人");
+		holder.distancecount.setText((float) items.get(position).getSDistance() + "Km");
+//		holder.icon.setImageBitmap(getBitmapFromUrl((String) items.get(position).getImageurl()));
+
 		return convertView;
 	}
-	
-	private class DataList{
-		public TextView tv_shangjia_name,//
-						tv_youhuijia,//
-						tv_price,//
-						tv_qi,//
-						tv_category,//
-						tv_address,//
-						tv_distance;//
-		
-		public ImageView iv_shangjia_image,//
-						 iv_name;//
-		
+
+	/* class ViewHolder */
+	private class ViewHolder {
+		ImageView barbershopavatar;
+		HandyTextView barbershopname;
+		HandyTextView barbershop_discontent;
+		ImageView servicestar;
+		HandyTextView servicestarcount;
+		ImageView pricestar;
+		HandyTextView pricestarcount;
+		HandyTextView addupcount;
+		HandyTextView distancecount;
 	}
+	
+	//根据评分选择星级图片
+//	public Bitmap displayStar(float count) {
+//		if (count==0) {
+//			return 
+//		}
+//	}
 
 }
