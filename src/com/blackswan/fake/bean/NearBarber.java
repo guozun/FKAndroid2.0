@@ -5,7 +5,7 @@ public class NearBarber {
 	private String BSex;
 	private String BAge;
 	private String BDis;
-	private String BDistance;
+	private float BDistance;
 	private float AppraiseStar;
 	private int OrderAddup;
 	private String imageurl;
@@ -37,10 +37,10 @@ public class NearBarber {
 	public void setBDis(String bDis) {
 		BDis = bDis;
 	}
-	public String getBDistance() {
+	public float getBDistance() {
 		return BDistance;
 	}
-	public void setBDistance(String bDistance) {
+	public void setBDistance(float bDistance) {
 		BDistance = bDistance;
 	}
 	public float getAppraiseStar() {

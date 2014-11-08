@@ -1,13 +1,22 @@
 package com.blackswan.fake.adapter;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+
 import com.blackswan.fake.R;
 import com.blackswan.fake.bean.NearBarberShop;
 import com.blackswan.fake.view.HandyTextView;
@@ -70,7 +79,9 @@ public class BarbershopListAdapter extends BaseAdapter
 		holder.pricestarcount.setText((float) items.get(position).getPriceStar() + "");
 		holder.addupcount.setText((float) items.get(position).getOrderAddup() + "人");
 		holder.distancecount.setText((float) items.get(position).getSDistance() + "Km");
-//		holder.icon.setImageBitmap(getBitmapFromUrl((String) items.get(position).getImageurl()));
+		holder.barbershopavatar.setImageBitmap(getBitmapFromUrl((String) items.get(position).getImageurl()));
+		holder.pricestar.setImageBitmap(displayStar((float) items.get(position).getPriceStar()));
+		holder.servicestar.setImageBitmap(displayStar((float) items.get(position).getServiceStar()));
 
 		return convertView;
 	}
@@ -89,10 +100,38 @@ public class BarbershopListAdapter extends BaseAdapter
 	}
 	
 	//根据评分选择星级图片
-//	public Bitmap displayStar(float count) {
-//		if (count==0) {
-//			return 
-//		}
-//	}
+	public Bitmap displayStar(float count) {
+		URL url;
+		Bitmap bitmap = null;
+		try {
+			url = new URL("");
+			InputStream is = url.openConnection().getInputStream();
+			BufferedInputStream bis = new BufferedInputStream(is);
+			bitmap = BitmapFactory.decodeStream(bis);
+			bis.close();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bitmap;
+	}
+	
+	private Bitmap getBitmapFromUrl(String imgUrl) {
+		URL url;
+		Bitmap bitmap = null;
+		try {
+			url = new URL(imgUrl);
+			InputStream is = url.openConnection().getInputStream();
+			BufferedInputStream bis = new BufferedInputStream(is);
+			bitmap = BitmapFactory.decodeStream(bis);
+			bis.close();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bitmap;
+	}
 
 }
