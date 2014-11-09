@@ -2,6 +2,7 @@ package com.blackswan.fake.base;
 
 import java.util.List;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blackswan.fake.R;
+import com.blackswan.fake.activity.HairDoDetailActivity;
 import com.huewu.pla.lib.MultiColumnPullToRefreshListView;
 import com.huewu.pla.lib.MultiColumnPullToRefreshListView.OnRefreshListener;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -124,7 +126,12 @@ public class HairdoWaterfallFragment extends Fragment {
 				
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
+					Intent intent = new Intent();
+					intent.setClass(getActivity(), HairDoDetailActivity.class);
+//					Bundle
+//						intent.putExtras(bundle);
+					
+					startActivity(intent);
 					
 				}
 			});
