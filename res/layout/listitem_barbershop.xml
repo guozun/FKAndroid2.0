@@ -11,11 +11,10 @@
                 android:background="#fff" >
 
                 <ImageView
-                    android:id="@+id/imageView1"
+                    android:id="@+id/iv_barbershopavatar"
                     android:layout_width="140dp"
                     android:layout_height="100dp"
                     android:layout_margin="6dp"
-                    android:src="@drawable/barbershop1"
                      />
 
                 <LinearLayout
@@ -30,10 +29,9 @@
                         android:layout_marginTop="10dp" >
 
                         <com.blackswan.fake.view.HandyTextView
-                            android:id="@+id/textView1"
+                            android:id="@+id/tv_barbershopname"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="魔方发艺"
                             android:textSize="14sp"
                             android:layout_margin="5dp" />
 
@@ -46,7 +44,7 @@
                         android:layout_height="wrap_content" >
 
                         <com.blackswan.fake.view.HandyTextView
-                            android:id="@+id/textView3"
+                            android:id="@+id/tv_barbershopdis"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="简介："
@@ -55,10 +53,9 @@
                             android:layout_marginLeft="5dp" />
 
                         <com.blackswan.fake.view.HandyTextView
-                            android:id="@+id/textView4"
+                            android:id="@+id/tv_barbershop_discontent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="连锁品牌，值得信赖"
                             android:layout_marginLeft="1dp"
                             android:textSize="12sp"
                             android:singleLine="true"
@@ -73,8 +70,7 @@
                         android:layout_gravity="center"
                         android:layout_marginTop="5dip"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingTop="5dip" >
+                        android:orientation="horizontal" >
 
                         <com.blackswan.fake.view.HandyTextView
                             android:id="@+id/tv_servicestar"
@@ -87,47 +83,70 @@
                             android:layout_marginBottom="1dp" />
                         
                             <ImageView
-                                android:layout_width="12dp"
+                                android:id="@+id/iv_servicestar"
+                                android:layout_width="66dp"
                                 android:layout_height="12dp"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_rating_star_small_on"
+                                android:src="@drawable/star50"
                                 android:layout_marginBottom="2dp" />
 
-				            <ImageView
-				                android:layout_width="12dp"
-                                android:layout_height="12dp"
-				                android:layout_gravity="center"
-				                android:src="@drawable/ic_rating_star_small_on"
-				                android:layout_marginBottom="2dp"  />
 
-				            <ImageView 
-				                android:layout_width="12dp"
-                                android:layout_height="12dp"
-				                android:src="@drawable/ic_rating_star_small_on"
-				                android:layout_marginBottom="2dp" />
-				            <ImageView 
-				                android:layout_width="12dp"
-                                android:layout_height="12dp"
-				                android:src="@drawable/ic_rating_star_small_on"
-				                android:layout_marginBottom="2dp" />
-				            <ImageView 
-				                android:layout_width="12dp"
-                                android:layout_height="12dp"
-				                android:src="@drawable/ic_rating_star_small_on"
-				                android:layout_marginBottom="2dp" />
-
-				            <LinearLayout
+				            <com.blackswan.fake.view.HandyTextView
+				                android:id="@+id/tv_servicestarcount"
 				                android:layout_width="wrap_content"
-				                android:layout_height="match_parent"
-				                android:layout_gravity="center" >
+				                android:layout_height="wrap_content"
+				                android:text="4.7分"
+				                android:layout_marginLeft="10dp" 
+				                android:textSize="11sp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_pricestar"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dip"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal" >
+
+                        <com.blackswan.fake.view.HandyTextView
+                            android:id="@+id/tv_pricestar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="1dp"
+                            android:layout_marginLeft="5dp"
+                            android:text="@string/pricestar"
+                            android:textColor="@color/black3"
+                            android:textSize="8sp" />
+
+                       <ImageView
+                                android:id="@+id/iv_pricestar"
+                                android:layout_width="66dp"
+                                android:layout_height="12dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/star50"
+                                android:layout_marginBottom="2dp" />
+                        <TextView
+                            android:id="@+id/tv_pricestarconut"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="4.9分"
+                            android:layout_marginLeft="10dp" 
+                            android:textSize="11sp" />
+                       
+                    </LinearLayout>
+                    <LinearLayout
+				                android:layout_width="wrap_content"
+				                android:layout_height="match_parent" >
 
 				                <com.blackswan.fake.view.HandyTextView
-				                    android:id="@+id/tv_leiji"
+				                    android:id="@+id/tv_addup"
 				                    android:layout_width="wrap_content"
 				                    android:layout_height="wrap_content"
 				                    android:text="@string/addup" 
 				                    android:textSize="8sp"
-				                    android:layout_marginLeft="3dp"
+				                    android:layout_marginLeft="5dp"
 				                    android:layout_marginBottom="2dp"
 				                    android:layout_gravity="center"/>
 				                <com.blackswan.fake.view.HandyTextView
@@ -140,64 +159,6 @@
 				                android:layout_marginBottom="2dp"
 				                android:layout_marginLeft="1dp"
 				                android:layout_gravity="center" />
-				            </LinearLayout>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/ll_pricestar"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="5dip"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingTop="5dip" >
-
-                        <com.blackswan.fake.view.HandyTextView
-                            android:id="@+id/tv_pricestar"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="1dp"
-                            android:layout_marginLeft="5dp"
-                            android:text="@string/pricestar"
-                            android:textColor="@color/black3"
-                            android:textSize="8sp" />
-
-                        <ImageView
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:layout_marginBottom="2dp"
-                            android:src="@drawable/ic_rating_star_small_on" />
-
-                        <ImageView
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:layout_marginBottom="2dp"
-                            android:src="@drawable/ic_rating_star_small_on" />
-
-                        <ImageView
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:layout_marginBottom="2dp"
-                            android:src="@drawable/ic_rating_star_small_on" />
-
-                        <ImageView
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:layout_marginBottom="2dp"
-                            android:src="@drawable/ic_rating_star_small_on" />
-
-                        <ImageView
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:layout_marginBottom="2dp"
-                            android:src="@drawable/ic_rating_star_small_on" />
-                         
-                         <LinearLayout
-				                android:layout_width="wrap_content"
-				                android:layout_height="match_parent"
-				                android:layout_gravity="center" >
-
 				                <com.blackswan.fake.view.HandyTextView
 				                    android:id="@+id/tv_distance"
 				                    android:layout_width="wrap_content"
@@ -205,7 +166,7 @@
 				                    android:text="@string/distance" 
 				                    android:textSize="8sp"
 				                    android:layout_marginBottom="2dp"
-				                    android:layout_marginLeft="3dp"
+				                    android:layout_marginLeft="40dp"
 				                    android:layout_gravity="center"/>
 				                <com.blackswan.fake.view.HandyTextView
 				                android:id="@+id/tv_distancecount"
@@ -217,8 +178,8 @@
 				                android:layout_marginBottom="2dp"
 				                android:layout_marginLeft="2dp"
 				                android:layout_gravity="center" />
-				            </LinearLayout>
-                    </LinearLayout>
+				                
+				   </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 </RelativeLayout>    

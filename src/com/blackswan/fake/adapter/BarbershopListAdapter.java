@@ -1,70 +1,120 @@
 package com.blackswan.fake.adapter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
 
-import com.blackswan.fake.R;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.view.LayoutInflater;
+import android.content.Entity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-public class BarbershopListAdapter extends BaseAdapter
+import com.blackswan.fake.R;
+import com.blackswan.fake.base.BaseApplication;
+import com.blackswan.fake.base.BaseObjectListAdapter;
+import com.blackswan.fake.bean.NearBarberShop;
+import com.blackswan.fake.view.HandyTextView;
+
+public class BarbershopListAdapter extends BaseObjectListAdapter
 {
-	private Context context;
-	private ArrayList<HashMap<String,Object>> data;
-
-	@Override
-	public int getCount() {
-		// TODO Auto-generated method stub
-		return data.size();
+	public BarbershopListAdapter(BaseApplication application, Context context,
+			List<? extends Entity> datas) {
+		super(application, context, datas);
 	}
 
-	@Override
-	public Object getItem(int position) {
-		// TODO Auto-generated method stub
-		return data.get(position);
-	}
+	private ViewHolder holder;
 
+	@SuppressLint("InflateParams") 
 	@Override
-	public long getItemId(int position) {
-		// TODO Auto-generated method stub
-		return position;
-	}
+	public View getView(final int position, View convertView,
+			ViewGroup parent) {
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		DataList dl = new DataList();
-//		convertView = LayoutInflater.from(context).inflate(R.layout.listitem_barber, null);
-//		dl.iv_name = (ImageView) convertView.findViewById(R.id.iv_name);
-//		//dl.iv_shangjia_image = (ImageView) convertView.findViewById(R.id.iv_shangjia_image);
-//		dl.tv_shangjia_name = (TextView) convertView.findViewById(R.id.tv_shangjia_name);
-//		dl.tv_youhuijia = (TextView) convertView.findViewById(R.id.tv_youhuijia);
-//		dl.tv_price = (TextView) convertView.findViewById(R.id.tv_price);
-//		dl.tv_qi = (TextView) convertView.findViewById(R.id.tv_qi);
-//		dl.tv_address = (TextView) convertView.findViewById(R.id.tv_address);
-//		dl.tv_category = (TextView) convertView.findViewById(R.id.tv_category);
-//		dl.tv_distance = (TextView) convertView.findViewById(R.id.tv_distance);
-//		
+		if (convertView == null) {
+			convertView = mInflater.inflate(R.layout.listitem_barbershop, null);
+			holder = new ViewHolder();
+			
+			holder.barbershopname = (HandyTextView) convertView.findViewById(R.id.tv_barbershopname);
+			holder.barbershop_discontent = (HandyTextView) convertView.findViewById(R.id.tv_barbershop_discontent);
+			holder.servicestarcount = (HandyTextView) convertView.findViewById(R.id.tv_servicestarcount);
+			holder.pricestarcount = (HandyTextView) convertView.findViewById(R.id.tv_pricestarconut);
+			holder.addupcount = (HandyTextView) convertView.findViewById(R.id.tv_addupcount);
+			holder.distancecount= (HandyTextView) convertView.findViewById(R.id.tv_distancecount);
+			holder.servicestar = (ImageView) convertView.findViewById(R.id.iv_servicestar);
+			holder.pricestar = (ImageView) convertView.findViewById(R.id.iv_pricestar);
+			holder.barbershopavatar = (ImageView) convertView.findViewById(R.id.iv_barbershopavatar);
+			
+			convertView.setTag(holder);
+		} else {
+			holder = (ViewHolder) convertView.getTag();
+		}
+		NearBarberShop barberShop = (NearBarberShop) getItem(position);
+		// 向视图填充数据
+		holder.barbershopname.setText((String)barberShop.getSName() + "");
+		holder.barbershop_discontent.setText((String)barberShop.getSDis() + "");
+		holder.servicestarcount.setText((float)barberShop.getServiceStar() + "");
+		holder.pricestarcount.setText((float)barberShop.getPriceStar() + "");
+		holder.addupcount.setText((float)barberShop.getOrderAddup() + "人");
+		holder.distancecount.setText((float)barberShop.getSDistance() + "Km");
+		holder.barbershopavatar.setImageBitmap(getBitmapFromUrl((String)barberShop.getImageurl()));
+		holder.pricestar.setImageBitmap(displayStar((float)barberShop.getPriceStar()));
+		holder.servicestar.setImageBitmap(displayStar((float)barberShop.getServiceStar()));
+
 		return convertView;
 	}
+
+	/* class ViewHolder */
+	private class ViewHolder {
+		ImageView barbershopavatar;
+		HandyTextView barbershopname;
+		HandyTextView barbershop_discontent;
+		ImageView servicestar;
+		HandyTextView servicestarcount;
+		ImageView pricestar;
+		HandyTextView pricestarcount;
+		HandyTextView addupcount;
+		HandyTextView distancecount;
+	}
 	
-	private class DataList{
-		public TextView tv_shangjia_name,//
-						tv_youhuijia,//
-						tv_price,//
-						tv_qi,//
-						tv_category,//
-						tv_address,//
-						tv_distance;//
-		
-		public ImageView iv_shangjia_image,//
-						 iv_name;//
-		
+	//根据评分选择星级图片
+	public Bitmap displayStar(float count) {
+		URL url;
+		Bitmap bitmap = null;
+		try {
+			url = new URL("");
+			InputStream is = url.openConnection().getInputStream();
+			BufferedInputStream bis = new BufferedInputStream(is);
+			bitmap = BitmapFactory.decodeStream(bis);
+			bis.close();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bitmap;
+	}
+	
+	private Bitmap getBitmapFromUrl(String imgUrl) {
+		URL url;
+		Bitmap bitmap = null;
+		try {
+			url = new URL(imgUrl);
+			InputStream is = url.openConnection().getInputStream();
+			BufferedInputStream bis = new BufferedInputStream(is);
+			bitmap = BitmapFactory.decodeStream(bis);
+			bis.close();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bitmap;
 	}
 
 }
