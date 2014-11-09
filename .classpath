@@ -8,5 +8,8 @@
 	<classpathentry kind="lib" path="libs/BaiduLBS_Android.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="libs/baidumapapi_v2_0_0.jar"/>
+	<classpathentry kind="lib" path="libs/pinyin4j-2.5.0.jar"/>
+	<classpathentry kind="lib" path="libs/universal-image-loader-1.9.3-with-sources.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

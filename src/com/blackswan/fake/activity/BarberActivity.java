@@ -22,6 +22,7 @@ import com.blackswan.fake.R;
 import com.blackswan.fake.activity.barberactivity.BarberDetailsPageActivity;
 import com.blackswan.fake.adapter.CategoryListAdapter;
 import com.blackswan.fake.base.BaseActivity;
+import com.blackswan.fake.view.FakeRefreshListView;
 import com.blackswan.fake.view.FakeRefreshListView.OnCancelListener;
 import com.blackswan.fake.view.FakeRefreshListView.OnRefreshListener;
 
@@ -36,13 +37,11 @@ public class BarberActivity extends BaseActivity implements OnItemClickListener,
 	private ListView rootList;
 	private ListView childList;
 	private FrameLayout flChild;
-	
+	private FakeRefreshListView refreshListView;
 	private ArrayList<HashMap<String,Object>> itemList;
 	
 	private LinearLayout linLayout;
 	private String title[]= {"环翠区","高新技术开发区","经济开发区","文登区"};
-	//private ListView lv_barber;
-	private View view1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -50,33 +49,21 @@ public class BarberActivity extends BaseActivity implements OnItemClickListener,
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_barber);
-		initPopupWindow();
-		view1 = findViewById(R.id.testbarber);
-		view1.setOnClickListener(new OnClickListener()
-		{
-			
-			@Override
-			public void onClick(View v)
-			{
-				Intent intent = new Intent(BarberActivity.this, BarberDetailsPageActivity.class);
-				startActivity(intent);
-				
-			}
-		});
-//		lv_barber = (ListView) findViewById(R.id.lv_barber);
-//		BarberListAdapter adapter = new BarberListAdapter();
-//		lv_barber.setAdapter(adapter);		
+		initViews();
+		initEvents();
 	}
 	
-	private void initPopupWindow() {
-		itemList = new ArrayList<HashMap<String,Object>>();
+	@Override
+	protected void initViews() {
 		text1 = (TextView) findViewById(R.id.barber_text1);
 		text2 = (TextView) findViewById(R.id.barber_text2);
 		text3 = (TextView) findViewById(R.id.barber_text3);
 		linLayout = (LinearLayout) findViewById(R.id.barber);
-		
+	}
+	
+	@Override
+	protected void initEvents() {
 		text1.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				showPopupWindow(linLayout.getWidth(),linLayout.getHeight());
@@ -84,7 +71,6 @@ public class BarberActivity extends BaseActivity implements OnItemClickListener,
 		});
 		
 		text2.setOnClickListener(new OnClickListener() {
-					
 			@Override
 			public void onClick(View v) {
 				//将理发店铺列表按评价从高到低排列
@@ -92,13 +78,14 @@ public class BarberActivity extends BaseActivity implements OnItemClickListener,
 			});
 		
 		text3.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				//将理发店铺列表按距离从近到远排序
 			}
 		});
+		
 	}
+	
 	@SuppressLint("InflateParams")
 	private void showPopupWindow(int width, int height) {
 		
@@ -143,19 +130,7 @@ public class BarberActivity extends BaseActivity implements OnItemClickListener,
 			}
 		});
 	}
-
-	@Override
-	protected void initViews() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void initEvents() {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public void onCancel() {
 		// TODO Auto-generated method stub

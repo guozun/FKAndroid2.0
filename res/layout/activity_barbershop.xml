@@ -62,7 +62,7 @@
             
     </RelativeLayout>
 	<com.blackswan.fake.view.FaKeRefreshExpandableList
-        android:id="@+id/nearby_group_mmrelv_list"
+        android:id="@+id/nearbarbershop_reflist"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:cacheColorHint="@color/transparent"
@@ -70,19 +70,5 @@
         android:fadingEdge="none"
         android:listSelector="@drawable/list_selector_transition" >
     </com.blackswan.fake.view.FaKeRefreshExpandableList>
-   
-          
-        <LinearLayout
-            android:id="@+id/ll_barbershop"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/ll_refresh_addr" >
-
-            <ListView
-                android:id="@+id/lv_barbershop"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" >
-            </ListView>
-        </LinearLayout>
 
 </LinearLayout>

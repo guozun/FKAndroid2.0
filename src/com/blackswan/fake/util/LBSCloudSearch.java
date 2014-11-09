@@ -38,7 +38,7 @@ public class LBSCloudSearch {
 	//云检索公钥
 	private static String ak = "A4749739227af1618f7b0d1b588c0e85";
 	
-	private static String geotable_id = "30960";
+	private static String geotable_id = "78111";
 
 	private static int TIME_OUT = 12000;
 	private static int retry = 3;
@@ -135,7 +135,7 @@ public class LBSCloudSearch {
 									.getEntity(), "utf-8");
 							Header a = httpResponse.getEntity().getContentType();
 							//获取activity传回的搜索成功状态值
-							Message msgTmp = handler.obtainMessage();
+							Message msgTmp = handler.obtainMessage(1);
 							msgTmp.obj = result;
 							msgTmp.sendToTarget();
 							
@@ -144,7 +144,7 @@ public class LBSCloudSearch {
 						} else {
 							httpRequest.abort();
 							//获取activity传回的搜索失败状态值
-							Message msgTmp = handler.obtainMessage();
+							Message msgTmp = handler.obtainMessage(200);
 							msgTmp.obj = "HttpStatus error";
 							msgTmp.sendToTarget();
 						}
@@ -158,7 +158,7 @@ public class LBSCloudSearch {
 				
 				if ( count <= 0 && handler != null){
 					//获取activity传回的超时状态值
-					Message msgTmp =  handler.obtainMessage();
+					Message msgTmp =  handler.obtainMessage(100);
 					msgTmp.sendToTarget();
 				}
 				

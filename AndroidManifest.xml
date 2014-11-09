@@ -112,6 +112,7 @@
         <activity android:name="com.blackswan.fake.activity.SelectCityByProvince"/>
         <activity android:name="com.blackswan.fake.activity.HairDoActivity"/>      
         <activity android:name="com.blackswan.fake.activity.SelectCityBySort"/>
+        <activity android:name="com.blackswan.fake.activity.BaiduMapActivity"/>
          <service
             android:name="com.baidu.location.f"
             android:enabled="true"
