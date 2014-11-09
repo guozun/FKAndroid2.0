@@ -6,50 +6,31 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Entity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
+
 import com.blackswan.fake.R;
+import com.blackswan.fake.base.BaseApplication;
+import com.blackswan.fake.base.BaseObjectListAdapter;
 import com.blackswan.fake.bean.NearBarber;
 import com.blackswan.fake.view.HandyTextView;
 
-public class BarberListAdapter extends BaseAdapter
+public class BarberListAdapter extends BaseObjectListAdapter
 {
-	private LayoutInflater mInflater;
-	private List<NearBarber> items;
+	public BarberListAdapter(BaseApplication application, Context context,
+			List<? extends Entity> datas) {
+		super(application, context, datas);
+	}
 
 	private ViewHolder holder;
-
-	public void ContentAdapter(Context context, List<NearBarber> list) {
-		mInflater = LayoutInflater.from(context);
-
-		items = list;
-	}
-
-	@Override
-	public int getCount()
-	{
-		return items.size();
-	}
-
-	@Override
-	public Object getItem(int position)
-	{
-		return items.get(position);
-	}
-
-	@Override
-	public long getItemId(int position)
-	{
-		return position;
-	}
-
+	
 	@SuppressLint("InflateParams") 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent)
@@ -70,17 +51,17 @@ public class BarberListAdapter extends BaseAdapter
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-
+		NearBarber barber = (NearBarber) getItem(position);
 		// 向视图填充数据
-		holder.barbername.setText((String) items.get(position).getBName() + "");
-		holder.barberdis.setText((String) items.get(position).getBDis() + "");
-		holder.appraisestarcount.setText((float) items.get(position).getAppraiseStar() + "");
-		holder.addupcount.setText((float) items.get(position).getOrderAddup() + "人");
-		holder.barberdistance.setText((float) items.get(position).getBDistance() + "Km");
-		holder.barberavatar.setImageBitmap(getBitmapFromUrl((String) items.get(position).getImageurl()));
-		holder.appraisestar.setImageBitmap(displayStar((float) items.get(position).getAppraiseStar()));
-		holder.barbersex.setImageBitmap(displaySex((String) items.get(position).getBSex()));
-		holder.barberage.setText((String) items.get(position).getBAge());
+		holder.barbername.setText((String)barber.getBName() + "");
+		holder.barberdis.setText((String) barber.getBDis() + "");
+		holder.appraisestarcount.setText((float) barber.getAppraiseStar() + "");
+		holder.addupcount.setText((float) barber.getOrderAddup() + "人");
+		holder.barberdistance.setText((float) barber.getBDistance() + "Km");
+		holder.barberavatar.setImageBitmap(getBitmapFromUrl((String) barber.getImageurl()));
+		holder.appraisestar.setImageBitmap(displayStar((float) barber.getAppraiseStar()));
+		holder.barbersex.setImageBitmap(displaySex((String) barber.getBSex()));
+		holder.barberage.setText((String)barber.getBAge());
 		return convertView;
 	}
 

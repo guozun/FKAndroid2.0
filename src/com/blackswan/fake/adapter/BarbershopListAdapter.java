@@ -9,47 +9,30 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Entity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import com.blackswan.fake.R;
+import com.blackswan.fake.base.BaseApplication;
+import com.blackswan.fake.base.BaseObjectListAdapter;
 import com.blackswan.fake.bean.NearBarberShop;
 import com.blackswan.fake.view.HandyTextView;
 
-public class BarbershopListAdapter extends BaseAdapter
+public class BarbershopListAdapter extends BaseObjectListAdapter
 {
-	private LayoutInflater mInflater;
-	private List<NearBarberShop> items;
+	public BarbershopListAdapter(BaseApplication application, Context context,
+			List<? extends Entity> datas) {
+		super(application, context, datas);
+	}
 
 	private ViewHolder holder;
 
-	public void ContentAdapter(Context context, List<NearBarberShop> list) {
-		mInflater = LayoutInflater.from(context);
-
-		items = list;
-	}
-
+	@SuppressLint("InflateParams") 
 	@Override
-	public int getCount() {
-		return items.size();
-	}
-
-	@Override
-	public Object getItem(int position) {
-		return items.get(position);
-	}
-
-	@Override
-	public long getItemId(int position) {
-		return position;
-	}
-
-	@SuppressLint("InflateParams") @Override
 	public View getView(final int position, View convertView,
 			ViewGroup parent) {
 
@@ -71,17 +54,17 @@ public class BarbershopListAdapter extends BaseAdapter
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-
+		NearBarberShop barberShop = (NearBarberShop) getItem(position);
 		// 向视图填充数据
-		holder.barbershopname.setText((String) items.get(position).getSName() + "");
-		holder.barbershop_discontent.setText((String) items.get(position).getSDis() + "");
-		holder.servicestarcount.setText((float) items.get(position).getServiceStar() + "");
-		holder.pricestarcount.setText((float) items.get(position).getPriceStar() + "");
-		holder.addupcount.setText((float) items.get(position).getOrderAddup() + "人");
-		holder.distancecount.setText((float) items.get(position).getSDistance() + "Km");
-		holder.barbershopavatar.setImageBitmap(getBitmapFromUrl((String) items.get(position).getImageurl()));
-		holder.pricestar.setImageBitmap(displayStar((float) items.get(position).getPriceStar()));
-		holder.servicestar.setImageBitmap(displayStar((float) items.get(position).getServiceStar()));
+		holder.barbershopname.setText((String)barberShop.getSName() + "");
+		holder.barbershop_discontent.setText((String)barberShop.getSDis() + "");
+		holder.servicestarcount.setText((float)barberShop.getServiceStar() + "");
+		holder.pricestarcount.setText((float)barberShop.getPriceStar() + "");
+		holder.addupcount.setText((float)barberShop.getOrderAddup() + "人");
+		holder.distancecount.setText((float)barberShop.getSDistance() + "Km");
+		holder.barbershopavatar.setImageBitmap(getBitmapFromUrl((String)barberShop.getImageurl()));
+		holder.pricestar.setImageBitmap(displayStar((float)barberShop.getPriceStar()));
+		holder.servicestar.setImageBitmap(displayStar((float)barberShop.getServiceStar()));
 
 		return convertView;
 	}
