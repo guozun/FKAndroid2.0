@@ -94,8 +94,7 @@ public class ImageSlideShowView extends FrameLayout {
 	public ImageSlideShowView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		this.context = context;
-		initImageLoader(context);
-
+		
 		displayImageOptions = new DisplayImageOptions.Builder()
 				.showImageOnLoading(R.drawable.imageslider_default) // resource or
 														// drawable
@@ -355,71 +354,5 @@ public class ImageSlideShowView extends FrameLayout {
 		}
 	}
 
-	/**
-	 * ImageLoader 图片组件初始化
-	 * 
-	 * @param context
-	 */
-	public static void initImageLoader(Context context) {
-		// This configuration tuning is custom. You can tune every option, you
-		// may tune some of them,
-		// or you can create default configuration by
-		// ImageLoaderConfiguration.createDefault(this);
-		// method.
-		// ImageLoaderConfiguration config = new
-		// ImageLoaderConfiguration.Builder(
-		// context).threadPriority(Thread.NORM_PRIORITY - 2)
-		// .denyCacheImageMultipleSizesInMemory()
-		// .discCacheFileNameGenerator(new Md5FileNameGenerator())
-		// .tasksProcessingOrder(QueueProcessingType.LIFO)
-		// .writeDebugLogs() // Remove
-		// // for
-		// // release
-		// // app
-		// .build();
 
-		int memoryCacheSize = IMAGE_COUNT * 100 * 1024;
-		int diskcacheSize = IMAGE_COUNT * 200 * 1024;
-		LruDiscCache diskcache = null;
-		try {
-			diskcache = new LruDiscCache(FileUtils.getDiskCacheDir(context,
-					"bitmap"), new HashCodeFileNameGenerator(), diskcacheSize);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			diskcacheSize = 0;
-		}
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-				context)
-
-				.memoryCacheExtraOptions(480, 180)
-				// default = device screen
-				// dimensions
-				.diskCacheExtraOptions(480, 180, null)
-				// .taskExecutor()
-				// .taskExecutorForCachedImages(...)
-				.threadPoolSize(2)
-				// default
-				.threadPriority(Thread.NORM_PRIORITY - 2)
-				// default
-				.tasksProcessingOrder(QueueProcessingType.LIFO)
-				// default
-				.denyCacheImageMultipleSizesInMemory()
-				.memoryCache(new LruMemoryCache(memoryCacheSize))
-				.memoryCacheSize(memoryCacheSize)
-				// .memoryCacheSizePercentage(1)
-				// default
-				.diskCache(diskcache)
-				// default
-				.diskCacheSize(diskcacheSize).diskCacheFileCount(IMAGE_COUNT)
-				.diskCacheFileNameGenerator(new HashCodeFileNameGenerator()) // default
-				.imageDownloader(new BaseImageDownloader(context)) // default
-				.imageDecoder(new BaseImageDecoder(false)) // default
-				.defaultDisplayImageOptions(DisplayImageOptions.createSimple()) // default
-				.writeDebugLogs().build();
-
-		// Initialize ImageLoader with configuration.
-		ImageLoader.getInstance().init(config);
-
-	}
 }

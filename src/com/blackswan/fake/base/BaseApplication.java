@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,6 +22,17 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.blackswan.fake.R;
+import com.blackswan.fake.util.FileUtils;
+import com.nostra13.universalimageloader.cache.disc.impl.ext.LruDiscCache;
+import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
+import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 
 public class BaseApplication extends Application {
 	private Bitmap mDefaultAvatar;
@@ -92,7 +104,9 @@ public class BaseApplication extends Application {
 		});
 		mLocationClient.start();
 		mLocationClient.requestOfflineLocation();
-		System.out.println("开始获取");		
+		System.out.println("开始获取");	
+		//初始化 图片引擎
+		initImageLoader(getApplicationContext());
 	}
 
 	@Override
@@ -274,6 +288,64 @@ public class BaseApplication extends Application {
 		editor = preferences.edit();
 		editor.putFloat(key, value);
 		editor.commit();
+	}
+	//初始化图片加载引擎
+	private static void initImageLoader(Context context) {
+		// This configuration tuning is custom. You can tune every option, you may tune some of them,
+		// or you can create default configuration by
+		//  ImageLoaderConfiguration.createDefault(this);
+		// method.
+//		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
+//				.threadPriority(Thread.NORM_PRIORITY - 2)
+//				.denyCacheImageMultipleSizesInMemory()
+//				.diskCacheFileNameGenerator(new Md5FileNameGenerator())
+//				.diskCacheSize(50 * 1024 * 1024) // 50 Mb
+//				.tasksProcessingOrder(QueueProcessingType.LIFO)
+//				.writeDebugLogs() // Remove for release app
+//				.build();
+//		
+		int memoryCacheSize = 2 * 1024 * 1024;
+		int diskcacheSize = 50 * 1024 * 1024;	// 50 Mb
+		LruDiscCache diskcache = null;
+		try {
+			diskcache = new LruDiscCache(FileUtils.getDiskCacheDir(context,
+					"bitmap"), new HashCodeFileNameGenerator(), diskcacheSize);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			diskcacheSize = 0;
+		}
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
+				context)
+				//.memoryCacheExtraOptions(480, 180)
+				// default = device screen
+				// dimensions
+				//.diskCacheExtraOptions(480, 180, null)
+				// .taskExecutor()
+				// .taskExecutorForCachedImages(...)
+				//.threadPoolSize(2)
+				// default
+				.threadPriority(Thread.NORM_PRIORITY - 2)
+				// default
+				.tasksProcessingOrder(QueueProcessingType.LIFO)
+				// default
+				.denyCacheImageMultipleSizesInMemory()
+				.memoryCache(new LruMemoryCache(memoryCacheSize))
+				.memoryCacheSize(memoryCacheSize)
+				// .memoryCacheSizePercentage(1)
+				// default
+				.diskCache(diskcache)
+				// default
+				.diskCacheSize(diskcacheSize)
+				//.diskCacheFileCount(IMAGE_COUNT)
+				.diskCacheFileNameGenerator(new Md5FileNameGenerator())
+				//.imageDownloader(new BaseImageDownloader(context)) // default
+				//.imageDecoder(new BaseImageDecoder(false)) // default
+				//.defaultDisplayImageOptions(DisplayImageOptions.createSimple()) // default
+				.writeDebugLogs().build();
+
+		// Initialize ImageLoader with configuration.
+		ImageLoader.getInstance().init(config);
 	}
 }
 
