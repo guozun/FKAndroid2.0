@@ -2,9 +2,7 @@ package com.blackswan.fake.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import com.blackswan.fake.R;
-import com.blackswan.fake.adapter.CategoryListAdapter;
-import com.blackswan.fake.base.BaseActivity;
+
 import android.annotation.SuppressLint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -13,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -20,7 +19,13 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class BarberShopActivity extends BaseActivity
+import com.blackswan.fake.R;
+import com.blackswan.fake.adapter.CategoryListAdapter;
+import com.blackswan.fake.base.BaseActivity;
+import com.blackswan.fake.view.FakeRefreshListView.OnCancelListener;
+import com.blackswan.fake.view.FakeRefreshListView.OnRefreshListener;
+
+public class BarberShopActivity extends BaseActivity implements OnItemClickListener, OnRefreshListener, OnCancelListener
 {
 	private TextView text1;
 	private TextView text2;
@@ -155,6 +160,22 @@ public class BarberShopActivity extends BaseActivity
 	}
 	@Override
 	protected void initEvents() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onCancel() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onRefresh() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
 		// TODO Auto-generated method stub
 		
 	}
