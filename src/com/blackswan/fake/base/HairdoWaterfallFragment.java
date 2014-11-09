@@ -120,12 +120,14 @@ public class HairdoWaterfallFragment extends Fragment {
 			holder.tvUp.setText("10");
 			holder.tvDown.setText("100");
 			
-//			holder.ivIcon.setOnClickListener(new OnClickListener() {
-//				@Override
-//				public void onClick(View view) {
-//					Log.i("TAG", "image click");
-//				}
-//			});
+			holder.ivPic.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
 			
 			return view;
 		}
