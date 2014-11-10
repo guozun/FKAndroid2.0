@@ -71,12 +71,12 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 		listView.setOnScrollListener(this);
 		
 		barbershopListAdapter = new BarbershopListAdapter((BaseApplication)getApplication(),BarberShopActivity.this, barberShops);
-		setListAdapter(adapter);
+		setListAdapter(barbershopListAdapter);
 
-		DemoApplication app = (DemoApplication) getApplication();
-		app.setList(list);
-		app.setAdapter(adapter);
-		app.setListActivity(this);
+		BaseApplication app = (BaseApplication) getApplication();
+		app.setBarbershops(barberShops);
+		app.setBarbershopListAdapter(barbershopListAdapter);
+		app.setBarberShopActivity(this);
 		
 	}
 	
@@ -172,28 +172,6 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 		});
 	}
 
-	private long exitTime = 0;
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			exit();
-			return false;
-		}
-		return super.onKeyDown(keyCode, event);
-	}
-	
-	public void exit() {
-		if ((System.currentTimeMillis() - exitTime) > 2000) {
-			Toast.makeText(getApplicationContext(), "再按一次退出剃头",
-					Toast.LENGTH_SHORT).show();
-			exitTime = System.currentTimeMillis();
-		} else {
-			finish();
-			System.exit(0);
-		}
-	
-	}
-	
 	/**
 	 * 加载更多数据
 	 */
@@ -223,14 +201,46 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		// TODO Auto-generated method stub
+		int itemsLastIndex = barbershopListAdapter.getCount() - 1; // 数据集最后一项的索引
+		int lastIndex = itemsLastIndex + 1;
+		if (scrollState == OnScrollListener.SCROLL_STATE_IDLE
+				&& visibleLastIndex == lastIndex) {
+			loadMoreData();
+			progressBar.setVisibility(View.VISIBLE);
+		}
 		
 	}
 
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
-		// TODO Auto-generated method stub
+		visibleLastIndex = firstVisibleItem + visibleItemCount - 1;
+		if (totalItemCount == totalItem) {
+			getListView().removeFooterView(loadMoreView);
+		}
 		
 	}
+	private long exitTime = 0;
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			exit();
+			return false;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	public void exit() {
+		if ((System.currentTimeMillis() - exitTime) > 2000) {
+			Toast.makeText(getApplicationContext(), "再按一次退出剃头",
+					Toast.LENGTH_SHORT).show();
+			exitTime = System.currentTimeMillis();
+		} else {
+			finish();
+			System.exit(0);
+		}
+	
+	}
+	
+
 }

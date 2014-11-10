@@ -4,7 +4,7 @@ public class NearBarberShop {
 	private String SName;
 	private String SDis;
 	private String SAddress;
-	private float SDistance;
+	private String SDistance;
 	private float PriceStar;
 	private float ServiceStar;
 	private int OrderAddup;
@@ -31,10 +31,10 @@ public class NearBarberShop {
 	public void setSAddress(String sAddress) {
 		SAddress = sAddress;
 	}
-	public float getSDistance() {
+	public String getSDistance() {
 		return SDistance;
 	}
-	public void setSDistance(float sDistance) {
+	public void setSDistance(String sDistance) {
 		SDistance = sDistance;
 	}
 	public float getPriceStar() {

@@ -186,9 +186,9 @@ public class BaseApplication extends Application {
 		initImageLoader(getApplicationContext());
 		networkType = setNetworkType();
 		// 启动定位
-		LBSLocation.getInstance(this).startLocation();
-		mCurrentcity = currlocation.getCity();
-		Log.i("定位获取的城市名", mCurrentcity);
+//		LBSLocation.getInstance(this).startLocation();
+//		mCurrentcity = currlocation.getCity();
+//		Log.i("定位获取的城市名", mCurrentcity);
 	}
 
 	@Override
