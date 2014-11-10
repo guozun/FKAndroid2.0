@@ -5,8 +5,8 @@ public class NearBarberShop {
 	private String SDis;
 	private String SAddress;
 	private String SDistance;
-	private float PriceStar;
-	private float ServiceStar;
+	private double PriceStar;
+	private double ServiceStar;
 	private int OrderAddup;
 	private String imageurl;
 	private String webUrl;
@@ -37,16 +37,16 @@ public class NearBarberShop {
 	public void setSDistance(String sDistance) {
 		SDistance = sDistance;
 	}
-	public float getPriceStar() {
+	public double getPriceStar() {
 		return PriceStar;
 	}
-	public void setPriceStar(float priceStar) {
+	public void setPriceStar(double priceStar) {
 		PriceStar = priceStar;
 	}
-	public float getServiceStar() {
+	public double getServiceStar() {
 		return ServiceStar;
 	}
-	public void setServiceStar(float serviceStar) {
+	public void setServiceStar(double serviceStar) {
 		ServiceStar = serviceStar;
 	}
 	public int getOrderAddup() {

@@ -2,12 +2,21 @@ package com.blackswan.fake.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.ListActivity;
+import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,17 +38,36 @@ import com.blackswan.fake.R;
 import com.blackswan.fake.adapter.BarbershopListAdapter;
 import com.blackswan.fake.adapter.CategoryListAdapter;
 import com.blackswan.fake.base.BaseApplication;
+import com.blackswan.fake.bean.MyRegion;
 import com.blackswan.fake.bean.NearBarberShop;
+import com.blackswan.fake.bean.PopCity;
 import com.blackswan.fake.util.LBSCloudSearch;
+import com.blackswan.fake.util.PopCityUtils;
 import com.blackswan.fake.view.FakeRefreshListView;
 import com.blackswan.fake.view.FakeRefreshListView.OnCancelListener;
 import com.blackswan.fake.view.FakeRefreshListView.OnRefreshListener;
 
 public class BarberShopActivity extends ListActivity implements OnItemClickListener, OnRefreshListener, OnCancelListener,OnScrollListener
 {
+	
+	private Context context;
+	BaseApplication application= (BaseApplication) getApplication();
+	public static final int MSG_NET_TIMEOUT = 100;
+	public static final int MSG_NET_STATUS_ERROR = 200;
+	public static final int MSG_NET_SUCC = 1;
+	public static final int MSG_DISTRICT = 3;
+
+	private boolean initSearchFlag = false;
+
+	private RelativeLayout progress;
+	
 	private TextView text1;
 	private TextView text2;
 	private TextView text3;
+	private ArrayList<MyRegion> regions;
+	private PopCityUtils cityUtils;
+	private PopCity city;
+	int last, current;
 	
 	private PopupWindow mPopWin;
 	private LinearLayout layout;
@@ -56,30 +85,71 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 	private ArrayList<HashMap<String,Object>> itemList;
 	
 	private LinearLayout linLayout;
-	private String title[]= {"环翠区","高新技术开发区","经济开发区","文登区"};
+	
+	/*
+	 * 处理网络请求
+	 */
+	private final Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			progress.setVisibility(View.INVISIBLE);
+			switch (msg.what) {
+			case MSG_NET_TIMEOUT:
+				break;
+			case MSG_NET_STATUS_ERROR:
+				break;
+			case MSG_NET_SUCC:
+				initSearchFlag = true;
+				String result = msg.obj.toString();
+				try {
+					JSONObject json = new JSONObject(result);
+					parser(json);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				break;
+			case MSG_DISTRICT:
+				regions = (ArrayList<MyRegion>) msg.obj;
+				break;
+			}
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_barbershop);
+		String cname=application.preferences.getString("city3", null);
+		if (cname == null) {
+			cname = application.mCurrentcity;
+		}
+		cityUtils.initDistricts(cname);
+		
 		initViews();
 		initEvents();
 		final ListView listView = getListView();
 		listView.setItemsCanFocus(false);
-//		listView.addFooterView(loadMoreView);
 		listView.setOnScrollListener(this);
 		
-		barbershopListAdapter = new BarbershopListAdapter((BaseApplication)getApplication(),BarberShopActivity.this, barberShops);
-		setListAdapter(barbershopListAdapter);
-
 		BaseApplication app = (BaseApplication) getApplication();
+		barbershopListAdapter = new BarbershopListAdapter(app,BarberShopActivity.this, barberShops);
+		setListAdapter(barbershopListAdapter);
 		app.setBarbershops(barberShops);
 		app.setBarbershopListAdapter(barbershopListAdapter);
 		app.setBarberShopActivity(this);
 		
 	}
-	
+	@Override
+	protected void onResume() {
+		String cname=application.preferences.getString("city3", null);
+		if (cname == null) {
+			cname = application.mCurrentcity;
+		}
+		cityUtils.initDistricts(cname);
+		super.onResume();
+	}
 	protected void initViews() {
 		text1 = (TextView) findViewById(R.id.barbershop_text1);
 		text2 = (TextView) findViewById(R.id.barbershop_text2);
@@ -133,9 +203,9 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 		itemList = new ArrayList<HashMap<String,Object>>();
 		layout = (LinearLayout) LayoutInflater.from(BarberShopActivity.this).inflate(R.layout.popup_category, null);
 		rootList = (ListView) layout.findViewById(R.id.rootcategory);
-		for(int i=0;i<title.length;i++){
+		for(int i=0;i<regions.size();i++){
 			HashMap<String,Object> items = new HashMap<String,Object>();
-			items.put("name", title[i]);
+			items.put("name", regions.get(i).getName());
 			items.put("count", i*5+4);
 			itemList.add(items);
 		}
@@ -171,7 +241,110 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 			}
 		});
 	}
+	
+	/*
+	 * 云检索发起
+	 */
+	private void search() {
+		search(LBSCloudSearch.SEARCH_TYPE_LOCAL);
+	}
+	/*
+	 * 获取云检索参数
+	 */
+	private HashMap<String, String> getRequestParams() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		return map;
+	}
+	/*
+	 * 根据搜索类型发起检索
+	 */
+	private void search(int searchType){
+		progress.setVisibility(View.VISIBLE);
+		BaseApplication app = BaseApplication.getmInstance();
+		app.getBarbershops().clear(); // 搜索前清空列表
+		app.getBarberShopActivity().loadMoreView.setVisibility(View.INVISIBLE);
+		if (app.getBarberShopActivity().getListView().getFooterViewsCount() == 0) {
+			// 点击查看更多按钮添加
+			app.getBarberShopActivity().getListView()
+					.addFooterView(app.getBarberShopActivity().loadMoreView);
+		}
 
+		app.getBarberShopActivity().getListView().setAdapter(app.getBarbershopListAdapter());
+
+		// 云检索发起
+		LBSCloudSearch.request(searchType, getRequestParams(), mHandler,
+				BaseApplication.networkType);
+	}
+	
+	/*
+	 * 解析返回数据
+	 */
+	private void parser(JSONObject json) {
+		BaseApplication app = (BaseApplication) getApplication();
+		List<NearBarberShop> list = app.getBarbershops();
+
+		try {
+			app.getBarberShopActivity().totalItem = json.getInt("total");
+
+			JSONArray jsonArray = json.getJSONArray("contents");
+			if (jsonArray != null && jsonArray.length() <= 0) {
+				Toast.makeText(context, "没有符合要求的数据", Toast.LENGTH_SHORT).show();
+			} else {
+				for (int i = 0; i < jsonArray.length(); i++) {
+					JSONObject jsonObject2 = (JSONObject) jsonArray.opt(i);
+					NearBarberShop content = new NearBarberShop();
+					content.setSName(jsonObject2.getString("title"));
+					content.setSAddress(jsonObject2.getString("address"));
+
+					JSONArray locArray = jsonObject2.getJSONArray("location");
+					double latitude = locArray.getDouble(1);
+					double longitude = locArray.getDouble(0);
+					content.setLatitude(latitude);
+					content.setLongitude(longitude);
+
+					float results[] = new float[1];
+
+					if (app.currlocation != null) {
+						Location.distanceBetween(
+								app.currlocation.getLatitude(),
+								app.currlocation.getLongitude(), latitude,
+								longitude, results);
+					}
+					content.setSDistance((int) results[0]/1000 + "km");
+
+					content.setSDis(jsonObject2.getString("discotent"));
+					content.setImageurl(jsonObject2.getString("imageurl"));
+					//设置为访问发客数据操作链接
+					content.setWebUrl(jsonObject2.getString("roomurl"));
+					content.setOrderAddup(jsonObject2.getInt("orderaddup"));
+					content.setPriceStar(jsonObject2.getDouble("pricestar"));
+					content.setServiceStar(jsonObject2.getDouble("servicestar"));
+					list.add(content);
+				}
+
+			}
+			if (list.size() < 15) {
+				app.getBarberShopActivity().getListView()
+						.removeFooterView(app.getBarberShopActivity().loadMoreView);
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		BarbershopListAdapter adapter = ((BaseApplication) getApplication())
+				.getBarbershopListAdapter();
+		if (adapter != null) {
+			adapter.notifyDataSetChanged();
+			app.getBarberShopActivity().loadMoreView.setVisibility(View.VISIBLE);
+			app.getBarberShopActivity().progressBar.setVisibility(View.INVISIBLE);
+		}
+		if (app.getBaiduMapActivity() != null) {
+			app.getBaiduMapActivity().removeAllMarker();
+			app.getBaiduMapActivity().addAllMarker();
+		}
+	}
+	
 	/**
 	 * 加载更多数据
 	 */
@@ -241,6 +414,5 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 		}
 	
 	}
-	
 
 }
