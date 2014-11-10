@@ -9,7 +9,6 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Entity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.View;

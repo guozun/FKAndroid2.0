@@ -61,7 +61,7 @@
         </LinearLayout>
             
     </RelativeLayout>
-	<com.blackswan.fake.view.FaKeRefreshExpandableList
+	<com.blackswan.fake.view.FakeRefreshListView
         android:id="@+id/nearbarbershop_reflist"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -69,6 +69,11 @@
         android:divider="@null"
         android:fadingEdge="none"
         android:listSelector="@drawable/list_selector_transition" >
-    </com.blackswan.fake.view.FaKeRefreshExpandableList>
+    </com.blackswan.fake.view.FakeRefreshListView> 
+     <ListView
+           android:id="@+id/listView1"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent" >
+                    </ListView>                                     
 
 </LinearLayout>
