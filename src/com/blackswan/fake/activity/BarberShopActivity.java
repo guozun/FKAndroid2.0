@@ -2,30 +2,39 @@ package com.blackswan.fake.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.app.ListActivity;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackswan.fake.R;
+import com.blackswan.fake.adapter.BarbershopListAdapter;
 import com.blackswan.fake.adapter.CategoryListAdapter;
-import com.blackswan.fake.base.BaseActivity;
+import com.blackswan.fake.base.BaseApplication;
+import com.blackswan.fake.bean.NearBarberShop;
+import com.blackswan.fake.util.LBSCloudSearch;
+import com.blackswan.fake.view.FakeRefreshListView;
 import com.blackswan.fake.view.FakeRefreshListView.OnCancelListener;
 import com.blackswan.fake.view.FakeRefreshListView.OnRefreshListener;
 
-public class BarberShopActivity extends BaseActivity implements OnItemClickListener, OnRefreshListener, OnCancelListener
+public class BarberShopActivity extends ListActivity implements OnItemClickListener, OnRefreshListener, OnCancelListener,OnScrollListener
 {
 	private TextView text1;
 	private TextView text2;
@@ -36,31 +45,52 @@ public class BarberShopActivity extends BaseActivity implements OnItemClickListe
 	private ListView rootList;
 	private ListView childList;
 	private FrameLayout flChild;
+	public FakeRefreshListView refreshListView;
+	public View loadMoreView;
+	public ProgressBar progressBar;
+	private int visibleLastIndex = 0;   //最后的可视项索引 
+	public int totalItem = -1; 
+	private BarbershopListAdapter barbershopListAdapter;
+	private List<NearBarberShop> barberShops = new ArrayList<NearBarberShop>();
 	
 	private ArrayList<HashMap<String,Object>> itemList;
 	
 	private LinearLayout linLayout;
 	private String title[]= {"环翠区","高新技术开发区","经济开发区","文登区"};
-	//private ListView lv_barbershop;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_barbershop);
-		initPopupWindow();
-//		lv_barbershop = (ListView) findViewById(R.id.lv_barbershop);
-//		BarbershopListAdapter adapter = new BarbershopListAdapter();
-//		lv_barbershop.setAdapter(adapter);
+		initViews();
+		initEvents();
+		final ListView listView = getListView();
+		listView.setItemsCanFocus(false);
+//		listView.addFooterView(loadMoreView);
+		listView.setOnScrollListener(this);
+		
+		barbershopListAdapter = new BarbershopListAdapter((BaseApplication)getApplication(),BarberShopActivity.this, barberShops);
+		setListAdapter(barbershopListAdapter);
+
+		BaseApplication app = (BaseApplication) getApplication();
+		app.setBarbershops(barberShops);
+		app.setBarbershopListAdapter(barbershopListAdapter);
+		app.setBarberShopActivity(this);
+		
 	}
-	private void initPopupWindow() {
-		itemList = new ArrayList<HashMap<String,Object>>();
+	
+	protected void initViews() {
 		text1 = (TextView) findViewById(R.id.barbershop_text1);
 		text2 = (TextView) findViewById(R.id.barbershop_text2);
 		text3 = (TextView) findViewById(R.id.barbershop_text3);
 		linLayout = (LinearLayout) findViewById(R.id.barbershop);
-		
+		loadMoreView = getLayoutInflater().inflate(R.layout.list_item_footer, null);
+		progressBar = (ProgressBar)loadMoreView.findViewById(R.id.progressBar);
+		refreshListView = (FakeRefreshListView) findViewById(R.id.nearbarbershop_reflist);
+	}
+	
+	protected void initEvents() {
 		text1.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -86,7 +116,17 @@ public class BarberShopActivity extends BaseActivity implements OnItemClickListe
 				showPopupWindow(linLayout.getWidth(),linLayout.getHeight());
 			}
 		});
+		
+		loadMoreView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				loadMoreData();
+				progressBar.setVisibility(View.VISIBLE);
+			}
+		});
+		
 	}
+	
 	@SuppressLint("InflateParams")
 	private void showPopupWindow(int width, int height) {
 		
@@ -132,6 +172,54 @@ public class BarberShopActivity extends BaseActivity implements OnItemClickListe
 		});
 	}
 
+	/**
+	 * 加载更多数据
+	 */
+	private void loadMoreData() {
+		HashMap<String, String> filterParams = BaseApplication.getmInstance().getFilterParams();
+		filterParams.put("page_index", (barberShops.size()/10 + 1) + "");
+		// search type 为 -1，将保持当前的搜索类型
+		LBSCloudSearch.request(-1,filterParams, BaseApplication.getmInstance().getHandler(), BaseApplication.networkType);
+	}
+	
+	@Override
+	public void onCancel() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onRefresh() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		int itemsLastIndex = barbershopListAdapter.getCount() - 1; // 数据集最后一项的索引
+		int lastIndex = itemsLastIndex + 1;
+		if (scrollState == OnScrollListener.SCROLL_STATE_IDLE
+				&& visibleLastIndex == lastIndex) {
+			loadMoreData();
+			progressBar.setVisibility(View.VISIBLE);
+		}
+		
+	}
+
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem,
+			int visibleItemCount, int totalItemCount) {
+		visibleLastIndex = firstVisibleItem + visibleItemCount - 1;
+		if (totalItemCount == totalItem) {
+			getListView().removeFooterView(loadMoreView);
+		}
+		
+	}
 	private long exitTime = 0;
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -153,30 +241,6 @@ public class BarberShopActivity extends BaseActivity implements OnItemClickListe
 		}
 	
 	}
-	@Override
-	protected void initViews() {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	protected void initEvents() {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void onCancel() {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void onRefresh() {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
-		// TODO Auto-generated method stub
-		
-	}
+	
+
 }

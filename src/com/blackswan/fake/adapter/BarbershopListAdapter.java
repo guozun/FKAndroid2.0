@@ -25,7 +25,7 @@ import com.blackswan.fake.view.HandyTextView;
 public class BarbershopListAdapter extends BaseObjectListAdapter
 {
 	public BarbershopListAdapter(BaseApplication application, Context context,
-			List<? extends Entity> datas) {
+			List<?> datas) {
 		super(application, context, datas);
 	}
 
@@ -60,8 +60,8 @@ public class BarbershopListAdapter extends BaseObjectListAdapter
 		holder.barbershop_discontent.setText((String)barberShop.getSDis() + "");
 		holder.servicestarcount.setText((float)barberShop.getServiceStar() + "");
 		holder.pricestarcount.setText((float)barberShop.getPriceStar() + "");
-		holder.addupcount.setText((float)barberShop.getOrderAddup() + "»À");
-		holder.distancecount.setText((float)barberShop.getSDistance() + "Km");
+		holder.addupcount.setText((int)barberShop.getOrderAddup() + "»À");
+		holder.distancecount.setText((String)barberShop.getSDistance());
 		holder.barbershopavatar.setImageBitmap(getBitmapFromUrl((String)barberShop.getImageurl()));
 		holder.pricestar.setImageBitmap(displayStar((float)barberShop.getPriceStar()));
 		holder.servicestar.setImageBitmap(displayStar((float)barberShop.getServiceStar()));

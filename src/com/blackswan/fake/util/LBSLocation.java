@@ -2,6 +2,7 @@ package com.blackswan.fake.util;
 
 
 import android.location.Location;
+import android.util.Log;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -46,8 +47,9 @@ public class LBSLocation {
 	public void startLocation() {
 		LocationClientOption option = new LocationClientOption();
 		option.setOpenGps(true);
-		option.setIsNeedAddress(true);
+		option.setAddrType("all");// 返回的定位结果包含地址信息
 		option.setCoorType("bd09ll");// 返回的定位结果是百度经纬度,默认值gcj02
+		option.disableCache(true);// 禁止启用缓存定位
 		mLocationClient.setLocOption(option);
 		mLocationClient.requestLocation();
 	}
@@ -61,6 +63,7 @@ public class LBSLocation {
 			if (location == null)
 				return;
 			app.currlocation = location;
+			Log.e("定位",location.getAddrStr());
 			mLocationClient.stop();
 			
 			//根据当前位置，计算列表中每一项的距离
@@ -73,7 +76,7 @@ public class LBSLocation {
 							content.getLongitude(), results);
 				}
 				float distance = results[0]/1000;
-				content.setSDistance((Float) (distance == 0.0 ? "" : (float) results[0]));
+				content.setSDistance(distance == 0.0 ? "" : results[0]/1000 + "km");
 			}
 			//刷新列表
 			app.getBarbershopListAdapter().notifyDataSetChanged();

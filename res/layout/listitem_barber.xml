@@ -30,6 +30,8 @@
                 android:background="@drawable/bglistitem_selector_session_select"
                 android:duplicateParentState="true"
                 android:scaleType="fitXY" />
+            
+
         </FrameLayout>
 
         <LinearLayout

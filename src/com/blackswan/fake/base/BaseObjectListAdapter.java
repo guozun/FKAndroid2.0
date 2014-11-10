@@ -19,10 +19,10 @@ public class BaseObjectListAdapter extends BaseAdapter {
 	protected BaseApplication mApplication;
 	protected Context mContext;
 	protected LayoutInflater mInflater;
-	protected List<? extends Entity> mDatas = new ArrayList<Entity>();
+	protected List<?> mDatas = new ArrayList<Entity>();
 
 	public BaseObjectListAdapter(BaseApplication application, Context context,
-			List<? extends Entity> datas) {
+			List<?> datas) {
 		mApplication = application;
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
@@ -51,7 +51,7 @@ public class BaseObjectListAdapter extends BaseAdapter {
 		return null;
 	}
 
-	public List<? extends Entity> getDatas() {
+	public List<?> getDatas() {
 		return mDatas;
 	}
 

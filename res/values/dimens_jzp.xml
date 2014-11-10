@@ -3,6 +3,14 @@
 
     <!-- hairdo里面 Bar文字大小设置 -->
     <dimen name="size_hairdo_bar_text">30sp</dimen>
-    
+    <dimen name="size_hairdo_detail_image">30dp</dimen>
+    <dimen name="size_hairdo_detail_barber_textview">12sp</dimen>
+
+    <color name="hairdo_bar">#005752</color>
+
+    <declare-styleable name="CircleImageView">
+        <attr name="border_width" format="dimension" />
+        <attr name="border_color" format="color" />
+    </declare-styleable>
 
 </resources>

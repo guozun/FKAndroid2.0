@@ -146,7 +146,8 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 				startActivity(intent);
 				break;
 			case R.id.homepagemap:
-//				Intent intent2 = new Intent(HomePageActivity.this,BaiduMapActivity.class);
+				Intent intent2 = new Intent(HomePageActivity.this,BaiduMapActivity.class);
+				startActivity(intent2);
 				break;
 			case R.id.ll_city:
 				Intent intent3 = new Intent(HomePageActivity.this,SelectCityActivity.class);

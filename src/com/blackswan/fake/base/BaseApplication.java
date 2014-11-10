@@ -1,10 +1,6 @@
 package com.blackswan.fake.base;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,26 +24,23 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.baidu.location.BDLocation;
-import com.baidu.location.LocationClient;
 import com.blackswan.fake.R;
-import com.blackswan.fake.util.FileUtils;
-import com.nostra13.universalimageloader.cache.disc.impl.ext.LruDiscCache;
-import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
-import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
-import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
+import com.blackswan.fake.activity.BaiduMapActivity;
 import com.blackswan.fake.activity.BarberActivity;
 import com.blackswan.fake.activity.BarberShopActivity;
 import com.blackswan.fake.adapter.BarberListAdapter;
 import com.blackswan.fake.adapter.BarbershopListAdapter;
 import com.blackswan.fake.bean.NearBarber;
 import com.blackswan.fake.bean.NearBarberShop;
+import com.blackswan.fake.util.FileUtils;
 import com.blackswan.fake.util.LBSLocation;
+import com.nostra13.universalimageloader.cache.disc.impl.ext.LruDiscCache;
+import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 public class BaseApplication extends Application {
 	private Bitmap mDefaultAvatar;
@@ -80,18 +73,8 @@ public class BaseApplication extends Application {
 	
 	private BarberShopActivity barberShopActivity;
 	private BarberActivity barberActivity;
-//	private BaiduMapActivity baiduMapActivity;
+	private BaiduMapActivity baiduMapActivity;
 	
-	
-	private static final String AVATAR_DIR = "avatar/";
-	private static final String PHOTO_ORIGINAL_DIR = "photo/original/";
-	private static final String PHOTO_THUMBNAIL_DIR = "photo/thumbnail/";
-	private static final String STATUS_PHOTO_DIR = "statusphoto/";
-	public Map<String, SoftReference<Bitmap>> mAvatarCache = new HashMap<String, SoftReference<Bitmap>>();
-	public Map<String, SoftReference<Bitmap>> mPhotoOriginalCache = new HashMap<String, SoftReference<Bitmap>>();
-	public Map<String, SoftReference<Bitmap>> mPhotoThumbnailCache = new HashMap<String, SoftReference<Bitmap>>();
-	public Map<String, SoftReference<Bitmap>> mStatusPhotoCache = new HashMap<String, SoftReference<Bitmap>>();
-
 	public static List<String> mEmoticons = new ArrayList<String>();
 	public static Map<String, Integer> mEmoticonsId = new HashMap<String, Integer>();
 	public static List<String> mEmoticons_Zem = new ArrayList<String>();
@@ -161,6 +144,14 @@ public class BaseApplication extends Application {
 		this.barberActivity = barberActivity;
 	}
 
+	public BaiduMapActivity getBaiduMapActivity() {
+		return baiduMapActivity;
+	}
+
+	public void setBaiduMapActivity(BaiduMapActivity baiduMapActivity) {
+		this.baiduMapActivity = baiduMapActivity;
+	}
+
 	public static BaseApplication getmInstance() {
 		return mInstance;
 	}
@@ -191,14 +182,13 @@ public class BaseApplication extends Application {
 		
 		//创建系统用SharedPrefernces文件
 		preferences = getSharedPreferences("fake", MODE_PRIVATE);
-		// 获取当前用户位置
 		//初始化 图片引擎
 		initImageLoader(getApplicationContext());
 		networkType = setNetworkType();
 		// 启动定位
-		LBSLocation.getInstance(this).startLocation();
-		mCurrentcity = currlocation.getCity();
-		Log.i("定位获取的城市名", mCurrentcity);
+//		LBSLocation.getInstance(this).startLocation();
+//		mCurrentcity = currlocation.getCity();
+//		Log.i("定位获取的城市名", mCurrentcity);
 	}
 
 	@Override
@@ -213,140 +203,6 @@ public class BaseApplication extends Application {
 		Log.e("BaseApplication", "onTerminate");
 	}
 
-	public Bitmap getAvatar(String imageName) {
-		if (mAvatarCache.containsKey(imageName)) {
-			Reference<Bitmap> reference = mAvatarCache.get(imageName);
-			if (reference.get() == null || reference.get().isRecycled()) {
-				mAvatarCache.remove(imageName);
-			} else {
-				return reference.get();
-			}
-		}
-		InputStream is = null;
-		Bitmap bitmap = null;
-		try {
-			is = getAssets().open(AVATAR_DIR + imageName);
-			bitmap = BitmapFactory.decodeStream(is);
-			if (bitmap == null) {
-				throw new FileNotFoundException(imageName + "is not find");
-			}
-			mAvatarCache.put(imageName, new SoftReference<Bitmap>(bitmap));
-			return bitmap;
-		} catch (Exception e) {
-			return mDefaultAvatar;
-		} finally {
-			try {
-				if (is != null) {
-					is.close();
-					is = null;
-				}
-			} catch (IOException e) {
-
-			}
-		}
-	}
-
-	public Bitmap getPhotoOriginal(String imageName) {
-		if (mPhotoOriginalCache.containsKey(imageName)) {
-			Reference<Bitmap> reference = mPhotoOriginalCache.get(imageName);
-			if (reference.get() == null || reference.get().isRecycled()) {
-				mPhotoOriginalCache.remove(imageName);
-			} else {
-				return reference.get();
-			}
-		}
-		InputStream is = null;
-		Bitmap bitmap = null;
-		try {
-			is = getAssets().open(PHOTO_ORIGINAL_DIR + imageName);
-			bitmap = BitmapFactory.decodeStream(is);
-			if (bitmap == null) {
-				throw new FileNotFoundException(imageName + "is not find");
-			}
-			mPhotoOriginalCache.put(imageName,
-					new SoftReference<Bitmap>(bitmap));
-			return bitmap;
-		} catch (Exception e) {
-			return null;
-		} finally {
-			try {
-				if (is != null) {
-					is.close();
-					is = null;
-				}
-			} catch (IOException e) {
-
-			}
-		}
-	}
-
-	public Bitmap getPhotoThumbnail(String imageName) {
-		if (mPhotoThumbnailCache.containsKey(imageName)) {
-			Reference<Bitmap> reference = mPhotoThumbnailCache.get(imageName);
-			if (reference.get() == null || reference.get().isRecycled()) {
-				mPhotoThumbnailCache.remove(imageName);
-			} else {
-				return reference.get();
-			}
-		}
-		InputStream is = null;
-		Bitmap bitmap = null;
-		try {
-			is = getAssets().open(PHOTO_THUMBNAIL_DIR + imageName);
-			bitmap = BitmapFactory.decodeStream(is);
-			if (bitmap == null) {
-				throw new FileNotFoundException(imageName + "is not find");
-			}
-			mPhotoThumbnailCache.put(imageName, new SoftReference<Bitmap>(
-					bitmap));
-			return bitmap;
-		} catch (Exception e) {
-			return null;
-		} finally {
-			try {
-				if (is != null) {
-					is.close();
-					is = null;
-				}
-			} catch (IOException e) {
-
-			}
-		}
-	}
-
-	public Bitmap getStatusPhoto(String imageName) {
-		if (mStatusPhotoCache.containsKey(imageName)) {
-			Reference<Bitmap> reference = mStatusPhotoCache.get(imageName);
-			if (reference.get() == null || reference.get().isRecycled()) {
-				mStatusPhotoCache.remove(imageName);
-			} else {
-				return reference.get();
-			}
-		}
-		InputStream is = null;
-		Bitmap bitmap = null;
-		try {
-			is = getAssets().open(STATUS_PHOTO_DIR + imageName);
-			bitmap = BitmapFactory.decodeStream(is);
-			if (bitmap == null) {
-				throw new FileNotFoundException(imageName + "is not find");
-			}
-			mStatusPhotoCache.put(imageName, new SoftReference<Bitmap>(bitmap));
-			return bitmap;
-		} catch (Exception e) {
-			return null;
-		} finally {
-			try {
-				if (is != null) {
-					is.close();
-					is = null;
-				}
-			} catch (IOException e) {
-
-			}
-		}
-	}
-	
 	/**
 	 * 设置手机网络类型，wifi，cmwap，ctwap，用于联网参数选择
 	 * @return
