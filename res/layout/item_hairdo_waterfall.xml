@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <ImageView
+        android:id="@+id/iv_hairdo_item_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:adjustViewBounds="true"
+        android:clickable="true"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:layout_gravity="bottom"
+        android:alpha="0.4"
+        android:background="@color/dark_gray"
+        android:layout_alignParentBottom="true"
+        android:duplicateParentState="true" />
+
+    <ImageView
+        android:id="@+id/iv_hairdo_item_good"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:paddingBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:duplicateParentState="true"
+        android:src="@drawable/iv_good" />
+
+    <TextView
+        android:id="@+id/tv_hairdo_item_good"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@id/iv_hairdo_item_good"
+        android:textColor="@color/white" />
+
+    <TextView
+        android:id="@+id/tv_hairdo_item_bad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
+        android:textColor="@color/white" />
+
+    <ImageView
+        android:id="@+id/iv_hairdo_item_bad"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+       android:layout_alignParentBottom="true"
+        android:paddingBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_toLeftOf="@id/tv_hairdo_item_bad"
+        android:duplicateParentState="true"
+        android:src="@drawable/iv_bad" />
+
+</RelativeLayout>
