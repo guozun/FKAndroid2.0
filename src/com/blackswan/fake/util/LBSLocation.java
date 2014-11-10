@@ -1,7 +1,6 @@
 package com.blackswan.fake.util;
 
 
-import android.location.Location;
 import android.util.Log;
 
 import com.baidu.location.BDLocation;
@@ -9,7 +8,6 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.blackswan.fake.base.BaseApplication;
-import com.blackswan.fake.bean.NearBarberShop;
 
 
 /**
@@ -63,23 +61,24 @@ public class LBSLocation {
 			if (location == null)
 				return;
 			app.currlocation = location;
-			Log.e("定位",location.getAddrStr());
+			app.mCurrentcity = location.getCity();
+			Log.i("定位",location.getAddrStr());
 			mLocationClient.stop();
 			
-			//根据当前位置，计算列表中每一项的距离
-			for (NearBarberShop content : app.getBarbershops()) {
-
-				float results[] = new float[1];
-				if (location != null) {
-					Location.distanceBetween(location.getLatitude(),
-							location.getLongitude(), content.getLatitude(),
-							content.getLongitude(), results);
-				}
-				float distance = results[0]/1000;
-				content.setSDistance(distance == 0.0 ? "" : results[0]/1000 + "km");
-			}
+//			//根据当前位置，计算列表中每一项的距离
+//			for (NearBarberShop content : app.getBarbershops()) {
+//
+//				float results[] = new float[1];
+//				if (location != null) {
+//					Location.distanceBetween(location.getLatitude(),
+//							location.getLongitude(), content.getLatitude(),
+//							content.getLongitude(), results);
+//				}
+//				float distance = results[0]/1000;
+//				content.setSDistance(distance == 0.0 ? "" : results[0]/1000 + "km");
+//			}
 			//刷新列表
-			app.getBarbershopListAdapter().notifyDataSetChanged();
+//			app.getBarbershopListAdapter().notifyDataSetChanged();
 			
 		}
 
