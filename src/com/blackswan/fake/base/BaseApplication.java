@@ -49,7 +49,7 @@ public class BaseApplication extends Application {
 	SharedPreferences.Editor editor;  
     Context context;
     private static BaseApplication mInstance = null;
-    public static final String strKey = "O65sXI7ksbsVeaMXI7aF94gf";
+    public static final String strKey = "UrM2iFVED4LwwRbUI21Dp7zp";
 
 	// 定位结果
 	public BDLocation currlocation = null;
@@ -186,7 +186,9 @@ public class BaseApplication extends Application {
 		initImageLoader(getApplicationContext());
 		networkType = setNetworkType();
 		// 启动定位
-		LBSLocation.getInstance(this).startLocation();
+//		LBSLocation.getInstance(this).startLocation();
+//		mCurrentcity = currlocation.getCity();
+//		Log.i("定位获取的城市名", mCurrentcity);
 	}
 
 	@Override
