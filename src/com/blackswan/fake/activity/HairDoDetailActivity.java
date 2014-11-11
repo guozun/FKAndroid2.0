@@ -22,14 +22,16 @@ import com.blackswan.fake.R;
 import com.blackswan.fake.base.BaseActivity;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
-public class HairDoDetailActivity extends BaseActivity implements ViewFactory,
+public class HairDoDetailActivity extends BaseActivity implements
 		OnTouchListener {
 
 	private TextView barber;
 	private ImageView barberpic;
-	private ImageSwitcher mImageSwitcher;
+	private ImageView hairdoImage;
 	private DisplayImageOptions options;
 	private Button order;
 	// ImageSwitch
@@ -61,7 +63,7 @@ public class HairDoDetailActivity extends BaseActivity implements ViewFactory,
 	protected void initViews() {
 		barber = (TextView) findViewById(R.id.tv_hairdo_detail_barber);
 		barberpic = (ImageView) findViewById(R.id.iv_rotat_hairdo_detail);
-		mImageSwitcher = (ImageSwitcher) findViewById(R.id.is_hairdo_detail_pic);
+		hairdoImage = (ImageView) findViewById(R.id.iv_hairdo_detail_pic);
 		order = (Button) findViewById(R.id.bt_hairdo_detail_order);
 
 		barber.setText("11111");
@@ -71,10 +73,14 @@ public class HairDoDetailActivity extends BaseActivity implements ViewFactory,
 				// TODO 进行预约操作
 			}
 		});
-		ImageLoader.getInstance().displayImage("http://img0.bdstatic.com/img/image/shouye/mnnll-14204092064.jpg",
-				barberpic, options);
-		mImageSwitcher.setFactory(this);
-		mImageSwitcher.setOnTouchListener(this);
+		hairdoImage.setOnTouchListener(this);
+		ImageLoader
+				.getInstance()
+				.displayImage(
+						"http://img0.bdstatic.com/img/image/shouye/mnnll-14204092064.jpg",
+						barberpic, options);
+		ImageLoader.getInstance().displayImage(imgUrl.get(currentPosition),
+				hairdoImage, options);
 	}
 
 	@Override
@@ -83,17 +89,6 @@ public class HairDoDetailActivity extends BaseActivity implements ViewFactory,
 
 	}
 
-	@Override
-	public View makeView() {
-		final ImageView i = new ImageView(this);
-		i.setScaleType(ScaleType.CENTER_CROP);
-		i.setLayoutParams(new ImageSwitcher.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT)); 
-		return i;
-	}
-
-	private void  showNext(){
-		ImageView i =mImageSwitcher.getBackground().;
-	}
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		switch (event.getAction()) {
@@ -107,17 +102,50 @@ public class HairDoDetailActivity extends BaseActivity implements ViewFactory,
 			// 抬起的时候的X坐标大于按下的时候就显示上一张图片
 			if (lastX > downX) {
 				if (currentPosition > 0) {
-					// 设置动画，这里的动画比较简单，不明白的去网上看看相关内容
-					TranslateAnimation leftInAnimation = new TranslateAnimation(
-							-100, 0, 0, 0);
-					leftInAnimation.setDuration(500);
-					mImageSwitcher.setInAnimation(leftInAnimation);
-					TranslateAnimation RightOutAnimation = new TranslateAnimation(
-							0, 100, 0, 0);
-					RightOutAnimation.setDuration(500);
-					mImageSwitcher.setOutAnimation(RightOutAnimation);
+					// TranslateAnimation leftInAnimation = new
+					// TranslateAnimation(
+					// -100, 0, 0, 0);
+					// leftInAnimation.setDuration(500);
+					// mImageSwitcher.setInAnimation(leftInAnimation);
+					// TranslateAnimation RightOutAnimation = new
+					// TranslateAnimation(
+					// 0, 100, 0, 0);
+					// RightOutAnimation.setDuration(500);
+					// mImageSwitcher.setOutAnimation(RightOutAnimation);
+					// currentPosition--;
+					// mImageSwitcher.showPrevious();
 					currentPosition--;
-					mImageSwitcher.showPrevious();
+					ImageLoader.getInstance().displayImage(
+							imgUrl.get(currentPosition), hairdoImage, options,
+							new ImageLoadingListener() {
+
+								@Override
+								public void onLoadingStarted(String imageUri,
+										View view) {
+									// TODO Auto-generated method stub
+
+								}
+
+								@Override
+								public void onLoadingFailed(String imageUri,
+										View view, FailReason failReason) {
+									// TODO Auto-generated method stub
+
+								}
+
+								@Override
+								public void onLoadingComplete(String imageUri,
+										View view, Bitmap loadedImage) {
+									// TODO Auto-generated method stub
+
+								}
+
+								@Override
+								public void onLoadingCancelled(String imageUri,
+										View view) {
+
+								}
+							});
 				} else {
 					Toast.makeText(getApplication(), "已经是第一张",
 							Toast.LENGTH_SHORT).show();
@@ -126,16 +154,48 @@ public class HairDoDetailActivity extends BaseActivity implements ViewFactory,
 
 			if (lastX < downX) {
 				if (currentPosition < imgUrl.size() - 1) {
-					TranslateAnimation rightInAnimation = new TranslateAnimation(
-							100, 0, 0, 0);
-					rightInAnimation.setDuration(500);
-					mImageSwitcher.setInAnimation(rightInAnimation);
-					TranslateAnimation leftOutAnimation = new TranslateAnimation(
-							0, -100, 0, 0);
-					leftOutAnimation.setDuration(500);
-					mImageSwitcher.setOutAnimation(leftOutAnimation);
+					// TranslateAnimation rightInAnimation = new
+					// TranslateAnimation(
+					// 100, 0, 0, 0);
+					// rightInAnimation.setDuration(500);
+					// mImageSwitcher.setInAnimation(rightInAnimation);
+					// TranslateAnimation leftOutAnimation = new
+					// TranslateAnimation(
+					// 0, -100, 0, 0);
+					// leftOutAnimation.setDuration(500);
+					// mImageSwitcher.setOutAnimation(leftOutAnimation);
 					currentPosition++;
-					showNext();
+					ImageLoader.getInstance().displayImage(
+							imgUrl.get(currentPosition), hairdoImage, options,
+							new ImageLoadingListener() {
+
+								@Override
+								public void onLoadingStarted(String imageUri,
+										View view) {
+									// TODO Auto-generated method stub
+
+								}
+
+								@Override
+								public void onLoadingFailed(String imageUri,
+										View view, FailReason failReason) {
+									// TODO Auto-generated method stub
+
+								}
+
+								@Override
+								public void onLoadingComplete(String imageUri,
+										View view, Bitmap loadedImage) {
+									// TODO Auto-generated method stub
+
+								}
+
+								@Override
+								public void onLoadingCancelled(String imageUri,
+										View view) {
+
+								}
+							});
 				} else {
 					Toast.makeText(getApplication(), "到了最后一张",
 							Toast.LENGTH_SHORT).show();

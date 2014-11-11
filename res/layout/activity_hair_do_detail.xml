@@ -33,11 +33,12 @@
         android:layout_width="fill_parent"
         android:layout_height="65dp"
         android:layout_weight="1" >
-        <ImageSwitcher
-            android:id="@+id/is_hairdo_detail_pic"
+
+        <ImageView
+            android:id="@+id/iv_hairdo_detail_pic"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-             />
+            android:layout_height="fill_parent" />
+
         <ImageView
             android:layout_width="fill_parent"
             android:layout_height="55dp"
@@ -55,13 +56,13 @@
             android:layout_marginBottom="10dp"
             android:layout_marginRight="10dp"
             android:background="@color/hairdo_bar"
+            android:minHeight="30dp"
+            android:minWidth="68dp"
             android:paddingBottom="2dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:paddingTop="2dp"
-            android:minWidth="68dp"
-            android:minHeight="30dp"
-			android:text="预约"            
+            android:text="预约"
             android:textColor="@color/white"
             android:textSize="15sp" />
 
@@ -70,10 +71,10 @@
             android:id="@+id/iv_rotat_hairdo_detail"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="15dp"
+            android:layout_alignParentLeft="true"
             android:layout_marginBottom="30dp"
+            android:layout_marginLeft="15dp"
             android:src="@drawable/ic_userpro_tweibo_large"
             app:border_color="@color/white"
             app:border_width="2dp" />
@@ -86,7 +87,6 @@
             android:layout_toRightOf="@id/iv_rotat_hairdo_detail"
             android:textColor="@color/white"
             android:textSize="@dimen/size_hairdo_detail_barber_textview" />
-
     </RelativeLayout>
 
     <RelativeLayout
@@ -95,8 +95,8 @@
         android:layout_height="40dp"
         android:layout_weight="0"
         android:background="@color/hairdo_bar"
-        android:orientation="horizontal" 
-        android:padding="5dp">
+        android:orientation="horizontal"
+        android:padding="5dp" >
 
         <ImageView
             android:id="@+id/iv_hairdo_detail_good"
