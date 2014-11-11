@@ -1,54 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/iv_hairdo_detail_top"
         android:layout_width="fill_parent"
         android:layout_height="50dip"
-        android:background="@drawable/bg_actionbar"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:layout_weight="0"
+        android:background="@drawable/bg_actionbar" >
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+        <ImageView
+            android:id="@+id/iv_hairdo_detail_back"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/bg_back" />
 
-            <ImageView
-                android:id="@+id/iv_hairdo_detail_back"
-                android:layout_width="48dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10dp"
-                android:src="@drawable/bg_back" />
+        <ImageView
+            android:id="@+id/iv_hairdo_detail_share"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/bg_share" />
+    </RelativeLayout>
 
-            <ImageView
-                android:id="@+id/iv_hairdo_detail_share"
-                android:layout_width="48dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="center_vertical"
-                android:layout_marginRight="10dp"
-                android:src="@drawable/bg_share" />
-        </RelativeLayout>
-    </LinearLayout>
-
-    <ImageView
-        android:id="@+id/iv_hairdo_detail_pic"
+    <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/iv_hairdo_detail_top"
-        android:scaleType="centerCrop" 
-        />
+        android:layout_height="65dp"
+        android:layout_weight="1" >
+        <ImageView
+            android:id="@+id/iv_hairdo_detail_pic"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+             />
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="55dp"
+            android:layout_alignParentBottom="true"
+            android:alpha="0.5"
+            android:background="@color/hairdo_bar"
+            android:duplicateParentState="true" />
+
+        <Button
+            android:id="@+id/bt_hairdo_detail_order"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/hairdo_bar"
+            android:paddingBottom="2dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="2dp"
+            android:minWidth="68dp"
+            android:minHeight="30dp"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+
+        <com.blackswan.fake.view.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/iv_rotat_hairdo_detail"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="30dp"
+            android:src="@drawable/ic_userpro_tweibo_large"
+            app:border_color="@color/white"
+            app:border_width="2dp" />
+
+        <TextView
+            android:id="@+id/tv_hairdo_detail_barber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/iv_rotat_hairdo_detail"
+            android:textColor="@color/white"
+            android:textSize="@dimen/size_hairdo_detail_barber_textview" />
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/id_hairdo_detail_bar"
         android:layout_width="fill_parent"
-        android:layout_height="30dp"
-        android:layout_alignParentBottom="true"
+        android:layout_height="40dp"
+        android:layout_weight="0"
         android:background="@color/hairdo_bar"
-        android:orientation="horizontal" >
+        android:orientation="horizontal" 
+        android:padding="5dp">
 
         <ImageView
             android:id="@+id/iv_hairdo_detail_good"
@@ -70,78 +117,4 @@
             android:background="@drawable/btn_bad" />
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="65dp"
-        android:layout_above="@id/id_hairdo_detail_bar" >
-
-        <ImageView
-            android:layout_width="fill_parent"
-            android:layout_height="45dp"
-            android:layout_alignParentBottom="true"
-            android:alpha="0.5"
-            android:background="@color/hairdo_bar"
-            android:duplicateParentState="true" />
-
-        <TextView
-            android:id="@+id/tv_hairdo_detail_order"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@color/hairdo_bar"
-            android:paddingBottom="2dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="2dp"
-            android:text="预约"
-            android:textColor="@color/white"
-            android:textSize="15sp" />
-
-        <com.blackswan.fake.view.RotatingImageView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/iv_rotat_hairdo_detail"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="15dp"
-            android:src="@drawable/ic_userpro_tweibo_large"
-            app:border_color="#FF000000"
-            app:border_width="2dp" />
-
-        <TextView
-            android:id="@+id/tv_hairdo_detail_barber3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white" 
-            
-            android:textSize="@dimen/size_hairdo_detail_barber_textview"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/iv_rotat_hairdo_detail"
-            />
-        <TextView
-            android:id="@+id/tv_hairdo_detail_barber2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white" 
-           
-            android:textSize="@dimen/size_hairdo_detail_barber_textview"
-            android:layout_above="@id/tv_hairdo_detail_barber3"
-            android:layout_toRightOf="@id/iv_rotat_hairdo_detail"
-            />
-        <TextView
-            android:id="@+id/tv_hairdo_detail_barber1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white" 
-           
-            android:textSize="@dimen/size_hairdo_detail_barber_textview"
-            android:layout_above="@id/tv_hairdo_detail_barber2"
-            android:layout_toRightOf="@id/iv_rotat_hairdo_detail"
-            />
-    </RelativeLayout>
-
-</RelativeLayout>
+</LinearLayout>

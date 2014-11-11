@@ -15,13 +15,11 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 public class HairDoDetailActivity extends BaseActivity {
 
-	private TextView barber1;
-	private TextView barber2;
-	private TextView barber3;
+	private TextView barber;
 	private ImageView barberpic;
 	private ImageView hairdopic;
 	private DisplayImageOptions options;
-	private TextView order;
+	private Button order;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,16 +35,12 @@ public class HairDoDetailActivity extends BaseActivity {
 
 	@Override
 	protected void initViews() {
-		barber1 = (TextView)findViewById(R.id.tv_hairdo_detail_barber1);
-		barber2 = (TextView)findViewById(R.id.tv_hairdo_detail_barber2);
-		barber3 = (TextView)findViewById(R.id.tv_hairdo_detail_barber3);
+		barber = (TextView)findViewById(R.id.tv_hairdo_detail_barber);
 		barberpic = (ImageView)findViewById(R.id.iv_rotat_hairdo_detail);
 		hairdopic = (ImageView)findViewById(R.id.iv_hairdo_detail_pic);
-		order = (TextView) findViewById(R.id.tv_hairdo_detail_order);
+		order = (Button) findViewById(R.id.bt_hairdo_detail_order);
 
-		barber1.setText("11111");
-		barber2.setText("2222");
-		barber3.setText("33333");
+		barber.setText("11111");
 		order.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
