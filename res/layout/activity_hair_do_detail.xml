@@ -33,8 +33,8 @@
         android:layout_width="fill_parent"
         android:layout_height="65dp"
         android:layout_weight="1" >
-        <ImageView
-            android:id="@+id/iv_hairdo_detail_pic"
+        <ImageSwitcher
+            android:id="@+id/is_hairdo_detail_pic"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
              />
@@ -61,6 +61,7 @@
             android:paddingTop="2dp"
             android:minWidth="68dp"
             android:minHeight="30dp"
+			android:text="预约"            
             android:textColor="@color/white"
             android:textSize="15sp" />
 
