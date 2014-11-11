@@ -1,5 +1,7 @@
 package com.blackswan.fake.activity;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +13,7 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.res.Resources.NotFoundException;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.Bundle;
@@ -31,10 +34,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.lbs.duanzu.DemoApplication;
 import com.blackswan.fake.R;
 import com.blackswan.fake.adapter.BarbershopListAdapter;
 import com.blackswan.fake.adapter.CategoryListAdapter;
@@ -90,7 +96,7 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 		@SuppressWarnings("unchecked")
 		@Override
 		public void handleMessage(Message msg) {
-//			progress.setVisibility(View.INVISIBLE);
+			progress.setVisibility(View.INVISIBLE);
 			switch (msg.what) {
 			case MSG_NET_TIMEOUT:
 				break;
@@ -107,13 +113,23 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 					e.printStackTrace();
 				}
 				break;
+			}
+		}
+	};
+	/*
+	 * 初始化城市列表
+	 */
+	private final Handler handler = new Handler()
+	{
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
 			case MSG_DISTRICT:
 				regions = (ArrayList<MyRegion>) msg.obj;
 				break;
 			}
 		}
+		
 	};
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -121,16 +137,16 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 		setContentView(R.layout.activity_barbershop);
 		initViews();
 		initEvents();
-//		final ListView listView = getListView();
-//		listView.setItemsCanFocus(false);
-//		listView.setOnScrollListener(this);
-//		
-//		BaseApplication app = (BaseApplication) getApplication();
-//		barbershopListAdapter = new BarbershopListAdapter(app,BarberShopActivity.this, barberShops);
-//		setListAdapter(barbershopListAdapter);
-//		app.setBarbershops(barberShops);
-//		app.setBarbershopListAdapter(barbershopListAdapter);
-//		app.setBarberShopActivity(this);
+		final ListView listView = getListView();
+		listView.setItemsCanFocus(false);
+		listView.setOnScrollListener(this);
+		
+		BaseApplication app = (BaseApplication) getApplication();
+		barbershopListAdapter = new BarbershopListAdapter(app,BarberShopActivity.this, barberShops);
+		setListAdapter(barbershopListAdapter);
+		app.setBarbershops(barberShops);
+		app.setBarbershopListAdapter(barbershopListAdapter);
+		app.setBarberShopActivity(this);
 		
 	}
 	@Override
@@ -140,8 +156,6 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 		if (cname == null) {
 			cname = application.mCurrentcity;
 		}
-		//重新显示的时候重新初始化城市表单
-		Log.i("重新初始化城市表单"," "+cname);
 		cityUtils.initDistricts(cname);
 		super.onResume();
 	}
@@ -158,11 +172,11 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 			cname = application.mCurrentcity;
 		}
 		Log.i("初始化城市表单",""+cname);
-		cityUtils = new PopCityUtils(this, mHandler);
+		cityUtils = new PopCityUtils(this, handler);
 		cityUtils.initDistricts(cname);
-//		loadMoreView = getLayoutInflater().inflate(R.layout.list_item_footer, null);
-//		progressBar = (ProgressBar)loadMoreView.findViewById(R.id.progressBar);
-//		refreshListView = (FakeRefreshListView) findViewById(R.id.nearbarbershop_reflist);
+		loadMoreView = getLayoutInflater().inflate(R.layout.list_item_footer, null);
+		progressBar = (ProgressBar)loadMoreView.findViewById(R.id.progressBar);
+		refreshListView = (FakeRefreshListView) findViewById(R.id.nearbarbershop_reflist);
 	}
 	
 	protected void initEvents() {
@@ -171,7 +185,7 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 			@Override
 			public void onClick(View v) {
 				//将理发店的星级评价
-				
+				showStarPopupWindow(linLayout.getWidth(),linLayout.getHeight());
 			}
 		});
 		
@@ -192,45 +206,77 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 				showDistancePopupWindow(linLayout.getWidth(),linLayout.getHeight());
 			}
 		});
-//		
-//		loadMoreView.setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				loadMoreData();
-//				progressBar.setVisibility(View.VISIBLE);
-//			}
-//		});
+		
+		loadMoreView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				loadMoreData();
+				progressBar.setVisibility(View.VISIBLE);
+			}
+		});
 		
 	}
 	
-	protected void showDistancePopupWindow(int width, int height) {
-		String title[] = {"1千米范围内","2千米范围内","5千米范围内"};
+	protected void showStarPopupWindow(int width, int height) {
+		String title[] = {"服务评价排序","卫生评价排序","设施评价排序","价格评价排序"};
 		itemList = new ArrayList<HashMap<String,Object>>();
-		layout = (LinearLayout) LayoutInflater.from(BarberShopActivity.this).inflate(R.layout.popup_category, null);
-		rootList = (ListView) layout.findViewById(R.id.rootcategory);
+		layout = (LinearLayout) LayoutInflater.from(BarberShopActivity.this).inflate(R.layout.popup_distance, null);
+		rootList = (ListView) layout.findViewById(R.id.distancecategory);
 		for(int i=0;i<title.length;i++){
 			HashMap<String,Object> items = new HashMap<String,Object>();
 			items.put("name",title[i]);
-			items.put("count", i*5+4);
+			items.put("count", 1);
 			itemList.add(items);
 		}
 		
 		CategoryListAdapter cla = new CategoryListAdapter(BarberShopActivity.this, itemList);
 		rootList.setAdapter(cla);
-		flChild = (FrameLayout) layout.findViewById(R.id.child_lay);
-		flChild.setVisibility(View.INVISIBLE);
 		
-		mPopWin = new PopupWindow(layout, width / 2, height / 2, true);
-		mPopWin.showAtLocation(layout, Gravity.RIGHT, 0, 0);
-		mPopWin.setBackgroundDrawable(new BitmapDrawable());
-		mPopWin.showAsDropDown(text1, 5, 1);
+		mPopWin = new PopupWindow(layout, width * 2/5, height *2/5, true);
+		mPopWin.showAtLocation(layout, Gravity.LEFT, 0, -120);
+		mPopWin.showAsDropDown(text1, 4, 1);
 		mPopWin.update();
 		
 		rootList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-								text2.setText((String)itemList.get(position).get("name"));
+								text1.setText((String)itemList.get(position).get("name"));
+								if (initSearchFlag) {
+									search();
+								}
+								layout.setVisibility(View.GONE);
+							}
+		});
+	}
+	protected void showDistancePopupWindow(int width, int height) {
+		String title[] = {"1千米内","2千米内","5千米内"};
+		itemList = new ArrayList<HashMap<String,Object>>();
+		layout = (LinearLayout) LayoutInflater.from(BarberShopActivity.this).inflate(R.layout.popup_distance, null);
+		rootList = (ListView) layout.findViewById(R.id.distancecategory);
+		for(int i=0;i<title.length;i++){
+			HashMap<String,Object> items = new HashMap<String,Object>();
+			items.put("name",title[i]);
+			items.put("count", 100);
+			itemList.add(items);
+		}
+		
+		CategoryListAdapter cla = new CategoryListAdapter(BarberShopActivity.this, itemList);
+		rootList.setAdapter(cla);
+		
+		mPopWin = new PopupWindow(layout, width * 1/3, height*1/ 3, true);
+		mPopWin.showAtLocation(layout, Gravity.RIGHT, 0, -138);
+		mPopWin.showAsDropDown(text1, 3, 1);
+		mPopWin.update();
+		
+		rootList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+								text3.setText((String)itemList.get(position).get("name"));
+								if (initSearchFlag) {
+									search();
+								}
 								layout.setVisibility(View.GONE);
 							}
 		});
@@ -273,6 +319,9 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 							public void onItemClick(AdapterView<?> parent,
 									View view, int position, long id) {
 								text2.setText((String)itemList.get(position).get("name"));
+								if (initSearchFlag) {
+									search();
+								}
 								layout.setVisibility(View.GONE);
 							}
 					});
@@ -291,6 +340,13 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 	 */
 	private HashMap<String, String> getRequestParams() {
 		HashMap<String, String> map = new HashMap<String, String>();
+		try {
+			map.put("region", URLEncoder.encode("北京", "utf-8"));
+			String filter = "";
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 		return map;
 	}
 	/*
