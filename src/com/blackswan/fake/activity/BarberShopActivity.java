@@ -2,7 +2,6 @@ package com.blackswan.fake.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -18,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,7 +57,6 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 	public static final int MSG_DISTRICT = 3;
 
 	private boolean initSearchFlag = false;
-
 	private RelativeLayout progress;
 	
 	private TextView text1;
@@ -205,46 +204,35 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 	}
 	
 	protected void showDistancePopupWindow(int width, int height) {
-		
+		String title[] = {"1千米范围内","2千米范围内","5千米范围内"};
 		itemList = new ArrayList<HashMap<String,Object>>();
 		layout = (LinearLayout) LayoutInflater.from(BarberShopActivity.this).inflate(R.layout.popup_category, null);
 		rootList = (ListView) layout.findViewById(R.id.rootcategory);
-		for(int i=0;i<regions.size();i++){
+		for(int i=0;i<title.length;i++){
 			HashMap<String,Object> items = new HashMap<String,Object>();
-			items.put("name", regions.get(i).getName());
+			items.put("name",title[i]);
 			items.put("count", i*5+4);
 			itemList.add(items);
 		}
 		
 		CategoryListAdapter cla = new CategoryListAdapter(BarberShopActivity.this, itemList);
 		rootList.setAdapter(cla);
-		
 		flChild = (FrameLayout) layout.findViewById(R.id.child_lay);
-		childList = (ListView) layout.findViewById(R.id.childcategory);
-		childList.setAdapter(cla);
 		flChild.setVisibility(View.INVISIBLE);
 		
-		mPopWin = new PopupWindow(layout, width * 9 / 10, height / 2, true);
+		mPopWin = new PopupWindow(layout, width / 2, height / 2, true);
+		mPopWin.showAtLocation(layout, Gravity.RIGHT, 0, 0);
 		mPopWin.setBackgroundDrawable(new BitmapDrawable());
 		mPopWin.showAsDropDown(text1, 5, 1);
 		mPopWin.update();
 		
 		rootList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				flChild.setVisibility(View.VISIBLE);
-				childList
-						.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
-							@Override
-							public void onItemClick(AdapterView<?> parent,
-									View view, int position, long id) {
 								text2.setText((String)itemList.get(position).get("name"));
 								layout.setVisibility(View.GONE);
 							}
-					});
-			}
 		});
 	}
 	@SuppressLint("InflateParams")
