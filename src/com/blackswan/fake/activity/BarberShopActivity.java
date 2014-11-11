@@ -17,6 +17,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +41,6 @@ import com.blackswan.fake.adapter.CategoryListAdapter;
 import com.blackswan.fake.base.BaseApplication;
 import com.blackswan.fake.bean.MyRegion;
 import com.blackswan.fake.bean.NearBarberShop;
-import com.blackswan.fake.bean.PopCity;
 import com.blackswan.fake.util.LBSCloudSearch;
 import com.blackswan.fake.util.PopCityUtils;
 import com.blackswan.fake.view.FakeRefreshListView;
@@ -51,7 +51,6 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 {
 	
 	private Context context;
-	BaseApplication application= (BaseApplication) getApplication();
 	public static final int MSG_NET_TIMEOUT = 100;
 	public static final int MSG_NET_STATUS_ERROR = 200;
 	public static final int MSG_NET_SUCC = 1;
@@ -66,7 +65,6 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 	private TextView text3;
 	private ArrayList<MyRegion> regions;
 	private PopCityUtils cityUtils;
-	private PopCity city;
 	int last, current;
 	
 	private PopupWindow mPopWin;
@@ -90,9 +88,10 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 	 * 处理网络请求
 	 */
 	private final Handler mHandler = new Handler() {
+		@SuppressWarnings("unchecked")
 		@Override
 		public void handleMessage(Message msg) {
-			progress.setVisibility(View.INVISIBLE);
+//			progress.setVisibility(View.INVISIBLE);
 			switch (msg.what) {
 			case MSG_NET_TIMEOUT:
 				break;
@@ -121,43 +120,50 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_barbershop);
-		String cname=application.preferences.getString("city3", null);
-		if (cname == null) {
-			cname = application.mCurrentcity;
-		}
-		cityUtils.initDistricts(cname);
-		
 		initViews();
 		initEvents();
-		final ListView listView = getListView();
-		listView.setItemsCanFocus(false);
-		listView.setOnScrollListener(this);
-		
-		BaseApplication app = (BaseApplication) getApplication();
-		barbershopListAdapter = new BarbershopListAdapter(app,BarberShopActivity.this, barberShops);
-		setListAdapter(barbershopListAdapter);
-		app.setBarbershops(barberShops);
-		app.setBarbershopListAdapter(barbershopListAdapter);
-		app.setBarberShopActivity(this);
+//		final ListView listView = getListView();
+//		listView.setItemsCanFocus(false);
+//		listView.setOnScrollListener(this);
+//		
+//		BaseApplication app = (BaseApplication) getApplication();
+//		barbershopListAdapter = new BarbershopListAdapter(app,BarberShopActivity.this, barberShops);
+//		setListAdapter(barbershopListAdapter);
+//		app.setBarbershops(barberShops);
+//		app.setBarbershopListAdapter(barbershopListAdapter);
+//		app.setBarberShopActivity(this);
 		
 	}
 	@Override
 	protected void onResume() {
+		BaseApplication application= (BaseApplication) getApplication();
 		String cname=application.preferences.getString("city3", null);
 		if (cname == null) {
 			cname = application.mCurrentcity;
 		}
+		//重新显示的时候重新初始化城市表单
+		Log.i("重新初始化城市表单"," "+cname);
 		cityUtils.initDistricts(cname);
 		super.onResume();
 	}
+	
+	@SuppressLint("InflateParams") 
 	protected void initViews() {
 		text1 = (TextView) findViewById(R.id.barbershop_text1);
 		text2 = (TextView) findViewById(R.id.barbershop_text2);
 		text3 = (TextView) findViewById(R.id.barbershop_text3);
 		linLayout = (LinearLayout) findViewById(R.id.barbershop);
-		loadMoreView = getLayoutInflater().inflate(R.layout.list_item_footer, null);
-		progressBar = (ProgressBar)loadMoreView.findViewById(R.id.progressBar);
-		refreshListView = (FakeRefreshListView) findViewById(R.id.nearbarbershop_reflist);
+		BaseApplication application= (BaseApplication) getApplication();
+		String cname=application.preferences.getString("city3", null);
+		if (cname == null) {
+			cname = application.mCurrentcity;
+		}
+		Log.i("初始化城市表单",""+cname);
+		cityUtils = new PopCityUtils(this, mHandler);
+		cityUtils.initDistricts(cname);
+//		loadMoreView = getLayoutInflater().inflate(R.layout.list_item_footer, null);
+//		progressBar = (ProgressBar)loadMoreView.findViewById(R.id.progressBar);
+//		refreshListView = (FakeRefreshListView) findViewById(R.id.nearbarbershop_reflist);
 	}
 	
 	protected void initEvents() {
@@ -165,7 +171,8 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 			
 			@Override
 			public void onClick(View v) {
-				showPopupWindow(linLayout.getWidth(),linLayout.getHeight());
+				//将理发店的星级评价
+				
 			}
 		});
 		
@@ -174,7 +181,7 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 			@Override
 			public void onClick(View v) {
 				//将理发店铺列表按评价从高到低排列
-				showPopupWindow(linLayout.getWidth(),linLayout.getHeight());
+				showCityPopupWindow(linLayout.getWidth(),linLayout.getHeight());
 				}
 			});
 		
@@ -183,22 +190,21 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 			@Override
 			public void onClick(View v) {
 				//将理发店铺列表按距离从近到远排序
-				showPopupWindow(linLayout.getWidth(),linLayout.getHeight());
+				showDistancePopupWindow(linLayout.getWidth(),linLayout.getHeight());
 			}
 		});
-		
-		loadMoreView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				loadMoreData();
-				progressBar.setVisibility(View.VISIBLE);
-			}
-		});
+//		
+//		loadMoreView.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				loadMoreData();
+//				progressBar.setVisibility(View.VISIBLE);
+//			}
+//		});
 		
 	}
 	
-	@SuppressLint("InflateParams")
-	private void showPopupWindow(int width, int height) {
+	protected void showDistancePopupWindow(int width, int height) {
 		
 		itemList = new ArrayList<HashMap<String,Object>>();
 		layout = (LinearLayout) LayoutInflater.from(BarberShopActivity.this).inflate(R.layout.popup_category, null);
@@ -234,7 +240,51 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 							@Override
 							public void onItemClick(AdapterView<?> parent,
 									View view, int position, long id) {
-								// TODO Auto-generated method stub
+								text2.setText((String)itemList.get(position).get("name"));
+								layout.setVisibility(View.GONE);
+							}
+					});
+			}
+		});
+	}
+	@SuppressLint("InflateParams")
+	private void showCityPopupWindow(int width, int height) {
+		
+		itemList = new ArrayList<HashMap<String,Object>>();
+		layout = (LinearLayout) LayoutInflater.from(BarberShopActivity.this).inflate(R.layout.popup_category, null);
+		rootList = (ListView) layout.findViewById(R.id.rootcategory);
+		for(int i=0;i<regions.size();i++){
+			HashMap<String,Object> items = new HashMap<String,Object>();
+			items.put("name", regions.get(i).getName());
+			items.put("count", i*5+4);
+			itemList.add(items);
+		}
+		
+		CategoryListAdapter cla = new CategoryListAdapter(BarberShopActivity.this, itemList);
+		rootList.setAdapter(cla);
+		
+		flChild = (FrameLayout) layout.findViewById(R.id.child_lay);
+		childList = (ListView) layout.findViewById(R.id.childcategory);
+		childList.setAdapter(cla);
+		flChild.setVisibility(View.INVISIBLE);
+		
+		mPopWin = new PopupWindow(layout, width * 9 / 10, height / 2, true);
+		mPopWin.setBackgroundDrawable(new BitmapDrawable());
+		mPopWin.showAsDropDown(text1, 5, 1);
+		mPopWin.update();
+		
+		rootList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				flChild.setVisibility(View.VISIBLE);
+				childList
+						.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+							@Override
+							public void onItemClick(AdapterView<?> parent,
+									View view, int position, long id) {
+								text2.setText((String)itemList.get(position).get("name"));
 								layout.setVisibility(View.GONE);
 							}
 					});

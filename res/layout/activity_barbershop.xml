@@ -70,10 +70,10 @@
         android:fadingEdge="none"
         android:listSelector="@drawable/list_selector_transition" >
     </com.blackswan.fake.view.FakeRefreshListView> 
-     <ListView
-           android:id="@+id/listView1"
-           android:layout_width="match_parent"
-           android:layout_height="match_parent" >
-                    </ListView>                                     
+    <ListView 
+		android:id="@android:id/list"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+		</ListView>                                  
 
 </LinearLayout>
