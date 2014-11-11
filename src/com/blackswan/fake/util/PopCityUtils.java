@@ -28,6 +28,7 @@ public class PopCityUtils {
 		new Thread() {
 			@Override
 			public void run() {
+				Log.i("进入初始化城市列表函数","shit");
 				DBManager dbm = new DBManager(
 						context);
 				dbm.openDateBase();
@@ -36,7 +37,7 @@ public class PopCityUtils {
 				String pcode=null;
 				ArrayList<MyRegion> list = new ArrayList<MyRegion>();
 				try {
-					String sqlString = "SELECT id FROM REGION WHERE name='"+cname+"'";
+					String sqlString = "SELECT id FROM REGION WHERE name like'%"+cname+"%'";
 					Cursor c = db.rawQuery(sqlString, null);
 					c.moveToFirst();
 					pcode = c.getString(0);

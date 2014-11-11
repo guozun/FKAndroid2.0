@@ -68,6 +68,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 		BaseApplication application = ((BaseApplication) getApplication());
 		String historycity=application.preferences.getString("city3", null);
         if (historycity==null) {
+        	application.putString("city3", application.mCurrentcity);
 			city.setText(application.mCurrentcity);
 		}else {
 			city.setText(historycity);
@@ -109,6 +110,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 			BaseApplication application = ((BaseApplication) getApplication());
 			String historycity=application.preferences.getString("city3", null);
 	        if (historycity==null) {
+	        	application.putString("city3", application.mCurrentcity);
 				city.setText(application.mCurrentcity);
 			}else {
 				city.setText(historycity);
