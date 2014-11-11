@@ -19,6 +19,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.renderscript.Element;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -34,13 +35,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.baidu.lbs.duanzu.DemoApplication;
 import com.blackswan.fake.R;
 import com.blackswan.fake.adapter.BarbershopListAdapter;
 import com.blackswan.fake.adapter.CategoryListAdapter;
@@ -121,6 +119,7 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 	 */
 	private final Handler handler = new Handler()
 	{
+		@SuppressWarnings("unchecked")
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case MSG_DISTRICT:
@@ -137,6 +136,9 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 		setContentView(R.layout.activity_barbershop);
 		initViews();
 		initEvents();
+		search();
+
+		BaseApplication.getmInstance().setHandler(mHandler);
 		final ListView listView = getListView();
 		listView.setItemsCanFocus(false);
 		listView.setOnScrollListener(this);
@@ -343,10 +345,32 @@ public class BarberShopActivity extends ListActivity implements OnItemClickListe
 		try {
 			map.put("region", URLEncoder.encode("北京", "utf-8"));
 			String filter = "";
-			
+			String radius;
+			if (text3.getText().equals("1千米内")) {
+				radius = "1000";
+			}
+			if (text3.getText().equals("2千米内")) {
+				radius = "2000";
+			}else {
+				radius = "5000";
+			}
+			map.put("radius", radius);
+			BaseApplication app = BaseApplication.getmInstance();
+			if (app.currlocation != null) {
+				map.put("location", app.currlocation.getLongitude() + ","
+						+ app.currlocation.getLatitude());
+			} else {
+				// 无定位数据默认北京中心
+				double cLat = 39.909230;
+				double cLon = 116.397428;
+				map.put("location", cLat + "," + cLon);
+			}
+			//本地搜索过滤条件
+			map.put("filter", filter);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
+		BaseApplication.getmInstance().setFilterParams(map);
 		return map;
 	}
 	/*
