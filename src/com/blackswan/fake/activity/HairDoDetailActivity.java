@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,10 +20,13 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.FrameLayout.LayoutParams;
 
 import com.blackswan.fake.R;
 import com.blackswan.fake.base.BaseActivity;
+import com.blackswan.fake.util.Utility;
 import com.blackswan.fake.view.ProgressWheel;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -41,6 +45,7 @@ public class HairDoDetailActivity extends BaseActivity implements
 	private ViewPager mViewPager;
 	private DisplayImageOptions options;
 	private Button order;
+	private Button buttonBack;
 	// 进度条
 	private ProgressWheel mProgressWheel;
 	// ImageSwitch
@@ -72,13 +77,23 @@ public class HairDoDetailActivity extends BaseActivity implements
 		order = (Button) findViewById(R.id.bt_hairdo_detail_order);
 		mProgressWheel = (ProgressWheel) findViewById(R.id.id_hairdo_detail_progress);
 		imageGone = (ImageView) findViewById(R.id.id_hairdo_detail_pic_cache);
+		buttonBack = (Button)findViewById(R.id.iv_hairdo_detail_back);
+		
+		buttonBack.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				defaultFinish();
+			}
+		});
 		mProgressWheel.setVisibility(View.GONE);
-		// imageGone.setVisibility(View.GONE);
 		imageGone.setImageLevel(1);
 		mViewPager.setOnTouchListener(this);
+		initDrops();
+		
 		cacheImage[0] = new ImageView(this);
 		cacheImage[1] = new ImageView(this);
 		this.initViews();
+		refreshDrops();
 	}
 
 	@Override
@@ -87,7 +102,7 @@ public class HairDoDetailActivity extends BaseActivity implements
 		imgUrl.add("http://g.hiphotos.baidu.com/image/pic/item/f31fbe096b63f624b55c6a738444ebf81a4ca3b9.jpg");
 		imgUrl.add("http://e.hiphotos.baidu.com/image/pic/item/359b033b5bb5c9eae1d75710d739b6003af3b319.jpg");
 		imgUrl.add("http://c.hiphotos.baidu.com/image/w%3D230/sign=beeba198a0cc7cd9fa2d33da09012104/0823dd54564e9258c34d3c9b9f82d158ccbf4e4d.jpg");
-		
+
 		for (int i = 0; i < imgUrl.size(); i++) {
 			ImageView iv = new ImageView(this);
 			iv.setImageLevel(0);
@@ -184,6 +199,23 @@ public class HairDoDetailActivity extends BaseActivity implements
 
 			}
 		});
+		mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			
+			@Override
+			public void onPageSelected(int arg0) {
+				changeDrops(currentPosition,arg0);
+				currentPosition = 	arg0;			
+			}
+			
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+				
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+			}
+		});
 	}
 
 	@Override
@@ -198,7 +230,7 @@ public class HairDoDetailActivity extends BaseActivity implements
 		imgUrl.add("http://d.hiphotos.baidu.com/image/pic/item/dc54564e9258d109207093b1d258ccbf6c814d25.jpg");
 		imgUrl.add("http://d.hiphotos.baidu.com/image/pic/item/4afbfbedab64034f9b88f805acc379310a551d6f.jpg");
 		imgUrl.add("http://a.hiphotos.baidu.com/image/pic/item/aa18972bd40735fa369774ba9d510fb30f240849.jpg");
-		
+
 		for (int i = 0; i < imgUrl.size(); i++) {
 			ImageView iv = new ImageView(this);
 			iv.setImageLevel(0);
@@ -252,11 +284,47 @@ public class HairDoDetailActivity extends BaseActivity implements
 		}
 		return false;
 	}
-	private void initDrops(){
-		//把5个小点点隐藏起来
-//		int i;
-//		for(i=0;i<PIC_NUM;i++){
-//			drops[i]
-//		}
+
+	private void initDrops() {
+		//控制位置
+		int marginSum = 30;
+		RelativeLayout relat = (RelativeLayout) findViewById(R.id.id_hairdo_detail_bar);
+		int i;
+		for (i = 0; i < PIC_NUM; i++) {
+			drops[i] = new ImageView(this);
+			RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
+					Utility.Dp2Px(this, 15), Utility.Dp2Px(this, 15));
+			if (i == 0) {
+				parms.leftMargin = Utility.Dp2Px(this, marginSum);
+				parms.addRule(RelativeLayout.ALIGN_PARENT_LEFT,
+						RelativeLayout.TRUE);
+				
+			} else {
+				parms.leftMargin = Utility.Dp2Px(this, marginSum);
+			}
+			parms.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+			relat.addView(drops[i],parms);
+			marginSum += 24;
+		}
+
+	}
+
+	private void refreshDrops() {
+		int i;
+		for (i = 0; i < imgUrl.size(); i++) {
+			if (i == 0) {
+				drops[i].setImageResource(R.drawable.bg_drop_no_lack);
+			} else {
+				drops[i].setImageResource(R.drawable.bg_drop_lack);
+			}
+			drops[i].setVisibility(View.VISIBLE);
+		}
+		for(;i<PIC_NUM;i++){
+			drops[i].setVisibility(View.GONE);
+		}
+	}
+	private void changeDrops(int old,int now){
+		drops[now].setImageResource(R.drawable.bg_drop_no_lack);
+		drops[old].setImageResource(R.drawable.bg_drop_lack);
 	}
 }
