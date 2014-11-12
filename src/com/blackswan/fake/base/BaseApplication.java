@@ -26,8 +26,8 @@ import android.util.Log;
 import com.baidu.location.BDLocation;
 import com.blackswan.fake.R;
 import com.blackswan.fake.activity.BaiduMapActivity;
-import com.blackswan.fake.activity.BarberActivity;
-import com.blackswan.fake.activity.BarberShopActivity;
+import com.blackswan.fake.activity.barberactivity.BarberListActivity;
+import com.blackswan.fake.activity.barbershopactivity.BarberShopListActivity;
 import com.blackswan.fake.adapter.BarberListAdapter;
 import com.blackswan.fake.adapter.BarbershopListAdapter;
 import com.blackswan.fake.bean.NearBarber;
@@ -71,8 +71,8 @@ public class BaseApplication extends Application {
 	//云检索参数
 	private HashMap<String, String> filterParams;
 	
-	private BarberShopActivity barberShopActivity;
-	private BarberActivity barberActivity;
+	private BarberShopListActivity barberShopListActivity;
+	private BarberListActivity barberListActivity;
 	private BaiduMapActivity baiduMapActivity;
 	
 	public static List<String> mEmoticons = new ArrayList<String>();
@@ -128,20 +128,20 @@ public class BaseApplication extends Application {
 		this.filterParams = filterParams;
 	}
 
-	public BarberShopActivity getBarberShopActivity() {
-		return barberShopActivity;
+	public BarberShopListActivity getBarberShopListActivity() {
+		return barberShopListActivity;
 	}
 
-	public void setBarberShopActivity(BarberShopActivity barberShopActivity) {
-		this.barberShopActivity = barberShopActivity;
+	public void setBarberShopListActivity(BarberShopListActivity barberShopListActivity) {
+		this.barberShopListActivity = barberShopListActivity;
 	}
 
-	public BarberActivity getBarberActivity() {
-		return barberActivity;
+	public BarberListActivity getBarberListActivity() {
+		return barberListActivity;
 	}
 
-	public void setBarberActivity(BarberActivity barberActivity) {
-		this.barberActivity = barberActivity;
+	public void setBarberListActivity(BarberListActivity barberListActivity) {
+		this.barberListActivity = barberListActivity;
 	}
 
 	public BaiduMapActivity getBaiduMapActivity() {
