@@ -4,63 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/barbershop" >
-     <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <!-- 子菜单选项 -->
-
-     <LinearLayout
-            android:id="@+id/layout_barbershop"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/text_normal"
-            android:orientation="horizontal" >
-
-            <TextView
-                android:id="@+id/barbershop_text1"
-                android:layout_width="wrap_content"
-                android:layout_height="42.0dip"
-                android:layout_weight="1.0"
-                android:background="@drawable/selector_btn_text"
-                android:clickable="true"
-                android:gravity="center"
-                android:text="@string/homepagetext1"
-                android:textColor="#737373"
-                android:textSize="16.0sp" />
-
-           
-
-            <TextView
-                android:id="@+id/barbershop_text2"
-                android:layout_width="wrap_content"
-                android:layout_height="42.0dip"
-                android:layout_weight="1.0"
-                android:background="@drawable/selector_btn_text"
-                android:clickable="true"
-                android:gravity="center"
-                android:text="@string/homepagetext2"
-                android:textColor="#737373"
-                android:textSize="16.0sp" />
-
-          
-
-            <TextView
-                android:id="@+id/barbershop_text3"
-                android:layout_width="wrap_content"
-                android:layout_height="42.0dip"
-                android:layout_weight="1.0"
-                android:background="@drawable/selector_btn_text"
-                android:clickable="true"
-                android:gravity="center"
-                android:text="@string/homepagetext3"
-                android:textColor="#737373"
-                android:textSize="16.0sp" />
-
-        
-        </LinearLayout>
-            
-    </RelativeLayout>
 	<com.blackswan.fake.view.FakeRefreshListView
         android:id="@+id/nearbarbershop_reflist"
         android:layout_width="fill_parent"

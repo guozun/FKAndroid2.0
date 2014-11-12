@@ -20,8 +20,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.blackswan.fake.activity.MainActivity;
-
 public class LBSCloudSearch {
 	
 	private static String mTAG = "NetWorkManager";
@@ -38,7 +36,6 @@ public class LBSCloudSearch {
 	//云检索公钥
 	private static String ak = "A4749739227af1618f7b0d1b588c0e85";
 	
-	private static String geotable_id = "78111";
 
 	private static int TIME_OUT = 12000;
 	private static int retry = 3;
@@ -51,7 +48,7 @@ public class LBSCloudSearch {
 	 * @param networkType	手机联网类型
 	 * @return
 	 */
-	public static boolean request(final int searchType,final HashMap<String, String> filterParams,final Handler handler, final String networkType) {
+	public static boolean request(final int searchType,final HashMap<String, String> filterParams,final Handler handler, final String networkType,final String geotable_id) {
 		if (IsBusy || filterParams == null)
 			return false;
 		IsBusy = true;
