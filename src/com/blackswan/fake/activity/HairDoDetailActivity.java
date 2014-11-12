@@ -5,9 +5,12 @@ import java.util.List;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageSwitcher;
@@ -26,12 +29,11 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
-public class HairDoDetailActivity extends BaseActivity implements
-		OnTouchListener {
+public class HairDoDetailActivity extends BaseActivity {
 
 	private TextView barber;
 	private ImageView barberpic;
-	private ImageView hairdoImage;
+	private ViewPager mViewPager;
 	private DisplayImageOptions options;
 	private Button order;
 	// ImageSwitch
@@ -49,7 +51,7 @@ public class HairDoDetailActivity extends BaseActivity implements
 		options = new DisplayImageOptions.Builder()
 				.showImageOnLoading(R.drawable.homepage_location)
 				.cacheInMemory(true).cacheOnDisk(true).considerExifParams(true)
-				.imageScaleType(ImageScaleType.EXACTLY)
+				.imageScaleType(ImageScaleType.EXACTLY_STRETCHED)
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
 
 		// 填入测试数据
@@ -63,7 +65,7 @@ public class HairDoDetailActivity extends BaseActivity implements
 	protected void initViews() {
 		barber = (TextView) findViewById(R.id.tv_hairdo_detail_barber);
 		barberpic = (ImageView) findViewById(R.id.iv_rotat_hairdo_detail);
-		hairdoImage = (ImageView) findViewById(R.id.iv_hairdo_detail_pic);
+		mViewPager = (ViewPager) findViewById(R.id.id_hairdo_detail_pic);
 		order = (Button) findViewById(R.id.bt_hairdo_detail_order);
 
 		barber.setText("11111");
@@ -73,14 +75,38 @@ public class HairDoDetailActivity extends BaseActivity implements
 				// TODO 进行预约操作
 			}
 		});
-		hairdoImage.setOnTouchListener(this);
 		ImageLoader
 				.getInstance()
 				.displayImage(
 						"http://img0.bdstatic.com/img/image/shouye/mnnll-14204092064.jpg",
 						barberpic, options);
-		ImageLoader.getInstance().displayImage(imgUrl.get(currentPosition),
-				hairdoImage, options);
+		mViewPager.setAdapter(new PagerAdapter() {
+
+			@Override
+			public boolean isViewFromObject(View arg0, Object arg1) {
+				return arg0 == arg1;
+			}
+
+			@Override
+			public int getCount() {
+				return imgUrl.size();
+			}
+
+			@Override
+			public void destroyItem(ViewGroup container, int position,
+					Object object) {
+				container.removeViewAt(position);
+			}
+
+			@Override
+			public Object instantiateItem(ViewGroup container, int position) {
+				ImageView i = new ImageView(HairDoDetailActivity.this);
+				ImageLoader.getInstance().displayImage(imgUrl.get(position), i,
+						options);
+				container.addView(i, position);
+				return i;
+			}
+		});
 	}
 
 	@Override
@@ -89,123 +115,4 @@ public class HairDoDetailActivity extends BaseActivity implements
 
 	}
 
-	@Override
-	public boolean onTouch(View v, MotionEvent event) {
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN: {
-			// 手指按下的X坐标
-			downX = event.getX();
-			break;
-		}
-		case MotionEvent.ACTION_UP: {
-			float lastX = event.getX();
-			// 抬起的时候的X坐标大于按下的时候就显示上一张图片
-			if (lastX > downX) {
-				if (currentPosition > 0) {
-					// TranslateAnimation leftInAnimation = new
-					// TranslateAnimation(
-					// -100, 0, 0, 0);
-					// leftInAnimation.setDuration(500);
-					// mImageSwitcher.setInAnimation(leftInAnimation);
-					// TranslateAnimation RightOutAnimation = new
-					// TranslateAnimation(
-					// 0, 100, 0, 0);
-					// RightOutAnimation.setDuration(500);
-					// mImageSwitcher.setOutAnimation(RightOutAnimation);
-					// currentPosition--;
-					// mImageSwitcher.showPrevious();
-					currentPosition--;
-					ImageLoader.getInstance().displayImage(
-							imgUrl.get(currentPosition), hairdoImage, options,
-							new ImageLoadingListener() {
-
-								@Override
-								public void onLoadingStarted(String imageUri,
-										View view) {
-									// TODO Auto-generated method stub
-
-								}
-
-								@Override
-								public void onLoadingFailed(String imageUri,
-										View view, FailReason failReason) {
-									// TODO Auto-generated method stub
-
-								}
-
-								@Override
-								public void onLoadingComplete(String imageUri,
-										View view, Bitmap loadedImage) {
-									// TODO Auto-generated method stub
-
-								}
-
-								@Override
-								public void onLoadingCancelled(String imageUri,
-										View view) {
-
-								}
-							});
-				} else {
-					Toast.makeText(getApplication(), "已经是第一张",
-							Toast.LENGTH_SHORT).show();
-				}
-			}
-
-			if (lastX < downX) {
-				if (currentPosition < imgUrl.size() - 1) {
-					// TranslateAnimation rightInAnimation = new
-					// TranslateAnimation(
-					// 100, 0, 0, 0);
-					// rightInAnimation.setDuration(500);
-					// mImageSwitcher.setInAnimation(rightInAnimation);
-					// TranslateAnimation leftOutAnimation = new
-					// TranslateAnimation(
-					// 0, -100, 0, 0);
-					// leftOutAnimation.setDuration(500);
-					// mImageSwitcher.setOutAnimation(leftOutAnimation);
-					currentPosition++;
-					ImageLoader.getInstance().displayImage(
-							imgUrl.get(currentPosition), hairdoImage, options,
-							new ImageLoadingListener() {
-
-								@Override
-								public void onLoadingStarted(String imageUri,
-										View view) {
-									// TODO Auto-generated method stub
-
-								}
-
-								@Override
-								public void onLoadingFailed(String imageUri,
-										View view, FailReason failReason) {
-									// TODO Auto-generated method stub
-
-								}
-
-								@Override
-								public void onLoadingComplete(String imageUri,
-										View view, Bitmap loadedImage) {
-									// TODO Auto-generated method stub
-
-								}
-
-								@Override
-								public void onLoadingCancelled(String imageUri,
-										View view) {
-
-								}
-							});
-				} else {
-					Toast.makeText(getApplication(), "到了最后一张",
-							Toast.LENGTH_SHORT).show();
-				}
-			}
-		}
-
-			break;
-		}
-
-		return true;
-	}
 }
