@@ -1,16 +1,10 @@
 package com.blackswan.fake.util;
 
-
-import android.location.Location;
-import android.util.Log;
-
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.blackswan.fake.base.BaseApplication;
-import com.blackswan.fake.bean.NearBarberShop;
-
 
 /**
  * 百度定位API使用类，启动定位，当返回定位结果是停止定位
