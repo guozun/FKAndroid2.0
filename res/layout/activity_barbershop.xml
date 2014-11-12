@@ -70,6 +70,22 @@
         android:fadingEdge="none"
         android:listSelector="@drawable/list_selector_transition" >
     </com.blackswan.fake.view.FakeRefreshListView> 
+    <RelativeLayout
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:clickable="false"
+        android:visibility="invisible" >
+
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+    </RelativeLayout>
     <ListView 
 		android:id="@android:id/list"
 		android:layout_width="fill_parent"

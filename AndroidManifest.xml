@@ -114,6 +114,8 @@
         <activity android:name="com.blackswan.fake.activity.SelectCityBySort"/>
         <activity android:name="com.blackswan.fake.activity.BaiduMapActivity"/>
         <activity android:name="com.blackswan.fake.activity.HairDoDetailActivity"/>
+        <activity android:name="com.blackswan.fake.activity.barbershopactivity.BarberShopListActivity"/>
+        <activity android:name="com.blackswan.fake.activity.barberactivity.BarberListActivity"/>
          <service
             android:name="com.baidu.location.f"
             android:enabled="true"
