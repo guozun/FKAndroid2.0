@@ -33,7 +33,7 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListe
 
 public class HairDoDetailActivity extends BaseActivity implements
 		OnTouchListener {
-
+	protected final int PIC_NUM = 5;
 	private TextView barber;
 	private ImageView barberpic;
 	// 完成图片消失的动画的图片
@@ -46,8 +46,9 @@ public class HairDoDetailActivity extends BaseActivity implements
 	// ImageSwitch
 	private List<String> imgUrl = new ArrayList<String>();
 	private int currentPosition = 0;
-	private List<ImageView> imgPage = new ArrayList<ImageView>();
-
+	private ImageView[] imgPage = new ImageView[PIC_NUM];
+	// 小点点
+	private ImageView[] drops = new ImageView[PIC_NUM];
 	// 存放 上下两个相册的图片
 	private ImageView[] cacheImage = new ImageView[2];
 	/**
@@ -72,7 +73,7 @@ public class HairDoDetailActivity extends BaseActivity implements
 		mProgressWheel = (ProgressWheel) findViewById(R.id.id_hairdo_detail_progress);
 		imageGone = (ImageView) findViewById(R.id.id_hairdo_detail_pic_cache);
 		mProgressWheel.setVisibility(View.GONE);
-		//imageGone.setVisibility(View.GONE);
+		// imageGone.setVisibility(View.GONE);
 		imageGone.setImageLevel(1);
 		mViewPager.setOnTouchListener(this);
 		cacheImage[0] = new ImageView(this);
@@ -86,8 +87,11 @@ public class HairDoDetailActivity extends BaseActivity implements
 		imgUrl.add("http://g.hiphotos.baidu.com/image/pic/item/f31fbe096b63f624b55c6a738444ebf81a4ca3b9.jpg");
 		imgUrl.add("http://e.hiphotos.baidu.com/image/pic/item/359b033b5bb5c9eae1d75710d739b6003af3b319.jpg");
 		imgUrl.add("http://c.hiphotos.baidu.com/image/w%3D230/sign=beeba198a0cc7cd9fa2d33da09012104/0823dd54564e9258c34d3c9b9f82d158ccbf4e4d.jpg");
+		
 		for (int i = 0; i < imgUrl.size(); i++) {
-			imgPage.add(new ImageView(this));
+			ImageView iv = new ImageView(this);
+			iv.setImageLevel(0);
+			imgPage[i] = iv;
 		}
 		barber.setText("11111");
 		order.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +106,7 @@ public class HairDoDetailActivity extends BaseActivity implements
 				.displayImage(
 						"http://f.hiphotos.baidu.com/image/pic/item/ac4bd11373f0820287c2ab3c48fbfbedab641b64.jpg",
 						cacheImage[0], options);
-		
+
 		ImageLoader
 				.getInstance()
 				.displayImage(
@@ -128,15 +132,14 @@ public class HairDoDetailActivity extends BaseActivity implements
 			@Override
 			public void destroyItem(ViewGroup container, int position,
 					Object object) {
-				container.removeView(imgPage.get(position));
+				container.removeView(imgPage[position]);
 			}
 
 			@Override
 			public Object instantiateItem(ViewGroup container, int position) {
 
 				ImageLoader.getInstance().displayImage(imgUrl.get(position),
-						imgPage.get(position), options,
-						new ImageLoadingListener() {
+						imgPage[position], options, new ImageLoadingListener() {
 
 							@Override
 							public void onLoadingStarted(String imageUri,
@@ -176,8 +179,8 @@ public class HairDoDetailActivity extends BaseActivity implements
 							}
 						});
 
-				container.addView(imgPage.get(position));
-				return imgPage.get(position);
+				container.addView(imgPage[position]);
+				return imgPage[position];
 
 			}
 		});
@@ -190,16 +193,16 @@ public class HairDoDetailActivity extends BaseActivity implements
 	}
 
 	private void showNext() {
-		imgPage.clear();
 		imgUrl.clear();
 		imgUrl.add("http://f.hiphotos.baidu.com/image/pic/item/ac4bd11373f0820287c2ab3c48fbfbedab641b64.jpg");
 		imgUrl.add("http://d.hiphotos.baidu.com/image/pic/item/dc54564e9258d109207093b1d258ccbf6c814d25.jpg");
 		imgUrl.add("http://d.hiphotos.baidu.com/image/pic/item/4afbfbedab64034f9b88f805acc379310a551d6f.jpg");
 		imgUrl.add("http://a.hiphotos.baidu.com/image/pic/item/aa18972bd40735fa369774ba9d510fb30f240849.jpg");
+		
 		for (int i = 0; i < imgUrl.size(); i++) {
 			ImageView iv = new ImageView(this);
 			iv.setImageLevel(0);
-			imgPage.add(iv);
+			imgPage[i] = iv;
 		}
 		mViewPager.getAdapter().notifyDataSetChanged();
 		mViewPager.setCurrentItem(0);
@@ -235,12 +238,12 @@ public class HairDoDetailActivity extends BaseActivity implements
 				mAnimationSet.addAnimation(alpha);
 				mAnimationSet.addAnimation(scale);
 				mAnimationSet.setDuration(500);
-				
-				imageGone.setImageDrawable(imgPage.get(
-						mViewPager.getCurrentItem()).getDrawable());
+
+				imageGone.setImageDrawable(imgPage[mViewPager.getCurrentItem()]
+						.getDrawable());
 				imageGone.setVisibility(View.VISIBLE);
 				imageGone.startAnimation(mAnimationSet);
-				
+
 				mViewPager.setBackgroundDrawable(cacheImage[0].getDrawable());
 				mViewPager.removeAllViews();
 				showNext();
@@ -249,5 +252,11 @@ public class HairDoDetailActivity extends BaseActivity implements
 		}
 		return false;
 	}
-
+	private void initDrops(){
+		//把5个小点点隐藏起来
+//		int i;
+//		for(i=0;i<PIC_NUM;i++){
+//			drops[i]
+//		}
+	}
 }
