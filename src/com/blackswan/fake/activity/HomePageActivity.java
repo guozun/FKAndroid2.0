@@ -104,6 +104,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 				String result = msg.obj.toString();
 				try {
 					JSONObject json = new JSONObject(result);
+					Log.i("返回对象", "shit"+json.toString());
 					parser(json);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -583,7 +584,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 			}else {
 				region = text5.getText().toString();
 			}
-			map.put("region", URLEncoder.encode(region, "utf-8"));
+			map.put("region", "威海市");
 			//设置搜索半径参数
 			String radius="5000";
 			if (text6.getText().equals("1千米内")) {
@@ -608,7 +609,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 				map.put("location", cLat + "," + cLon);
 			}
 			//设置排序条件参数
-			String sort=null;
+			String sort="servicestar:-1";
 			if (text4.getText().equals("服务评价排序")) {
 				sort = "servicestar:-1";
 			}
@@ -675,15 +676,15 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 	private void searchBarberShop(int searchType){
 		progress.setVisibility(View.VISIBLE);
 		BaseApplication app = BaseApplication.getmInstance();
-		app.getBarbershops().clear(); // 搜索前清空列表
-		app.getBarberShopListActivity().loadMoreView.setVisibility(View.INVISIBLE);
-		if (app.getBarberShopListActivity().getListView().getFooterViewsCount() == 0) {
-			// 点击查看更多按钮添加
-			app.getBarberShopListActivity().getListView()
-					.addFooterView(app.getBarberShopListActivity().loadMoreView);
-		}
-
-		app.getBarberShopListActivity().getListView().setAdapter(app.getBarbershopListAdapter());
+//		app.getBarbershops().clear(); // 搜索前清空列表
+//		app.getBarberShopListActivity().loadMoreView.setVisibility(View.INVISIBLE);
+//		if (app.getBarberShopListActivity().getListView().getFooterViewsCount() == 0) {
+//			// 点击查看更多按钮添加
+//			app.getBarberShopListActivity().getListView()
+//					.addFooterView(app.getBarberShopListActivity().loadMoreView);
+//		}
+//
+//		app.getBarberShopListActivity().getListView().setAdapter(app.getBarbershopListAdapter());
 
 		// 云检索发起
 		LBSCloudSearch.request(searchType, getBSRequestParams(), mHandler,

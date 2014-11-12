@@ -6,12 +6,7 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.ListActivity;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.MeasureSpec;
@@ -19,22 +14,14 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.blackswan.fake.R;
 import com.blackswan.fake.adapter.BarbershopListAdapter;
-import com.blackswan.fake.adapter.CategoryListAdapter;
 import com.blackswan.fake.base.BaseApplication;
-import com.blackswan.fake.bean.MyRegion;
 import com.blackswan.fake.bean.NearBarberShop;
 import com.blackswan.fake.util.LBSCloudSearch;
-import com.blackswan.fake.util.PopCityUtils;
 import com.blackswan.fake.view.FakeRefreshListView;
 
 public class BarberShopListActivity extends ListActivity implements OnScrollListener{
@@ -52,8 +39,16 @@ public class BarberShopListActivity extends ListActivity implements OnScrollList
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		initViews();
-		initEvents();
+		loadMoreView = getLayoutInflater().inflate(R.layout.list_item_footer, null);
+		progressBar = (ProgressBar)loadMoreView.findViewById(R.id.progressBar);
+		refreshListView = (FakeRefreshListView) findViewById(R.id.nearbarbershop_reflist);
+		loadMoreView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				loadMoreData();
+				progressBar.setVisibility(View.VISIBLE);
+			}
+		});
 		
 		final ListView listView = getListView();
 		listView.setItemsCanFocus(false);
@@ -69,23 +64,6 @@ public class BarberShopListActivity extends ListActivity implements OnScrollList
 		
 	}
 	
-	@SuppressLint("InflateParams") 
-	protected void initViews() {
-		loadMoreView = getLayoutInflater().inflate(R.layout.list_item_footer, null);
-		progressBar = (ProgressBar)loadMoreView.findViewById(R.id.progressBar);
-		refreshListView = (FakeRefreshListView) findViewById(R.id.nearbarbershop_reflist);
-	}
-	
-	protected void initEvents() {
-		loadMoreView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				loadMoreData();
-				progressBar.setVisibility(View.VISIBLE);
-			}
-		});
-		
-	}
 	
 	/**
 	 * 列表item点击回调
