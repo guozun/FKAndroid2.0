@@ -49,7 +49,6 @@ public class HairdoWaterfallFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		Log.i(this.getTag(), "onCreateView");
 		View viewroot = inflater.inflate(R.layout.fragment_hairdo_waterfall,
 				container, false);
 		waterfallView = (MultiColumnPullToRefreshListView) viewroot
@@ -70,13 +69,11 @@ public class HairdoWaterfallFragment extends Fragment {
 	
 	@Override
 	public void onResume() {
-		Log.i(this.getTag(), "onResume");
 		super.onResume();
 	}
 
 	@Override
 	public void onStart() {
-		Log.i(this.getTag(), "onStart");
 		super.onStart();
 	}
 

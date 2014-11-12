@@ -326,7 +326,7 @@ public class BaseApplication extends Application {
 //				.writeDebugLogs() // Remove for release app
 //				.build();
 //		
-		int memoryCacheSize = 2 * 1024 * 1024;
+		int memoryCacheSize = 5 * 1024 * 1024;
 		int diskcacheSize = 50 * 1024 * 1024;	// 50 Mb
 		LruDiscCache diskcache = null;
 		try {
@@ -345,14 +345,14 @@ public class BaseApplication extends Application {
 				//.diskCacheExtraOptions(480, 180, null)
 				// .taskExecutor()
 				// .taskExecutorForCachedImages(...)
-				//.threadPoolSize(2)
+				.threadPoolSize(5)
 				// default
-				.threadPriority(Thread.NORM_PRIORITY - 2)
+				.threadPriority(Thread.NORM_PRIORITY )
 				// default
 				.tasksProcessingOrder(QueueProcessingType.LIFO)
 				// default
 				.denyCacheImageMultipleSizesInMemory()
-				.memoryCache(new LruMemoryCache(memoryCacheSize))
+				//.memoryCache(new LruMemoryCache(memoryCacheSize))
 				.memoryCacheSize(memoryCacheSize)
 				// .memoryCacheSizePercentage(1)
 				// default
