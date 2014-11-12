@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:id="@+id/ll_homepage" >
 <TabHost 
     android:id="@+id/homepagetabHost"
     android:layout_width="fill_parent"
@@ -10,7 +11,7 @@
  
  <!-- 镶嵌线性布局 -->
 
-<LinearLayout
+<RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical" >    
@@ -92,13 +93,108 @@
                android:src="@drawable/homepage_location" />
        </LinearLayout>
    </RelativeLayout>
+   <RelativeLayout 
+		       android:id="@+id/barberfilter"
+		       android:layout_width="fill_parent"
+		       android:layout_height="42dp"
+		       android:layout_below="@+id/rl_first_top">
+             <LinearLayout
+		            android:id="@+id/layout_barber"
+		            android:layout_width="fill_parent"
+		            android:layout_height="wrap_content"
+		            android:background="@color/text_normal"
+		            android:orientation="horizontal" >
+        	<TextView
+	                android:id="@+id/barber_text1"
+	                android:layout_width="wrap_content"
+	                android:layout_height="42.0dip"
+	                android:layout_weight="1.0"
+	                android:background="@drawable/selector_btn_text"
+	                android:clickable="true"
+	                android:gravity="center"
+	                android:text="@string/homepagetext1"
+	                android:textColor="#737373"
+	                android:textSize="16.0sp" />
+            <TextView
+	                android:id="@+id/barber_text2"
+	                android:layout_width="wrap_content"
+	                android:layout_height="42.0dip"
+	                android:layout_weight="1.0"
+	                android:background="@drawable/selector_btn_text"
+	                android:clickable="true"
+	                android:gravity="center"
+	                android:text="@string/homepagetext2"
+	                android:textColor="#737373"
+	                android:textSize="16.0sp" />
+            <TextView
+	                android:id="@+id/barber_text3"
+	                android:layout_width="wrap_content"
+	                android:layout_height="42.0dip"
+	                android:layout_weight="1.0"
+	                android:background="@drawable/selector_btn_text"
+	                android:clickable="true"
+	                android:gravity="center"
+	                android:text="@string/homepagetext3"
+	                android:textColor="#737373"
+	                android:textSize="16.0sp" />
+        </LinearLayout>
+   </RelativeLayout>
+   <RelativeLayout 
+		       android:id="@+id/barbershopfilter"
+		       android:layout_width="fill_parent"
+		       android:layout_height="42dp"
+		       android:layout_below="@+id/rl_first_top">
+             <LinearLayout
+		            android:id="@+id/layout_barbershop"
+		            android:layout_width="fill_parent"
+		            android:layout_height="wrap_content"
+		            android:background="@color/text_normal"
+		            android:orientation="horizontal" >
+        	<TextView
+	                android:id="@+id/barbershop_text1"
+	                android:layout_width="wrap_content"
+	                android:layout_height="42.0dip"
+	                android:layout_weight="1.0"
+	                android:background="@drawable/selector_btn_text"
+	                android:clickable="true"
+	                android:gravity="center"
+	                android:text="@string/homepagetext1"
+	                android:textColor="#737373"
+	                android:textSize="16.0sp" />
 
+           
+
+            <TextView
+	                android:id="@+id/barbershop_text2"
+	                android:layout_width="wrap_content"
+	                android:layout_height="42.0dip"
+	                android:layout_weight="1.0"
+	                android:background="@drawable/selector_btn_text"
+	                android:clickable="true"
+	                android:gravity="center"
+	                android:text="@string/homepagetext2"
+	                android:textColor="#737373"
+	                android:textSize="16.0sp" />
+            <TextView
+	                android:id="@+id/barbershop_text3"
+	                android:layout_width="wrap_content"
+	                android:layout_height="42.0dip"
+	                android:layout_weight="1.0"
+	                android:background="@drawable/selector_btn_text"
+	                android:clickable="true"
+	                android:gravity="center"
+	                android:text="@string/homepagetext3"
+	                android:textColor="#737373"
+	                android:textSize="16.0sp" />
+        </LinearLayout>
+      </RelativeLayout>
 	<FrameLayout
 	            android:id="@android:id/tabcontent"
 	            android:layout_width="fill_parent"
-	            android:layout_height="fill_parent" >
+	            android:layout_height="fill_parent"
+	            android:layout_below="@+id/barberfilter" >
 	  
 	</FrameLayout>
-</LinearLayout>
+</RelativeLayout>
 </TabHost>
 </LinearLayout>
