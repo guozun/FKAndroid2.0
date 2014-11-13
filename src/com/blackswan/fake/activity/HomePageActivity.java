@@ -133,11 +133,11 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 				break;
 			case MSG_NET_SUCC:
 				initSearchFlag = true;
-				String result = msg.obj.toString();
+				String shopresult = msg.obj.toString();
 				try {
-					JSONObject json = new JSONObject(result);
-					Log.i("返回理发店", "内容："+json.toString());
-					parserBarberShop(json);
+					JSONObject shopjson = new JSONObject(shopresult);
+					Log.i("返回理发店", "内容："+shopjson.toString());
+					parserBarberShop(shopjson);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
