@@ -3,14 +3,19 @@ package com.blackswan.fake.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 
 import com.blackswan.fake.R;
 import com.blackswan.fake.base.BaseActivity;
@@ -35,7 +40,8 @@ public class HairDoActivity extends BaseActivity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_hairdo);
-
+		
+		
 		mViewPager = (ViewPager) findViewById(R.id.id_hairdo_waterfall);
 		this.initViews();
 		

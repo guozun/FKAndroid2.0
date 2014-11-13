@@ -97,8 +97,7 @@
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-             >
+            android:layout_marginTop="10dp" >
 
             <Button
                 android:id="@+id/bt_mypage_collect"
@@ -108,16 +107,57 @@
             <Button
                 android:id="@+id/bt_mypage_topic"
                 style="@style/style_ib_mypage"
-                android:layout_marginLeft="10dp" 
-                android:layout_toRightOf="@id/bt_mypage_collect"/>
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/bt_mypage_collect" />
 
             <TextView
                 android:id="@+id/tv_mypage_hairshow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true" />
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true" />
         </RelativeLayout>
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/id_mypage_tab"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="1dp"
+        android:background="@color/color_mypage" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/tv_mypage_now_order"
+                style="@style/style_mypage_tv"
+                android:layout_marginRight="1dp"
+                android:text="当前预约" />
+
+            <ImageView style="@style/style_mypage_line" />
+
+            <TextView
+                android:id="@+id/tv_mypage_need_eval"
+                style="@style/style_mypage_tv"
+                android:layout_marginRight="1dp"
+                android:text="待评价" />
+
+            <ImageView style="@style/style_mypage_line" />
+
+            <TextView
+                android:id="@+id/tv_mypage_old_order"
+                style="@style/style_mypage_tv"
+                android:text="预约记录" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <android.support.v4.view.ViewPager
+        android:layout_marginTop="1dp"
+        android:id="@+id/id_mypager_viewpager"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7" />
 
 </LinearLayout>
