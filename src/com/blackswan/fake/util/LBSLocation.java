@@ -56,7 +56,7 @@ public class LBSLocation {
 			if (location == null)
 				return;
 			app.currlocation = location;
-			app.mCurrentcity = location.getCity()+"";
+			app.mCurrentcity = location.getCity();
 			mLocationClient.stop();
 			
 			//根据当前位置，计算列表中每一项的距离

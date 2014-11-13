@@ -7,9 +7,7 @@ import java.util.List;
 import android.annotation.SuppressLint;
 import android.app.ListActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.AbsListView;
@@ -22,7 +20,6 @@ import com.blackswan.fake.adapter.BarbershopListAdapter;
 import com.blackswan.fake.base.BaseApplication;
 import com.blackswan.fake.bean.NearBarberShop;
 import com.blackswan.fake.util.LBSCloudSearch;
-import com.blackswan.fake.view.FakeRefreshListView;
 
 public class BarberShopListActivity extends ListActivity implements OnScrollListener{
 	
@@ -32,16 +29,13 @@ public class BarberShopListActivity extends ListActivity implements OnScrollList
 	public ProgressBar progressBar;
 	private int visibleLastIndex = 0;   //最后的可视项索引 
 	public int totalItem = -1;
-	public FakeRefreshListView refreshListView;
 	
 	
-	@SuppressLint("InflateParams") 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		loadMoreView = getLayoutInflater().inflate(R.layout.list_item_footer, null);
 		progressBar = (ProgressBar)loadMoreView.findViewById(R.id.progressBar);
-		refreshListView = (FakeRefreshListView) findViewById(R.id.nearbarbershop_reflist);
 		loadMoreView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -53,10 +47,11 @@ public class BarberShopListActivity extends ListActivity implements OnScrollList
 		final ListView listView = getListView();
 		listView.setItemsCanFocus(false);
 		listView.setOnScrollListener(this);
-		BaseApplication application=(BaseApplication) getApplication();
-		adapter = new BarbershopListAdapter(application,BarberShopListActivity.this, list);
+		
+		adapter = new BarbershopListAdapter(BarberShopListActivity.this, list);
 		setListAdapter(adapter);
-
+		
+		BaseApplication application=(BaseApplication) getApplication();
 		application.setBarbershops(list);
 		application.setBarbershopListAdapter(adapter);
 		application.setBarberShopListActivity(this);
@@ -71,19 +66,19 @@ public class BarberShopListActivity extends ListActivity implements OnScrollList
 	@SuppressLint("InflateParams") 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		View popview = LayoutInflater.from(this).inflate(R.layout.marker_pop, null);
-		popview.setDrawingCacheEnabled(true);
-		//启用绘图缓存   
-		popview.setDrawingCacheEnabled(true);        
-        //调用下面这个方法非常重要，如果没有调用这个方法，得到的bitmap为null   
-		popview.measure(MeasureSpec.makeMeasureSpec(256, MeasureSpec.EXACTLY),  
-                MeasureSpec.makeMeasureSpec(256, MeasureSpec.EXACTLY));  
-        //这个方法也非常重要，设置布局的尺寸和位置   
-		popview.layout(0, 0, popview.getMeasuredWidth(), popview.getMeasuredHeight());  
-        //获得绘图缓存中的Bitmap   
-		popview.buildDrawingCache();   
-		
-		super.onListItemClick(l, v, position, id);
+//		View popview = LayoutInflater.from(this).inflate(R.layout.marker_pop, null);
+//		popview.setDrawingCacheEnabled(true);
+//		//启用绘图缓存   
+//		popview.setDrawingCacheEnabled(true);        
+//        //调用下面这个方法非常重要，如果没有调用这个方法，得到的bitmap为null   
+//		popview.measure(MeasureSpec.makeMeasureSpec(256, MeasureSpec.EXACTLY),  
+//                MeasureSpec.makeMeasureSpec(256, MeasureSpec.EXACTLY));  
+//        //这个方法也非常重要，设置布局的尺寸和位置   
+//		popview.layout(0, 0, popview.getMeasuredWidth(), popview.getMeasuredHeight());  
+//        //获得绘图缓存中的Bitmap   
+//		popview.buildDrawingCache();   
+//		
+//		super.onListItemClick(l, v, position, id);
 		
 //		String webUrl = list.get(position).getWebUrl();
 		
@@ -94,7 +89,7 @@ public class BarberShopListActivity extends ListActivity implements OnScrollList
 //	    startActivity(intent);
 	    
 	    //调用百度统计接口
-	    BaseApplication.getmInstance().callStatistics();
+//	    BaseApplication.getmInstance().callStatistics();
 	}
 	
 	@Override

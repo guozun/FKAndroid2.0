@@ -16,14 +16,12 @@ import com.blackswan.fake.view.HandyTextView;
 
 public class BaseObjectListAdapter extends BaseAdapter {
 
-	protected BaseApplication mApplication;
 	protected Context mContext;
 	protected LayoutInflater mInflater;
 	protected List<?> mDatas = new ArrayList<Entity>();
 
-	public BaseObjectListAdapter(BaseApplication application, Context context,
+	public BaseObjectListAdapter(Context context,
 			List<?> datas) {
-		mApplication = application;
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
 		if (datas != null) {

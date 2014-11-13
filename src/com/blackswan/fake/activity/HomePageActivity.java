@@ -1,6 +1,6 @@
 package com.blackswan.fake.activity;
 
-import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,12 +39,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackswan.fake.R;
+import com.blackswan.fake.activity.barberactivity.BarberListActivity;
 //import com.blackswan.fake.activity.BaiduMapActivity;
 import com.blackswan.fake.activity.barbershopactivity.BarberShopListActivity;
+import com.blackswan.fake.adapter.BarberListAdapter;
 import com.blackswan.fake.adapter.BarbershopListAdapter;
 import com.blackswan.fake.adapter.CategoryListAdapter;
 import com.blackswan.fake.base.BaseApplication;
 import com.blackswan.fake.bean.MyRegion;
+import com.blackswan.fake.bean.NearBarber;
 import com.blackswan.fake.bean.NearBarberShop;
 import com.blackswan.fake.util.LBSCloudSearch;
 import com.blackswan.fake.util.PopCityUtils;
@@ -90,6 +93,35 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 	public static final int RESEAR_BARBERSHOP = 99;
 	private boolean initSearchFlag = false;
 	private RelativeLayout progress;
+	
+	//获取云端美发师数据
+	private final Handler mBHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			progress.setVisibility(View.INVISIBLE);
+			switch (msg.what) {
+			case MSG_NET_TIMEOUT:
+				break;
+			case MSG_NET_STATUS_ERROR:
+				break;
+			case MSG_NET_SUCC:
+				initSearchFlag = true;
+				String result = msg.obj.toString();
+				try {
+					JSONObject json = new JSONObject(result);
+					Log.i("返回美发师", "内容："+json.toString());
+					parserBarber(json);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				break;
+
+			}
+		}
+	};
+	
+	//获取云端理发店数据
 	private final Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -104,8 +136,8 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 				String result = msg.obj.toString();
 				try {
 					JSONObject json = new JSONObject(result);
-					Log.i("返回对象", "shit"+json.toString());
-					parser(json);
+					Log.i("返回理发店", "内容："+json.toString());
+					parserBarberShop(json);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -144,7 +176,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 		TabWidget tabWidget = tabHost.getTabWidget();
 		TabSpec tab1 = tabHost.newTabSpec("barber");
         tab1.setIndicator(createContent("发型师",R.drawable.toplabelleft));
-        tab1.setContent(new Intent(this,BarberActivity.class));
+        tab1.setContent(new Intent(this,BarberListActivity.class));
         tabHost.addTab(tab1);
         
         TabSpec tab2 = tabHost.newTabSpec("barbershop");
@@ -156,8 +188,8 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
         initEvent();
         
         //请求网络搜索
-        searchBarberShop(LBSCloudSearch.SEARCH_TYPE_LOCAL);
-		BaseApplication.getmInstance().setHandler(mHandler);
+        searchBarber(LBSCloudSearch.SEARCH_TYPE_LOCAL);
+		BaseApplication.getmInstance().setHandler(mBHandler);
 	}
 	//注入界面控件
 	protected void initViews() {
@@ -188,8 +220,12 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 		//设置首页城市
 		String historycity=application.preferences.getString("city3", null);
         if (historycity==null) {
-        	application.putString("city3", application.mCurrentcity);
-			city.setText(application.mCurrentcity);
+        	if (application.mCurrentcity==null) {
+				city.setText("城市");
+			}else {
+				application.putString("city3", application.mCurrentcity);
+				city.setText(application.mCurrentcity);
+			}
 		}else {
 			city.setText(historycity);
 		}
@@ -242,6 +278,9 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 			text5.setVisibility(View.VISIBLE);
 			text6.setVisibility(View.VISIBLE);
 			barbershopfilter.setVisibility(View.VISIBLE);
+			//发起对理发店的检索
+			searchBarberShop(LBSCloudSearch.SEARCH_TYPE_LOCAL);
+			BaseApplication.getmInstance().setHandler(mHandler);
 		} else if (tabId.equals("barber")) {
 			tabHost.setCurrentTabByTag("发型师");
 			text1.setVisibility(View.VISIBLE);
@@ -252,6 +291,8 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 			text5.setVisibility(View.INVISIBLE);
 			text6.setVisibility(View.INVISIBLE);
 			barbershopfilter.setVisibility(View.INVISIBLE);
+			searchBarber(LBSCloudSearch.SEARCH_TYPE_LOCAL);
+			BaseApplication.getmInstance().setHandler(mBHandler);
 		}
 	}
 		
@@ -261,8 +302,12 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 		BaseApplication application = ((BaseApplication) getApplication());
 		String historycity=application.preferences.getString("city3", null);
 	       if (historycity==null) {
-	        	application.putString("city3", application.mCurrentcity);
-				city.setText(application.mCurrentcity);
+	    	   if (application.mCurrentcity==null) {
+					city.setText("城市");
+				}else {
+					application.putString("city3", application.mCurrentcity);
+					city.setText(application.mCurrentcity);
+				}
 			}else {
 				city.setText(historycity);
 			}
@@ -364,113 +409,13 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 		public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 								text1.setText((String)itemList.get(position).get("name"));
-								
-								layout.setVisibility(View.GONE);
-							}
-		});
-	}	
-	
-	//弹出理发店评价排序条件
-	@SuppressLint("InflateParams") 
-	protected void showStarPopupWindow(int width, int height) {
-		String title[] = {"服务评价排序","卫生评价排序","设施评价排序","价格评价排序"};
-		itemList = new ArrayList<HashMap<String,Object>>();
-		layout = (LinearLayout) LayoutInflater.from(HomePageActivity.this).inflate(R.layout.popup_distance, null);
-		rootList = (ListView) layout.findViewById(R.id.distancecategory);
-		for(int i=0;i<title.length;i++){
-			HashMap<String,Object> items = new HashMap<String,Object>();
-			items.put("name",title[i]);
-			items.put("count", 1);
-			itemList.add(items);
-		}
-		
-		CategoryListAdapter cla = new CategoryListAdapter(HomePageActivity.this, itemList);
-		rootList.setAdapter(cla);
-		
-		mPopWin = new PopupWindow(layout, width * 2/5, height *2/5, true);
-		mPopWin.showAtLocation(layout, Gravity.LEFT, 0, -116);
-		mPopWin.showAsDropDown(text1, 4, 1);
-		mPopWin.update();
-		
-		rootList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-								text4.setText((String)itemList.get(position).get("name"));
 								if (initSearchFlag) {
-									searchBarberShop(LBSCloudSearch.SEARCH_TYPE_LOCAL);
+									searchBarber(LBSCloudSearch.SEARCH_TYPE_LOCAL);
 								}
 								layout.setVisibility(View.GONE);
 							}
 		});
-	}
-	
-	//弹出美发师距离条件选项
-	@SuppressLint("InflateParams") 
-	protected void showBDistancePopupWindow(int width, int height) {
-		String title[] = {"1千米内","2千米内","5千米内"};
-		itemList = new ArrayList<HashMap<String,Object>>();
-		layout = (LinearLayout) LayoutInflater.from(HomePageActivity.this).inflate(R.layout.popup_distance, null);
-		rootList = (ListView) layout.findViewById(R.id.distancecategory);
-		for(int i=0;i<title.length;i++){
-			HashMap<String,Object> items = new HashMap<String,Object>();
-			items.put("name",title[i]);
-			items.put("count", 100);
-			itemList.add(items);
-		}
-		
-		CategoryListAdapter cla = new CategoryListAdapter(HomePageActivity.this, itemList);
-		rootList.setAdapter(cla);
-		
-		mPopWin = new PopupWindow(layout, width * 1/3, height*1/ 3, true);
-		mPopWin.showAtLocation(layout, Gravity.RIGHT, 0, -126);
-		mPopWin.showAsDropDown(text1, 3, 1);
-		mPopWin.update();
-		
-		rootList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-								text3.setText((String)itemList.get(position).get("name"));
-								layout.setVisibility(View.GONE);
-							}
-		});
 	}	
-	
-	//弹出理发店距离条件选项
-	@SuppressLint("InflateParams") 
-	protected void showBSDistancePopupWindow(int width, int height) {
-		String title[] = {"1千米内","2千米内","5千米内"};
-		itemList = new ArrayList<HashMap<String,Object>>();
-		layout = (LinearLayout) LayoutInflater.from(HomePageActivity.this).inflate(R.layout.popup_distance, null);
-		rootList = (ListView) layout.findViewById(R.id.distancecategory);
-		for(int i=0;i<title.length;i++){
-			HashMap<String,Object> items = new HashMap<String,Object>();
-			items.put("name",title[i]);
-			items.put("count", 100);
-			itemList.add(items);
-		}
-		
-		CategoryListAdapter cla = new CategoryListAdapter(HomePageActivity.this, itemList);
-		rootList.setAdapter(cla);
-		
-		mPopWin = new PopupWindow(layout, width * 1/3, height*1/ 3, true);
-		mPopWin.showAtLocation(layout, Gravity.RIGHT, 0, -126);
-		mPopWin.showAsDropDown(text1, 3, 1);
-		mPopWin.update();
-		
-		rootList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-								text6.setText((String)itemList.get(position).get("name"));
-								if (initSearchFlag) {
-									searchBarberShop(LBSCloudSearch.SEARCH_TYPE_LOCAL);
-								}
-								layout.setVisibility(View.GONE);
-							}
-		});
-	}
 	
 	//弹出美发师城市区域条件选项
 	@SuppressLint("InflateParams")
@@ -511,12 +456,123 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 							public void onItemClick(AdapterView<?> parent,
 									View view, int position, long id) {
 								text2.setText((String)itemList.get(position).get("name"));
+								if (initSearchFlag) {
+									searchBarber(LBSCloudSearch.SEARCH_TYPE_LOCAL);
+								}
 								layout.setVisibility(View.GONE);
 							}
 					});
 			}
 		});
 	}
+	
+	//弹出美发师距离条件选项
+	@SuppressLint("InflateParams") 
+	protected void showBDistancePopupWindow(int width, int height) {
+		String title[] = {"1千米内","2千米内","5千米内"};
+		itemList = new ArrayList<HashMap<String,Object>>();
+		layout = (LinearLayout) LayoutInflater.from(HomePageActivity.this).inflate(R.layout.popup_distance, null);
+		rootList = (ListView) layout.findViewById(R.id.distancecategory);
+		for(int i=0;i<title.length;i++){
+			HashMap<String,Object> items = new HashMap<String,Object>();
+			items.put("name",title[i]);
+			items.put("count", 100);
+			itemList.add(items);
+		}
+		
+		CategoryListAdapter cla = new CategoryListAdapter(HomePageActivity.this, itemList);
+		rootList.setAdapter(cla);
+		
+		mPopWin = new PopupWindow(layout, width * 1/3, height*1/ 3, true);
+		mPopWin.showAtLocation(layout, Gravity.RIGHT, 0, -126);
+		mPopWin.showAsDropDown(text1, 3, 1);
+		mPopWin.update();
+		
+		rootList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+								text3.setText((String)itemList.get(position).get("name"));
+								if (initSearchFlag) {
+									searchBarber(LBSCloudSearch.SEARCH_TYPE_LOCAL);
+								}
+								layout.setVisibility(View.GONE);
+							}
+		});
+	}			
+	//弹出理发店评价排序条件
+	@SuppressLint("InflateParams") 
+	protected void showStarPopupWindow(int width, int height) {
+		String title[] = {"服务评价排序","卫生评价排序","设施评价排序","价格评价排序"};
+		itemList = new ArrayList<HashMap<String,Object>>();
+		layout = (LinearLayout) LayoutInflater.from(HomePageActivity.this).inflate(R.layout.popup_distance, null);
+		rootList = (ListView) layout.findViewById(R.id.distancecategory);
+		for(int i=0;i<title.length;i++){
+			HashMap<String,Object> items = new HashMap<String,Object>();
+			items.put("name",title[i]);
+			items.put("count", 1);
+			itemList.add(items);
+		}
+		
+		CategoryListAdapter cla = new CategoryListAdapter(HomePageActivity.this, itemList);
+		rootList.setAdapter(cla);
+		
+		mPopWin = new PopupWindow(layout, width * 2/5, height *2/5, true);
+		mPopWin.showAtLocation(layout, Gravity.LEFT, 0, -116);
+		mPopWin.showAsDropDown(text1, 4, 1);
+		mPopWin.update();
+		
+		rootList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+								text4.setText((String)itemList.get(position).get("name"));
+								if (initSearchFlag) {
+									searchBarberShop(LBSCloudSearch.SEARCH_TYPE_LOCAL);
+								}
+								layout.setVisibility(View.GONE);
+							}
+		});
+	}
+	
+	
+	
+	//弹出理发店距离条件选项
+	@SuppressLint("InflateParams") 
+	protected void showBSDistancePopupWindow(int width, int height) {
+		String title[] = {"1千米内","2千米内","5千米内"};
+		itemList = new ArrayList<HashMap<String,Object>>();
+		layout = (LinearLayout) LayoutInflater.from(HomePageActivity.this).inflate(R.layout.popup_distance, null);
+		rootList = (ListView) layout.findViewById(R.id.distancecategory);
+		for(int i=0;i<title.length;i++){
+			HashMap<String,Object> items = new HashMap<String,Object>();
+			items.put("name",title[i]);
+			items.put("count", 100);
+			itemList.add(items);
+		}
+		
+		CategoryListAdapter cla = new CategoryListAdapter(HomePageActivity.this, itemList);
+		rootList.setAdapter(cla);
+		
+		mPopWin = new PopupWindow(layout, width * 1/3, height*1/ 3, true);
+		mPopWin.showAtLocation(layout, Gravity.RIGHT, 0, -126);
+		mPopWin.showAsDropDown(text1, 3, 1);
+		mPopWin.update();
+		
+		rootList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+								text6.setText((String)itemList.get(position).get("name"));
+								if (initSearchFlag) {
+									searchBarberShop(LBSCloudSearch.SEARCH_TYPE_LOCAL);
+								}
+								layout.setVisibility(View.GONE);
+							}
+		});
+	}
+	
+	
 	
 	//弹出理发店城市区域选项
 	private void showBSCityPopupWindow(int width, int height) {
@@ -567,6 +623,62 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 	}
 	
 	/*
+	 * 获取美发师云检索参数
+	 */
+	private HashMap<String, String> getBRequestParams() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		try {
+			//设置搜索地区参数
+			String region = null;
+			if (text2.getText().toString().equals("全市")) {
+				BaseApplication application = (BaseApplication) getApplication();
+				if (application.preferences.getString("city3", null)==null) {
+					if (application.mCurrentcity==null) {
+						Toast.makeText(context, "网络异常，无法获取当前城市信息！", Toast.LENGTH_SHORT).show();
+					}else {
+						region = application.mCurrentcity;
+					}
+					
+				}else {
+					region = application.preferences.getString("city3", null);
+				}
+			}else {
+				region = text2.getText().toString();
+			}
+			map.put("region", region);
+			//设置搜索半径参数
+			String radius="5000";
+			if (text3.getText().equals("1千米内")) {
+				radius = "1000";
+			}
+			if (text3.getText().equals("2千米内")) {
+				radius = "2000";
+			}
+			if (text3.getText().equals("5千米内")) {
+				radius = "5000";
+			}
+			map.put("radius", radius);
+			//设置中心点参数
+			BaseApplication app = BaseApplication.getmInstance();
+			if (app.currlocation != null) {
+				map.put("location", app.currlocation.getLongitude() + ","
+						+ app.currlocation.getLatitude());
+			} else {
+				// 无定位数据默认北京中心
+				double cLat = 39.909230;
+				double cLon = 116.397428;
+				map.put("location", cLat + "," + cLon);
+			}
+			//设置排序条件参数
+			map.put("sortby","distance:1|appraisestar:-1");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		BaseApplication.getmInstance().setFilterParams(map);
+		return map;
+	}
+	
+	/*
 	 * 获取理发店云检索参数
 	 */
 	private HashMap<String, String> getBSRequestParams() {
@@ -577,14 +689,18 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 			if (text5.getText().toString().equals("全市")) {
 				BaseApplication application = (BaseApplication) getApplication();
 				if (application.preferences.getString("city3", null)==null) {
-					region = application.mCurrentcity;
+					if (application.mCurrentcity==null) {
+						Toast.makeText(context, "网络异常，无法获取当前城市信息！", Toast.LENGTH_SHORT).show();
+					}else {
+						region = application.mCurrentcity;
+					}
 				}else {
 					region = application.preferences.getString("city3", null);
 				}
 			}else {
 				region = text5.getText().toString();
 			}
-			map.put("region", "威海市");
+			map.put("region", region);
 			//设置搜索半径参数
 			String radius="5000";
 			if (text6.getText().equals("1千米内")) {
@@ -623,6 +739,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 				sort = "facilitystar:-1";
 			}
 			map.put("sortby", "distance:1|"+sort);
+			map.put("tags", "理发店");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -630,45 +747,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 		return map;
 	}
 	
-	/*
-	 * 获取美发师云检索参数
-	 */
-	private HashMap<String, String> getBRequestParams() {
-		HashMap<String, String> map = new HashMap<String, String>();
-		try {
-			//设置搜索地区参数
-			map.put("region", URLEncoder.encode(text2.getText().toString(), "utf-8"));
-			//设置搜索半径参数
-			String radius="5000";
-			if (text3.getText().equals("1千米内")) {
-				radius = "1000";
-			}
-			if (text3.getText().equals("2千米内")) {
-				radius = "2000";
-			}
-			if (text3.getText().equals("5千米内")) {
-				radius = "5000";
-			}
-			map.put("radius", radius);
-			//设置中心点参数
-			BaseApplication app = BaseApplication.getmInstance();
-			if (app.currlocation != null) {
-				map.put("location", app.currlocation.getLongitude() + ","
-						+ app.currlocation.getLatitude());
-			} else {
-				// 无定位数据默认北京中心
-				double cLat = 39.909230;
-				double cLon = 116.397428;
-				map.put("location", cLat + "," + cLon);
-			}
-			//设置排序条件参数
-			map.put("sortby","distance:1|appraisestar:-1");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		BaseApplication.getmInstance().setFilterParams(map);
-		return map;
-	}
+	
 	
 	/*
 	 * 根据搜索类型发起对理发店的检索
@@ -676,28 +755,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 	private void searchBarberShop(int searchType){
 		progress.setVisibility(View.VISIBLE);
 		BaseApplication app = BaseApplication.getmInstance();
-//		app.getBarbershops().clear(); // 搜索前清空列表
-//		app.getBarberShopListActivity().loadMoreView.setVisibility(View.INVISIBLE);
-//		if (app.getBarberShopListActivity().getListView().getFooterViewsCount() == 0) {
-//			// 点击查看更多按钮添加
-//			app.getBarberShopListActivity().getListView()
-//					.addFooterView(app.getBarberShopListActivity().loadMoreView);
-//		}
-//
-//		app.getBarberShopListActivity().getListView().setAdapter(app.getBarbershopListAdapter());
-
-		// 云检索发起
-		LBSCloudSearch.request(searchType, getBSRequestParams(), mHandler,
-				BaseApplication.networkType,"78111");
-	}
-	
-	/*
-	 * 根据搜索类型发起对美发师的检索
-	 */
-	private void searchBarber(int searchType){
-		progress.setVisibility(View.VISIBLE);
-		BaseApplication app = BaseApplication.getmInstance();
-		app.getBarbers().clear(); // 搜索前清空列表
+		app.getBarbershops().clear(); // 搜索前清空列表
 		app.getBarberShopListActivity().loadMoreView.setVisibility(View.INVISIBLE);
 		if (app.getBarberShopListActivity().getListView().getFooterViewsCount() == 0) {
 			// 点击查看更多按钮添加
@@ -713,13 +771,107 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 	}
 	
 	/*
-	 * 解析返回数据
+	 * 根据搜索类型发起对美发师的检索
 	 */
-	private void parser(JSONObject json) {
-		BaseApplication app = (BaseApplication) getApplication();
+	private void searchBarber(int searchType){
+		progress.setVisibility(View.VISIBLE);
+		BaseApplication app = BaseApplication.getmInstance();
+		app.getBarbers().clear(); // 搜索前清空列表
+		app.getBarberListActivity().loadMoreView.setVisibility(View.INVISIBLE);
+		if (app.getBarberListActivity().getListView().getFooterViewsCount() == 0) {
+			// 点击查看更多按钮添加
+			app.getBarberListActivity().getListView()
+					.addFooterView(app.getBarberListActivity().loadMoreView);
+		}
+
+		app.getBarberListActivity().getListView().setAdapter(app.getBarberadapter());
+
+		// 云检索发起
+		LBSCloudSearch.request(searchType, getBRequestParams(), mBHandler,
+				BaseApplication.networkType,"85084");
+	}
+	
+	/*
+	 * 解析返回美发师数据
+	 */
+	private void parserBarber(JSONObject json) {
+		BaseApplication app = (BaseApplication)getApplication();
+		List<NearBarber> list = app.getBarbers();
+
+		try {
+			Log.i("返回对象总数",""+json.getInt("total"));
+			app.getBarberListActivity().totalItem = json.getInt("total");
+
+			JSONArray jsonArray = json.getJSONArray("contents");
+			if (jsonArray != null && jsonArray.length() <= 0) {
+				Toast.makeText(context, "没有符合要求的数据", Toast.LENGTH_SHORT).show();
+			} else {
+				for (int i = 0; i < jsonArray.length(); i++) {
+					JSONObject jsonObject2 = (JSONObject) jsonArray.opt(i);
+					NearBarber content = new NearBarber();
+					content.setBName(jsonObject2.getString("title"));
+					content.setBAddress(jsonObject2.getString("address"));
+
+					JSONArray locArray = jsonObject2.getJSONArray("location");
+					double latitude = locArray.getDouble(1);
+					double longitude = locArray.getDouble(0);
+					content.setLatitude(latitude);
+					content.setLongitude(longitude);
+
+					float results[] = new float[1];
+
+					if (app.currlocation != null) {
+						Location.distanceBetween(
+								app.currlocation.getLatitude(),
+								app.currlocation.getLongitude(), latitude,
+								longitude, results);
+					}
+					DecimalFormat decimalFormat = new DecimalFormat(".00");
+					String dist = decimalFormat.format(results[0]/1000);
+					content.setBDistance(dist);
+					Log.i("距离", ""+content.getBDistance());
+					content.setBDis(jsonObject2.getString("discontent"));
+					content.setImageurl(jsonObject2.getJSONObject("imageurl").getString("big"));
+					content.setBSex(jsonObject2.getString("sex"));
+					content.setBAge(jsonObject2.getInt("age"));
+					//设置为访问发客数据操作链接
+		
+					content.setOrderAddup(jsonObject2.getInt("orderaddup"));
+					content.setAppraiseStar(jsonObject2.getDouble("appraisestar"));
+					list.add(content);
+				}
+
+			}
+			if (list.size() < 15) {
+				app.getBarberListActivity().getListView()
+						.removeFooterView(app.getBarberListActivity().loadMoreView);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		BarberListAdapter adapter = ((BaseApplication) getApplication())
+				.getBarberadapter();
+		if (adapter != null) {
+			adapter.notifyDataSetChanged();
+			app.getBarberListActivity().loadMoreView.setVisibility(View.VISIBLE);
+			app.getBarberListActivity().progressBar.setVisibility(View.INVISIBLE);
+		}
+		if (app.getBaiduMapActivity() != null) {
+			app.getBaiduMapActivity().removeAllMarker();
+			app.getBaiduMapActivity().addAllMarker();
+		}
+	}
+	
+	/*
+	 * 解析返回理发店数据
+	 */
+	private void parserBarberShop(JSONObject json) {
+		BaseApplication app = (BaseApplication)getApplication();
 		List<NearBarberShop> list = app.getBarbershops();
 
 		try {
+			Log.i("返回对象总数",""+json.getInt("total"));
 			app.getBarberShopListActivity().totalItem = json.getInt("total");
 
 			JSONArray jsonArray = json.getJSONArray("contents");
@@ -746,12 +898,14 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 								app.currlocation.getLongitude(), latitude,
 								longitude, results);
 					}
-					content.setSDistance((int) results[0]/1000 + "km");
-
-					content.setSDis(jsonObject2.getString("discotent"));
-					content.setImageurl(jsonObject2.getString("imageurl"));
+					DecimalFormat decimalFormat = new DecimalFormat(".00");
+					String dist = decimalFormat.format(results[0]/1000);
+					content.setSDistance(dist);
+					Log.i("距离", ""+content.getSDistance());
+					content.setSDis(jsonObject2.optString("discontent"));
+					content.setImageurl(jsonObject2.getJSONObject("imageurl").getString("big"));
 					//设置为访问发客数据操作链接
-					content.setWebUrl(jsonObject2.getString("roomurl"));
+		
 					content.setOrderAddup(jsonObject2.getInt("orderaddup"));
 					content.setPriceStar(jsonObject2.getDouble("pricestar"));
 					content.setServiceStar(jsonObject2.getDouble("servicestar"));

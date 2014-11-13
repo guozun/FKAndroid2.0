@@ -49,7 +49,6 @@ public class BaseApplication extends Application {
 	SharedPreferences.Editor editor;  
     Context context;
     private static BaseApplication mInstance = null;
-    public static final String strKey = "O65sXI7ksbsVeaMXI7aF94gf";
 
 	// 定位结果
 	public BDLocation currlocation = null;

@@ -1,5 +1,7 @@
 package com.blackswan.fake.util;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -10,6 +12,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
@@ -34,7 +38,7 @@ public class LBSCloudSearch {
 	private static int currSearchType = 0;
 	
 	//云检索公钥
-	private static String ak = "O65sXI7ksbsVeaMXI7aF94gf";
+	private static String ak = "A3UPMK55OBoH6uypQlKGzfss";
 	
 
 	private static int TIME_OUT = 12000;
@@ -103,16 +107,18 @@ public class LBSCloudSearch {
 						}
 						
 						Log.d("FaKeLog", "request url:" + requestURL);
-						
-						HttpGet httpRequest = new HttpGet(requestURL);
+						URL url = new URL(requestURL);
+						URI uri = new URI(url.getProtocol(), url.getHost(), url.getPath(), url.getQuery(), null);
+						HttpGet httpRequest = new HttpGet(uri);
 						HttpClient httpclient = new DefaultHttpClient();
+						HttpClientParams.setCookiePolicy(httpclient.getParams(), CookiePolicy.BROWSER_COMPATIBILITY); 
 						httpclient.getParams().setParameter(
 								CoreConnectionPNames.CONNECTION_TIMEOUT, TIME_OUT);
 						httpclient.getParams().setParameter(
 								CoreConnectionPNames.SO_TIMEOUT, TIME_OUT);
 						
 						HttpProtocolParams.setUseExpectContinue(httpclient.getParams(), false);
-						
+						Log.d("FaKeLog", "检测request url:" + requestURL);
 						if(networkType.equals("cmwap")){
 							HttpHost proxy = new HttpHost("10.0.0.172", 80, "http");
 							httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
@@ -122,7 +128,6 @@ public class LBSCloudSearch {
 							httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
 									proxy);
 						}
-
 
 						HttpResponse httpResponse = httpclient.execute(httpRequest);
 						int status = httpResponse.getStatusLine().getStatusCode();

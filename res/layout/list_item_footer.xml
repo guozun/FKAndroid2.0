@@ -5,7 +5,6 @@
     android:layout_height="50dp"
     android:background="#FFFFFF"
     android:clickable="true" >
-
 	<TextView
 	    android:id="@+id/main_text"
 	    android:layout_width="wrap_content"
