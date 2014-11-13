@@ -46,6 +46,12 @@ public class HairDoDetailActivity extends BaseActivity implements
 	private DisplayImageOptions options;
 	private Button order;
 	private Button buttonBack;
+	//赞数  顶数
+	private TextView upNum;
+	private TextView downNum;
+	//赞 顶 按钮
+	private ImageView upImg;
+	private ImageView downImg;
 	// 进度条
 	private ProgressWheel mProgressWheel;
 	// ImageSwitch
@@ -78,11 +84,28 @@ public class HairDoDetailActivity extends BaseActivity implements
 		mProgressWheel = (ProgressWheel) findViewById(R.id.id_hairdo_detail_progress);
 		imageGone = (ImageView) findViewById(R.id.id_hairdo_detail_pic_cache);
 		buttonBack = (Button)findViewById(R.id.iv_hairdo_detail_back);
+		upNum = (TextView)findViewById(R.id.tv_hairdo_item_good);
+		downNum = (TextView)findViewById(R.id.tv_hairdo_item_bad);
+		upImg = (ImageView) findViewById(R.id.iv_hairdo_detail_good);
+		downImg = (ImageView) findViewById(R.id.iv_hairdo_detail_bad);
+		
 		
 		buttonBack.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				defaultFinish();
+			}
+		});
+		upImg.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+			}
+		});
+		downImg.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
 			}
 		});
 		mProgressWheel.setVisibility(View.GONE);

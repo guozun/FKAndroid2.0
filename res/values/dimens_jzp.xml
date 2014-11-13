@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- hairdo里面 Bar文字大小设置 -->
     <dimen name="size_hairdo_bar_text">30sp</dimen>
@@ -31,6 +31,23 @@
         <attr name="contourColor" format="color" />
         <attr name="contourSize" format="dimension" />
     </declare-styleable>
+
+    <!-- MyPage配置 -->
+    <color name="color_mypage">#EDFDFE</color>
+
+    <style name="style_ib_mypage" parent="@style/ButtonStyle">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+        <item name="android:background">@drawable/mypage_bt_selector</item>
+        
+    </style>
+
 
 
 </resources>
