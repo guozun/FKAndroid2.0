@@ -2,51 +2,200 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black4"
     android:orientation="vertical" >
+
     <!-- 头部导航 -->
 
     <RelativeLayout
-        android:id="@+id/rl_top"
         android:layout_width="fill_parent"
         android:layout_height="50dip"
         android:background="@drawable/bg_actionbar"
         android:gravity="center_vertical"
         android:orientation="horizontal" >
 
-       <LinearLayout
-            android:id="@+id/ll_img"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_marginLeft="10dip"
+        <ImageView
+            android:layout_width="45dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
             android:gravity="center"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:src="@drawable/bg_back" />
 
-            <ImageView
-              android:layout_width="45dp"
-              android:layout_height="match_parent"
-              android:layout_marginLeft="5dip"
-              android:src="@drawable/btn_back_normal" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_mine"
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_marginLeft="10dip"
-            android:layout_toRightOf="@id/ll_img"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="5dip"
+            android:text="个人资料"
+            android:textColor="#FFFFFFFF"
+            android:textSize="18sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/iv_personalinfo_alter_head"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/white"
+        android:padding="10dp" 
+        android:onClick="alterHead">
+
+        <ImageView
+            android:id="@+id/iv_personalinfo_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:adjustViewBounds="true"
+            android:maxHeight="50dp"
+            android:maxWidth="50dp" />
+
+        <ImageView style="@style/style_personalinfo_right_image" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:background="@color/white"
+        android:padding="10dp" >
+
+        <TextView
+            android:id="@+id/tv_personalinfo_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="昵称"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_personalinfo_alter_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:ems="10" >
+        </EditText>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:background="@color/white"
+        android:padding="10dp" >
+
+        <TextView
+            android:id="@+id/tv_personalinfo_sex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="性别"
+            android:textSize="18sp" />
+
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
             android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/tv_mine"
+            <RadioButton
+                android:id="@+id/radio_personalinfo_male"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="5dip"
-                android:text="账户详情"
-                android:textColor="#FFFFFFFF"
-                android:textSize="18sp" />
-        </LinearLayout>
+                android:checked="true"
+                android:text="男" />
+
+            <RadioButton
+                android:id="@+id/radio_personalinfo_female"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="女" />
+        </RadioGroup>
     </RelativeLayout>
-    
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:background="@color/white"
+        android:padding="10dp" >
+
+        <TextView
+            android:id="@+id/tv_personalinfo_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="手机号码"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_personalinfo_alter_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:ems="10"
+            android:inputType="phone" >
+        </EditText>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/iv_personalinfo_alter_password"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/white"
+        android:padding="10dp" 
+        android:onClick="alterPassword">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="修改密码" />
+
+        <ImageView style="@style/style_personalinfo_right_image" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/iv_personalinfo_alter_upgrade"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/white"
+        android:padding="10dp"
+        android:onClick="upgrade" 
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="检查更新" />
+
+        <ImageView style="@style/style_personalinfo_right_image" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/iv_personalinfo_alter_about"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/white"
+        android:padding="10dp" 
+        android:onClick="about">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="关于剃头" />
+
+        <ImageView style="@style/style_personalinfo_right_image" />
+    </RelativeLayout>
 
 </LinearLayout>

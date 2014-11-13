@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.blackswan.fake.R;
 import com.blackswan.fake.activity.useractivity.LoginActivity;
 import com.blackswan.fake.activity.useractivity.MyCollectActivity;
+import com.blackswan.fake.activity.useractivity.PersonalInfoActivity;
 import com.blackswan.fake.adapter.NowOrderListFragment;
 import com.blackswan.fake.adapter.ToEvaluateFragment;
 import com.blackswan.fake.base.BaseActivity;
@@ -78,7 +79,7 @@ public class MyPageActivity extends BaseActivity {
 			settingImageView = (ImageButton) findViewById(R.id.ib_mypage_detail);
 			mViewPager = (ViewPager)findViewById(R.id.id_mypager_viewpager);
 			cursor = new ImageView(this);
-			//setLisentener();
+			setLisentener();
 			initViews();
 		} else {
 			Button login = (Button) findViewById(R.id.mypage_nologin_login);
@@ -96,31 +97,11 @@ public class MyPageActivity extends BaseActivity {
 	 * 为各个控件设置监听
 	 */
 	private void setLisentener() {
-		myHeadImageView.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// 弹出修改头像的界面
-				
-			}
-		});
-		myName.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// 判断是否登入，未登入跳转登入界面
-				if (userInfo == null) {
-					startActivity(LoginActivity.class);
-				} else {
-					startActivity(MyPageActivity.class);
-				}
-			}
-		});
 		settingImageView.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				startActivity(MyPageActivity.class);
+				startActivity(PersonalInfoActivity.class);
 			}
 		});
 		myTopic.setOnClickListener(new OnClickListener() {

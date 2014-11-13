@@ -100,7 +100,7 @@
         <activity android:name="com.blackswan.fake.activity.MainActivity"/>
         <activity android:name="com.blackswan.fake.activity.MyCollectActivity"/>
         <activity android:name="com.blackswan.fake.activity.MyPageActivity"/>
-        <activity android:name="com.blackswan.fake.activity.PersonalInfoActivity"/>
+        <activity android:name="com.blackswan.fake.activity.useractivity.PersonalInfoActivity"/>
         <activity android:name="com.blackswan.fake.activity.RegisterActivity"/>
         <activity android:name="com.blackswan.fake.activity.SelectCityActivity"/>
         <activity android:name="com.blackswan.fake.activity.ShareToFriendsActivity"/>
