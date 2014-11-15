@@ -2,6 +2,8 @@ package com.blackswan.fake.activity;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -188,6 +190,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
         initEvent();
         
         //请求网络搜索
+        BaseApplication.setNetworkType();
         searchBarber(LBSCloudSearch.SEARCH_TYPE_LOCAL);
 		BaseApplication.getmInstance().setHandler(mBHandler);
 	}
@@ -387,7 +390,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 	//弹出美发师评价排序条件
 	@SuppressLint("InflateParams") 
 	protected void showBarberStarPopupWindow(int width, int height) {
-		String title = "按评价排序";
+		String title = "按评分排序";
 		itemList = new ArrayList<HashMap<String,Object>>();
 		layout = (LinearLayout) LayoutInflater.from(HomePageActivity.this).inflate(R.layout.popup_distance, null);
 		rootList = (ListView) layout.findViewById(R.id.distancecategory);
@@ -518,7 +521,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 		rootList.setAdapter(cla);
 		
 		mPopWin = new PopupWindow(layout, width * 2/5, height *2/5, true);
-		mPopWin.showAtLocation(layout, Gravity.LEFT, 0, -116);
+		mPopWin.showAtLocation(layout, Gravity.LEFT, 0, -100);
 		mPopWin.showAsDropDown(text1, 4, 1);
 		mPopWin.update();
 		
@@ -648,13 +651,13 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 			map.put("region", region);
 			//设置搜索半径参数
 			String radius="5000";
-			if (text3.getText().equals("1千米内")) {
+			if (text3.getText().toString().equals("1千米内")) {
 				radius = "1000";
 			}
-			if (text3.getText().equals("2千米内")) {
+			if (text3.getText().toString().equals("2千米内")) {
 				radius = "2000";
 			}
-			if (text3.getText().equals("5千米内")) {
+			if (text3.getText().toString().equals("5千米内")) {
 				radius = "5000";
 			}
 			map.put("radius", radius);
@@ -690,7 +693,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 				BaseApplication application = (BaseApplication) getApplication();
 				if (application.preferences.getString("city3", null)==null) {
 					if (application.mCurrentcity==null) {
-						Toast.makeText(context, "网络异常，无法获取当前城市信息！", Toast.LENGTH_SHORT).show();
+						Toast.makeText(context, "定位异常，无法获取当前城市信息！", Toast.LENGTH_SHORT).show();
 					}else {
 						region = application.mCurrentcity;
 					}
@@ -703,13 +706,13 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 			map.put("region", region);
 			//设置搜索半径参数
 			String radius="5000";
-			if (text6.getText().equals("1千米内")) {
+			if (text6.getText().toString().equals("1千米内")) {
 				radius = "1000";
 			}
-			if (text6.getText().equals("2千米内")) {
+			if (text6.getText().toString().equals("2千米内")) {
 				radius = "2000";
 			}
-			if (text6.getText().equals("5千米内")) {
+			if (text6.getText().toString().equals("5千米内")) {
 				radius = "5000";
 			}
 			map.put("radius", radius);
@@ -826,7 +829,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 								app.currlocation.getLongitude(), latitude,
 								longitude, results);
 					}
-					DecimalFormat decimalFormat = new DecimalFormat(".00");
+					DecimalFormat decimalFormat = new DecimalFormat("0.00");
 					String dist = decimalFormat.format(results[0]/1000);
 					content.setBDistance(dist);
 					Log.i("距离", ""+content.getBDistance());
@@ -839,10 +842,13 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 					content.setOrderAddup(jsonObject2.getInt("orderaddup"));
 					content.setAppraiseStar(jsonObject2.getDouble("appraisestar"));
 					list.add(content);
+					if (!text3.getText().toString().equals("按距离排序")&&text1.getText().toString().equals("按评价排序")) {
+						Collections.sort(list, new CompareBarberUnit());
+					}
 				}
 
 			}
-			if (list.size() < 15) {
+			if (list.size() <15) {
 				app.getBarberListActivity().getListView()
 						.removeFooterView(app.getBarberListActivity().loadMoreView);
 			}
@@ -857,10 +863,11 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 			app.getBarberListActivity().loadMoreView.setVisibility(View.VISIBLE);
 			app.getBarberListActivity().progressBar.setVisibility(View.INVISIBLE);
 		}
-		if (app.getBaiduMapActivity() != null) {
-			app.getBaiduMapActivity().removeAllMarker();
-			app.getBaiduMapActivity().addAllMarker();
-		}
+//		if (app.getBaiduMapActivity() != null) {
+//			app.getBaiduMapActivity().isBarber = true;
+//			app.getBaiduMapActivity().removeAllMarker();
+//			app.getBaiduMapActivity().addAllMarker();
+//		}
 	}
 	
 	/*
@@ -898,7 +905,7 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 								app.currlocation.getLongitude(), latitude,
 								longitude, results);
 					}
-					DecimalFormat decimalFormat = new DecimalFormat(".00");
+					DecimalFormat decimalFormat = new DecimalFormat("0.00");
 					String dist = decimalFormat.format(results[0]/1000);
 					content.setSDistance(dist);
 					Log.i("距离", ""+content.getSDistance());
@@ -910,10 +917,13 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 					content.setPriceStar(jsonObject2.getDouble("pricestar"));
 					content.setServiceStar(jsonObject2.getDouble("servicestar"));
 					list.add(content);
+					if (!text6.getText().toString().equals("按距离排序")&&text4.getText().toString().equals("按评价排序")) {
+						Collections.sort(list, new CompareBarberShopUnit());
+					}
 				}
 
 			}
-			if (list.size() < 15) {
+			if (list.size() <15) {
 				app.getBarberShopListActivity().getListView()
 						.removeFooterView(app.getBarberShopListActivity().loadMoreView);
 			}
@@ -929,9 +939,36 @@ public class HomePageActivity extends ActivityGroup implements OnClickListener
 			app.getBarberShopListActivity().progressBar.setVisibility(View.INVISIBLE);
 		}
 		if (app.getBaiduMapActivity() != null) {
+//			app.getBaiduMapActivity().isBarber = false;
 			app.getBaiduMapActivity().removeAllMarker();
 			app.getBaiduMapActivity().addAllMarker();
 		}
 	}
+	//对美发师进行按距离排序
+	class CompareBarberUnit implements Comparator<NearBarber>{
+	    @Override
+	    public int compare(NearBarber t1, NearBarber t2) {
+	        if(Float.valueOf(t1.getBDistance())<Float.valueOf(t2.getBDistance())){
+	            return -1;
+	        }
+	        if(Float.valueOf(t1.getBDistance())>Float.valueOf(t2.getBDistance())){
+	            return 1;
+	        }
+	        return 0;
+	    }
+	}
 	
+	//对理发店进行按距离排序
+	class CompareBarberShopUnit implements Comparator<NearBarberShop>{
+	    @Override
+	    public int compare(NearBarberShop t1, NearBarberShop t2) {
+	        if(Float.valueOf(t1.getSDistance())<Float.valueOf(t2.getSDistance())){
+	            return -1;
+	        }
+	        if(Float.valueOf(t1.getSDistance())>Float.valueOf(t2.getSDistance())){
+	            return 1;
+	        }
+	        return 0;
+	    }
+	}
 }

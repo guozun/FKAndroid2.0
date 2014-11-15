@@ -50,7 +50,7 @@ public class BarberShopListActivity extends ListActivity implements OnScrollList
 		
 		adapter = new BarbershopListAdapter(BarberShopListActivity.this, list);
 		setListAdapter(adapter);
-		
+		BaseApplication.setNetworkType();
 		BaseApplication application=(BaseApplication) getApplication();
 		application.setBarbershops(list);
 		application.setBarbershopListAdapter(adapter);

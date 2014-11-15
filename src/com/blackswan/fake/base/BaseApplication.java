@@ -22,6 +22,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.blackswan.fake.R;
@@ -56,6 +57,7 @@ public class BaseApplication extends Application {
 	// 周边理发店检索结果
 	private List<NearBarberShop> barbershops = new ArrayList<NearBarberShop>();
 	
+	public static final String strKey = "O65sXI7ksbsVeaMXI7aF94gf";
 	// 周边美发师检索结果
 	private List<NearBarber> barbers = new ArrayList<NearBarber>();
 
@@ -204,7 +206,7 @@ public class BaseApplication extends Application {
 	 * 设置手机网络类型，wifi，cmwap，ctwap，用于联网参数选择
 	 * @return
 	 */
-	static String setNetworkType() {
+	public static String setNetworkType() {
 		String networkType = "wifi";
 		ConnectivityManager manager = (ConnectivityManager) mInstance
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -212,6 +214,7 @@ public class BaseApplication extends Application {
 		NetworkInfo netWrokInfo = manager.getActiveNetworkInfo();
 		if (netWrokInfo == null || !netWrokInfo.isAvailable()) {
 			// 当前网络不可用
+			Toast.makeText(getmInstance().getApplicationContext(), "网络连接错误！", Toast.LENGTH_SHORT).show();
 			return "";
 		}
 

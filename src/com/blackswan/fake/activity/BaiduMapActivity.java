@@ -30,6 +30,7 @@ import com.baidu.platform.comapi.basestruct.GeoPoint;
 import com.blackswan.fake.R;
 import com.blackswan.fake.base.BaseActivity;
 import com.blackswan.fake.base.BaseApplication;
+import com.blackswan.fake.bean.NearBarber;
 import com.blackswan.fake.bean.NearBarberShop;
 
 public class BaiduMapActivity extends BaseActivity{
@@ -37,16 +38,17 @@ public class BaiduMapActivity extends BaseActivity{
 
 	public BMapManager mBMapManager = null;
 	public MapView mMapView = null;
-	public static final String strKey = "O65sXI7ksbsVeaMXI7aF94gf";
+	public static final String strKey = "A3UPMK55OBoH6uypQlKGzfss";
+//	public boolean isBarber = true;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		context = this;
-
+		
 		initEngineManager(this);
 		
 		setContentView(R.layout.activity_baidumap);
-		
+		BaseApplication.setNetworkType();
 		initViews();
 
 		BaseApplication.getmInstance().setBaiduMapActivity(this);
@@ -122,7 +124,7 @@ public class BaiduMapActivity extends BaseActivity{
 		public void onGetPermissionState(int iError) {
 			if (iError == MKEvent.ERROR_PERMISSION_DENIED) {
 				// 授权Key错误：
-				Toast.makeText(context, "请在 DemoApplication.java文件输入正确的授权Key！",
+				Toast.makeText(context, "您的网络出错了！",
 						Toast.LENGTH_LONG).show();
 			}
 		}
@@ -153,55 +155,101 @@ public class BaiduMapActivity extends BaseActivity{
 	}
 
 	/**
-	 * 添加所有标记
+	 * 添加所有理发店标记
 	 */
 	public void addAllMarker() {
 		BaseApplication app = (BaseApplication) getApplication();
-		List<NearBarberShop> list = app.getBarbershops();
 		mMapView.getOverlays().clear();
 		OverlayIcon ov = new OverlayIcon(null, this);
-		for (NearBarberShop content : list) {
-			int latitude = (int) (content.getLatitude() * 1000000);
-			int longitude = (int) (content.getLongitude() * 1000000);
+//		if (isBarber) {
+			List<NearBarberShop> list = app.getBarbershops();
+			for (NearBarberShop content : list) {
+				int latitude = (int) (content.getLatitude() * 1000000);
+				int longitude = (int) (content.getLongitude() * 1000000);
 
-			Drawable d = getResources().getDrawable(R.drawable.icon_marka);
-			OverlayItem item = new OverlayItem(
-					new GeoPoint(latitude, longitude), content.getSName(),
-					content.getSAddress());
-			item.setMarker(d);
+				Drawable d = getResources().getDrawable(R.drawable.icon_marka);
+				OverlayItem item = new OverlayItem(
+						new GeoPoint(latitude, longitude), content.getSName(),
+						content.getSAddress());
+				item.setMarker(d);
 
-			ov.addItem(item);
-		}
-		mMapView.getOverlays().add(ov);
-		mMapView.refresh();
-		
-		//如果定位成功，添加当前坐标点
-		if (app.currlocation != null)
-    	{
-			MyLocationOverlay myLocationOverlay = new MyLocationOverlay(mMapView);
-			LocationData locData = new LocationData();
-			//手动将位置源置为天安门，在实际应用中，请使用百度定位SDK获取位置信息，要在SDK中显示一个位置，需要
-			//		使用百度经纬度坐标（bd09ll）
-			locData.latitude = app.currlocation.getLatitude();
-			locData.longitude = app.currlocation.getLongitude();
-			locData.direction = 2.0f;
-			myLocationOverlay.setData(locData);
-			mMapView.getOverlays().add(myLocationOverlay);
+				ov.addItem(item);
+			}
+			
+			mMapView.getOverlays().add(ov);
 			mMapView.refresh();
-    	}
-
-
-		// 北京的中心，无定位时的地图中心
-		int cLat = 39909230;
-		int cLon = 116397428;
-		if (app.currlocation == null) {
-			mMapView.getController().setCenter(new GeoPoint(cLat, cLon));
-		} else if (list != null && list.size() >= 1) {
-			NearBarberShop c = (NearBarberShop)list.get(0);
-			int currLat = (int) (c.getLatitude() * 1000000);
-			int currLon = (int) (c.getLongitude() * 1000000);
-			mMapView.getController().setCenter(new GeoPoint(currLat, currLon));
-		}
+			
+			//如果定位成功，添加当前坐标点
+			if (app.currlocation != null)
+	    	{
+				MyLocationOverlay myLocationOverlay = new MyLocationOverlay(mMapView);
+				LocationData locData = new LocationData();
+				//手动将位置源置为天安门，在实际应用中，请使用百度定位SDK获取位置信息，要在SDK中显示一个位置，需要
+				//		使用百度经纬度坐标（bd09ll）
+				locData.latitude = app.currlocation.getLatitude();
+				locData.longitude = app.currlocation.getLongitude();
+				locData.direction = 2.0f;
+				myLocationOverlay.setData(locData);
+				mMapView.getOverlays().add(myLocationOverlay);
+				mMapView.refresh();
+	    	}
+			// 北京的中心，无定位时的地图中心
+			int cLat = 39909230;
+			int cLon = 116397428;
+			if (app.currlocation == null) {
+				mMapView.getController().setCenter(new GeoPoint(cLat, cLon));
+			} else if (list != null && list.size() >= 1) {
+				NearBarberShop c = (NearBarberShop)list.get(0);
+				int currLat = (int) (c.getLatitude() * 1000000);
+				int currLon = (int) (c.getLongitude() * 1000000);
+				mMapView.getController().setCenter(new GeoPoint(currLat, currLon));
+			}
+//显示美发师位置
+//		}else {
+//			List<NearBarber> list = app.getBarbers();
+//			for (NearBarber content : list) {
+//				int latitude = (int) (content.getLatitude() * 1000000);
+//				int longitude = (int) (content.getLongitude() * 1000000);
+//
+//				Drawable d = getResources().getDrawable(R.drawable.icon_marka);
+//				OverlayItem item = new OverlayItem(
+//						new GeoPoint(latitude, longitude), content.getBName(),
+//						content.getBAddress());
+//				item.setMarker(d);
+//
+//				ov.addItem(item);
+//				mMapView.getOverlays().add(ov);
+//				mMapView.refresh();
+//				
+//				//如果定位成功，添加当前坐标点
+//				if (app.currlocation != null)
+//		    	{
+//					MyLocationOverlay myLocationOverlay = new MyLocationOverlay(mMapView);
+//					LocationData locData = new LocationData();
+//					//手动将位置源置为天安门，在实际应用中，请使用百度定位SDK获取位置信息，要在SDK中显示一个位置，需要
+//					//		使用百度经纬度坐标（bd09ll）
+//					locData.latitude = app.currlocation.getLatitude();
+//					locData.longitude = app.currlocation.getLongitude();
+//					locData.direction = 2.0f;
+//					myLocationOverlay.setData(locData);
+//					mMapView.getOverlays().add(myLocationOverlay);
+//					mMapView.refresh();
+//		    	}
+//				// 北京的中心，无定位时的地图中心
+//				int cLat = 39909230;
+//				int cLon = 116397428;
+//				if (app.currlocation == null) {
+//					mMapView.getController().setCenter(new GeoPoint(cLat, cLon));
+//				} else if (list != null && list.size() >= 1) {
+//					NearBarber c = (NearBarber)list.get(0);
+//					int currLat = (int) (c.getLatitude() * 1000000);
+//					int currLon = (int) (c.getLongitude() * 1000000);
+//					mMapView.getController().setCenter(new GeoPoint(currLat, currLon));
+//				}
+//			}
+//		}
+		
+		
 	}
 
 	/**

@@ -53,7 +53,7 @@ public class BarberListActivity extends ListActivity implements OnScrollListener
 		
 		adapter = new BarberListAdapter(BarberListActivity.this, list);
 		setListAdapter(adapter);
-
+		BaseApplication.setNetworkType();
 		BaseApplication app = (BaseApplication) getApplication();
 		app.setBarbers(list);
 		app.setBarberadapter(adapter);
