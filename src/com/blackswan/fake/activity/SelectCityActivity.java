@@ -25,7 +25,6 @@ public class SelectCityActivity extends TabActivity{
 	ImageView reback;
 	Button citytext;
 	BaseApplication application;
-	@SuppressWarnings("unused")
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -34,7 +33,6 @@ public class SelectCityActivity extends TabActivity{
 		setContentView(R.layout.activity_selectcity);
 		tabHost = (TabHost) findViewById(android.R.id.tabhost);
 		tabHost.setup(this.getLocalActivityManager());
-		TabWidget tabWidget = tabHost.getTabWidget();
 		TabSpec tab1 = tabHost.newTabSpec("selectbyprovince");
         tab1.setIndicator(createContent("按省份",R.drawable.toplabelleft));
         tab1.setContent(new Intent(this,SelectCityByProvince.class));
@@ -49,8 +47,12 @@ public class SelectCityActivity extends TabActivity{
         initViews();
         initEvent();
         application = ((BaseApplication) getApplication());
-        citytext.setText(application.mCurrentcity);
-		
+        if (application.mCurrentcity==null) {
+			citytext.setText("城市");
+		}else {
+			citytext.setText(application.mCurrentcity);
+		}
+        		
 	}
 	
 	//注入界面控件
@@ -78,10 +80,10 @@ public class SelectCityActivity extends TabActivity{
 	            String city2 = application.preferences.getString("city2", null);
 	            String city3 = application.preferences.getString("city3", null);
 	            String currentcity = application.mCurrentcity;
-	            if (currentcity.equals(city2)||currentcity.equals(city1)||currentcity.equals(city0)) {
+	            if (currentcity==null||currentcity.equals(city2)||currentcity.equals(city1)||currentcity.equals(city0)) {
 	            	application.putString("city3", currentcity);
 				}
-	            if (city3.equals(city0)||city3.equals(city1)||city3.equals(city2)) {
+	            if (city3==null||city3.equals(city0)||city3.equals(city1)||city3.equals(city2)) {
 	            	application.putString("city0",city0);
 		        	application.putString("city1", city1);
 					application.putString("city2", city2);

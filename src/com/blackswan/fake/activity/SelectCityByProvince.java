@@ -124,7 +124,7 @@ public class SelectCityByProvince extends BaseActivity
             if (cityModel.getName().equals(city2)||cityModel.getName().equals(city1)||cityModel.getName().equals(city0)) {
             	application.putString("city3", cityModel.getName());
 			}
-            if (city3.equals(city0)||city3.equals(city1)||city3.equals(city2)) {
+            if (city3==null||city3.equals(city0)||city3.equals(city1)||city3.equals(city2)) {
             	application.putString("city0",city0);
 	        	application.putString("city1", city1);
 				application.putString("city2", city2);

@@ -1,5 +1,7 @@
 package com.blackswan.fake.util;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -10,6 +12,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
@@ -25,8 +29,8 @@ public class LBSCloudSearch {
 	private static String mTAG = "NetWorkManager";
 	
 	//百度云检索API URI
-	private static final String SEARCH_URI_NEARBY = "http://api.map.baidu.com/geosearch/v2/nearby?";
-	private static final String SEARCH_URI_LOCAL = "http://api.map.baidu.com/geosearch/v2/local?";
+	private static final String SEARCH_URI_NEARBY = "http://api.map.baidu.com/geosearch/v3/nearby?";
+	private static final String SEARCH_URI_LOCAL = "http://api.map.baidu.com/geosearch/v3/local?";
 	
 	public static final int SEARCH_TYPE_NEARBY = 1;
 	public static final int SEARCH_TYPE_LOCAL = 2;
@@ -34,7 +38,7 @@ public class LBSCloudSearch {
 	private static int currSearchType = 0;
 	
 	//云检索公钥
-	private static String ak = "A4749739227af1618f7b0d1b588c0e85";
+	private static String ak = "A3UPMK55OBoH6uypQlKGzfss";
 	
 
 	private static int TIME_OUT = 12000;
@@ -57,8 +61,8 @@ public class LBSCloudSearch {
 			public void run() {
 				int count = retry;
 				while (count > 0){
+					Log.i("FaKeLog", "搜索"+searchType);
 					try {
-						
 						//根据过滤选项拼接请求URL
 						String requestURL = "";
 						if(searchType == -1){
@@ -79,7 +83,7 @@ public class LBSCloudSearch {
 						requestURL = requestURL   + "&"
 										+ "ak=" + ak
 										+ "&geotable_id=" + geotable_id; 
-						
+						Log.d("FaKeLog", "request url:" + requestURL);
 						String filter = null;
 						Iterator iter = filterParams.entrySet().iterator();
 						while (iter.hasNext()) {
@@ -102,17 +106,19 @@ public class LBSCloudSearch {
 							requestURL = requestURL + "&filter=" + filter.substring(3);
 						}
 						
-						Log.d("DuanZuLog", "request url:" + requestURL);
-						
-						HttpGet httpRequest = new HttpGet(requestURL);
+						Log.d("FaKeLog", "request url:" + requestURL);
+						URL url = new URL(requestURL);
+						URI uri = new URI(url.getProtocol(), url.getHost(), url.getPath(), url.getQuery(), null);
+						HttpGet httpRequest = new HttpGet(uri);
 						HttpClient httpclient = new DefaultHttpClient();
+						HttpClientParams.setCookiePolicy(httpclient.getParams(), CookiePolicy.BROWSER_COMPATIBILITY); 
 						httpclient.getParams().setParameter(
 								CoreConnectionPNames.CONNECTION_TIMEOUT, TIME_OUT);
 						httpclient.getParams().setParameter(
 								CoreConnectionPNames.SO_TIMEOUT, TIME_OUT);
 						
 						HttpProtocolParams.setUseExpectContinue(httpclient.getParams(), false);
-						
+						Log.d("FaKeLog", "检测request url:" + requestURL);
 						if(networkType.equals("cmwap")){
 							HttpHost proxy = new HttpHost("10.0.0.172", 80, "http");
 							httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
@@ -122,7 +128,6 @@ public class LBSCloudSearch {
 							httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
 									proxy);
 						}
-
 
 						HttpResponse httpResponse = httpclient.execute(httpRequest);
 						int status = httpResponse.getStatusLine().getStatusCode();
@@ -146,7 +151,7 @@ public class LBSCloudSearch {
 							msgTmp.sendToTarget();
 						}
 					} catch (Exception e) {
-						Log.e("DuanZuLog", "网络异常，请检查网络后重试！");
+						Log.e("FaKeLog", "网络异常，请检查网络后重试！");
 						e.printStackTrace();
 					}
 					

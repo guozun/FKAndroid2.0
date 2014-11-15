@@ -3,10 +3,11 @@ package com.blackswan.fake.bean;
 public class NearBarber {
 	private String BName;
 	private String BSex;
-	private String BAge;
+	private int BAge;
 	private String BDis;
-	private float BDistance;
-	private float AppraiseStar;
+	private String BDistance;
+	private double AppraiseStar;
+	private String BAddress;
 	private int OrderAddup;
 	private String imageurl;
 	private String webUrl;
@@ -25,10 +26,10 @@ public class NearBarber {
 	public void setBSex(String bSex) {
 		BSex = bSex;
 	}
-	public String getBAge() {
+	public int getBAge() {
 		return BAge;
 	}
-	public void setBAge(String bAge) {
+	public void setBAge(int bAge) {
 		BAge = bAge;
 	}
 	public String getBDis() {
@@ -37,16 +38,16 @@ public class NearBarber {
 	public void setBDis(String bDis) {
 		BDis = bDis;
 	}
-	public float getBDistance() {
+	public String getBDistance() {
 		return BDistance;
 	}
-	public void setBDistance(float bDistance) {
+	public void setBDistance(String bDistance) {
 		BDistance = bDistance;
 	}
-	public float getAppraiseStar() {
+	public double getAppraiseStar() {
 		return AppraiseStar;
 	}
-	public void setAppraiseStar(float appraiseStar) {
+	public void setAppraiseStar(double appraiseStar) {
 		AppraiseStar = appraiseStar;
 	}
 	public int getOrderAddup() {
@@ -78,6 +79,12 @@ public class NearBarber {
 	}
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
+	}
+	public String getBAddress() {
+		return BAddress;
+	}
+	public void setBAddress(String bAddress) {
+		BAddress = bAddress;
 	}
 
 }
