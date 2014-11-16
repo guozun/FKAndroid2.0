@@ -82,11 +82,11 @@
 		<activity android:name="com.blackswan.fake.activity.AboutUsActivity"/>
         <activity android:name="com.blackswan.fake.activity.AddFriendsActivity"/>
         <activity android:name="com.blackswan.fake.activity.AllDiscussionActivity"/>
-        <activity android:name="com.blackswan.fake.useractivity.AlterHeadActivity"/>
-        <activity android:name="com.blackswan.fake.useractivity.AlterNickNameActivity"/>
-        <activity android:name="com.blackswan.fake.useractivity.AlterPhoneActivityvity"/>
-        <activity android:name="com.blackswan.fake.useractivity.AlterPwdActivity"/>
-        <activity android:name="com.blackswan.fake.useractivity.AlterSexActivityActivity"/>
+        <activity android:name="com.blackswan.fake.activity.useractivity.AlterHeadActivity"/>
+        <activity android:name="com.blackswan.fake.activity.useractivity.AlterNickNameActivity"/>
+        <activity android:name="com.blackswan.fake.activity.useractivity.AlterPhoneActivityvity"/>
+        <activity android:name="com.blackswan.fake.activity.useractivity.AlterPwdActivity"/>
+        <activity android:name="com.blackswan.fake.activity.useractivity.AlterSexActivityActivity"/>
         <activity android:name="com.blackswan.fake.activity.ApraiseBarberActivity"/>
         <activity android:name="com.blackswan.fake.activity.BarberActivity"/>
         <activity android:name="com.blackswan.fake.barberactivity.BarberDetailsPageActivity"/>

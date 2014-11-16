@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black4"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:id="@+id/id_personalinfo_layout_main" >
 
     <!-- 头部导航 -->
 
@@ -33,13 +34,12 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/iv_personalinfo_alter_head"
+        android:id="@+id/id_personalinfo_layout_alterHead"
         android:layout_width="fill_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:background="@color/white"
-        android:padding="10dp" 
-        android:onClick="alterHead">
+        android:padding="10dp" >
 
         <ImageView
             android:id="@+id/iv_personalinfo_head"
@@ -47,78 +47,76 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:adjustViewBounds="true"
-            android:maxHeight="50dp"
-            android:maxWidth="50dp" />
+            android:maxHeight="100dp"
+            android:maxWidth="100dp" />
 
         <ImageView style="@style/style_personalinfo_right_image" />
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/id_personalinfo_layout_alterName"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
         android:background="@color/white"
         android:padding="10dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="昵称"
+            android:textColor="@color/black2"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/tv_personalinfo_name_img1"
+            style="@style/style_personalinfo_right_image" />
 
         <TextView
             android:id="@+id/tv_personalinfo_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="昵称"
-            android:textSize="18sp" />
-
-        <EditText
-            android:id="@+id/et_personalinfo_alter_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
-            android:ems="10" >
-        </EditText>
+            android:layout_toLeftOf="@id/tv_personalinfo_name_img1"
+            android:textColor="@color/black2"
+            android:textSize="18sp" />
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/id_personalinfo_layout_alterSex"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
         android:background="@color/white"
+        android:clickable="true"
         android:padding="10dp" >
 
         <TextView
-            android:id="@+id/tv_personalinfo_sex"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:text="性别"
             android:textSize="18sp" />
 
-        <RadioGroup
+        <ImageView
+            android:id="@+id/tv_personalinfo_name_img2"
+            style="@style/style_personalinfo_right_image" />
+
+        <TextView
+            android:id="@+id/tv_personalinfo_sex"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
-            android:orientation="horizontal" >
-
-            <RadioButton
-                android:id="@+id/radio_personalinfo_male"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="男" />
-
-            <RadioButton
-                android:id="@+id/radio_personalinfo_female"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="女" />
-        </RadioGroup>
+            android:layout_toLeftOf="@id/tv_personalinfo_name_img2"
+            android:textColor="@color/black2"
+            android:textSize="18sp" />
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/id_personalinfo_layout_alterPhone"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
@@ -126,51 +124,52 @@
         android:padding="10dp" >
 
         <TextView
-            android:id="@+id/tv_personalinfo_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:text="手机号码"
             android:textSize="18sp" />
 
-        <EditText
-            android:id="@+id/et_personalinfo_alter_phone"
+        <ImageView
+            android:id="@+id/tv_personalinfo_name_img3"
+            style="@style/style_personalinfo_right_image" />
+
+        <TextView
+            android:id="@+id/tv_personalinfo_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
-            android:ems="10"
-            android:inputType="phone" >
-        </EditText>
+            android:layout_toLeftOf="@id/tv_personalinfo_name_img3"
+            android:textColor="@color/black2"
+            android:textSize="18sp" />
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/iv_personalinfo_alter_password"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="1dp"
         android:background="@color/white"
-        android:padding="10dp" 
-        android:onClick="alterPassword">
+        android:onClick="alterPassword"
+        android:padding="10dp" >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="修改密码" />
+            android:text="修改密码"
+            android:textSize="18sp" />
 
         <ImageView style="@style/style_personalinfo_right_image" />
     </RelativeLayout>
+
     <RelativeLayout
-        android:id="@+id/iv_personalinfo_alter_upgrade"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
         android:background="@color/white"
-        android:padding="10dp"
-        android:onClick="upgrade" 
-        >
+        android:onClick="upgrade"
+        android:padding="10dp" >
 
         <TextView
             android:layout_width="wrap_content"
@@ -180,14 +179,14 @@
 
         <ImageView style="@style/style_personalinfo_right_image" />
     </RelativeLayout>
+
     <RelativeLayout
-        android:id="@+id/iv_personalinfo_alter_about"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:layout_marginTop="5dp"
         android:background="@color/white"
-        android:padding="10dp" 
-        android:onClick="about">
+        android:onClick="about"
+        android:padding="10dp" >
 
         <TextView
             android:layout_width="wrap_content"

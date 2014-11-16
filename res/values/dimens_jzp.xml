@@ -70,5 +70,10 @@
         <item name="android:layout_alignParentRight">true</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
+    <!-- popupwindows 动画 -->
+    <style name="PopupAnimationPersonalinfo" mce_bogus="1" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/personalinfo_popup_enter</item>
+        <item name="android:windowExitAnimation">@anim/personalinfo_popup_exit</item>
+    </style>
 
 </resources>

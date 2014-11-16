@@ -3,31 +3,73 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-     <!-- 头部导航 -->
-  <LinearLayout 
+
+    <!-- 头部导航 -->
+
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="50dip"
+        android:layout_weight="0"
         android:background="@drawable/bg_actionbar"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_weight="0">
+        android:orientation="horizontal" >
 
-          <ImageView
-              android:layout_width="45dp"
-              android:layout_height="match_parent"
-              android:layout_marginLeft="5dip"
-              android:src="@drawable/btn_back_normal" />
+        <ImageView
+             android:id="@+id/iv_altername_back"
+            android:layout_width="45dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/btn_back_normal" />
 
-      
-         
-         <TextView 
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:textSize="18sp"
-             android:layout_marginLeft="15dip"
-             android:textColor="@android:color/white"
-            android:text="修改昵称"/>
-         
-    </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="修改昵称"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/id_altername_commit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:text="完成"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp" >
+
+        <EditText
+            android:id="@+id/et_altername"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="15sp" 
+            android:background="@drawable/shape_top_bottom_corner__line"/>
+
+        <ImageView
+            android:id="@+id/iv_altername_dele"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/altername_img_selector" />
+
+        <TextView
+            android:id="@+id/tv_altername_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="5dp"
+            android:textSize="15sp"
+             />
+    </RelativeLayout>
 
 </LinearLayout>
