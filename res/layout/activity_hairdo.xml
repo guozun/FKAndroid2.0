@@ -41,10 +41,7 @@
 
         <!-- 主题图片 -->
 
-        <com.blackswan.fake.view.ImageSlideShowView
-            android:id="@+id/slideshowView"
-            android:layout_width="fill_parent"
-            android:layout_height="180dp" />
+
 
         <com.huewu.pla.lib.MultiColumnListView
             android:id="@+id/hairdo_mm_list_view"

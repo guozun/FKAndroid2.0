@@ -1,10 +1,10 @@
 package com.blackswan.fake.activity;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 
-import me.maxwin.view.XListViewFooter;
-import me.maxwin.view.XListViewHeader;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -13,23 +13,28 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.Scroller;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blackswan.fake.R;
 import com.blackswan.fake.base.BaseActivity;
+import com.blackswan.fake.util.Utility;
+import com.blackswan.fake.view.HandyTextView;
+import com.blackswan.fake.view.ImageSlideShowView;
 import com.huewu.pla.lib.MultiColumnListView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
-public class HairDoActivity extends BaseActivity   {
+public class HairDoActivity extends BaseActivity {
 
 	LinkedList<String> imageList = new LinkedList<String>();
 	private DisplayImageOptions options;
@@ -37,40 +42,37 @@ public class HairDoActivity extends BaseActivity   {
 
 	MultiColumnListView mmListView;
 
-	private Scroller mScroller; // used for scroll back
-	private float mLastY = -1; // save event y
+	// HeadView
+	private final static int RELEASE_TO_REFRESH = 0;
+	private final static int PULL_TO_REFRESH = 1;
+	private final static int REFRESHING = 2;
+	private final static int DONE = 3;
+	private final static int LOADING = 4;
+	private final static int RATIO = 3;
 
-	// -- header view
-	private XListViewHeader mHeaderView;
-	// header view content, use it to calculate the Header's height. And hide it
-	// when disable pull refresh.
-	private RelativeLayout mHeaderViewContent;
-	private TextView mHeaderTimeView;
-	private int mHeaderViewHeight; // header view's height
-	private boolean mEnablePullRefresh = true;
-	private boolean mPullRefreshing = false; // is refreashing.
+	private View mHeader;
 
-	// -- footer view
-	private XListViewFooter mFooterView;
-	private boolean mEnablePullLoad = true;	//允许 上拉 使能
-	private boolean mPullLoading  ;	
-	private boolean mIsFooterReady = false;
+	private HandyTextView mHtvTitle;
+	private HandyTextView mHtvTime;
+	private ImageView mIvArrow;
+	private ImageView mIvLoading;
+	private ImageView mIvCancel;
 
-	// total list items, used to detect is at the bottom of listview.
-	private int mTotalItemCount;
+	private android.view.animation.RotateAnimation mPullAnimation;
+	private android.view.animation.RotateAnimation mReverseAnimation;
+	private Animation mLoadingAnimation;
 
-	// for mScroller, scroll back from header or footer.
-	private int mScrollBack;
-	private final static int SCROLLBACK_HEADER = 0;
-	private final static int SCROLLBACK_FOOTER = 1;
-	private final static int SCROLL_DURATION = 400; // scroll back duration
+	private boolean mIsRecored;
 
-	private final static float OFFSET_RADIO = 1.8f; // support iOS like pull
-													// feature.
-	private final static int PULL_LOAD_MORE_DELTA = 50; // when pull up >= 50px
+	private int mHeaderHeight;
 
-	// at bottom, trigger
-	// load more.
+	private int mStartY;
+
+	private int mState;
+
+	private boolean mIsBack;
+	private boolean mIsRefreshable;
+	private boolean mIsCancelable;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,9 +80,8 @@ public class HairDoActivity extends BaseActivity   {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_hairdo);
 		inflater = getLayoutInflater();
-		options = new DisplayImageOptions.Builder()
-
-		.cacheInMemory(true).cacheOnDisk(true).considerExifParams(true)
+		options = new DisplayImageOptions.Builder().cacheInMemory(true)
+				.cacheOnDisk(true).considerExifParams(true)
 				.imageScaleType(ImageScaleType.EXACTLY)
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
 		initViews();
@@ -94,7 +95,7 @@ public class HairDoActivity extends BaseActivity   {
 
 	@Override
 	protected void initViews() {
-		
+
 		imageList
 				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043531502.jpg");
 		imageList
@@ -119,72 +120,99 @@ public class HairDoActivity extends BaseActivity   {
 		initWithContext(this);
 		mmListView.setOnTouchListener(new View.OnTouchListener() {
 
+			@SuppressLint("ClickableViewAccessibility")
 			@Override
 			public boolean onTouch(View v, MotionEvent ev) {
-				if (mLastY == -1) {
-					mLastY = ev.getRawY();
-				}
-
-				switch (ev.getAction()) {
+				int action = ev.getAction();
+Log.d("mmListView", "x="+ev.getX()+"Y="+ev.getY());
+				switch (action) {
 				case MotionEvent.ACTION_DOWN:
-					mLastY = ev.getRawY();
+					if (mIsRefreshable) {
+						if (mmListView.getFirstVisiblePosition() == 0
+								&& !mIsRecored) {
+							mIsRecored = true;
+							mStartY = (int) ev.getY();
+						}
+					}
+
 					break;
+
 				case MotionEvent.ACTION_MOVE:
-					final float deltaY = ev.getRawY() - mLastY;
-					mLastY = ev.getRawY();
-					if (mmListView.getFirstVisiblePosition() == 0
-							&& (mHeaderView.getVisiableHeight() > 0 || deltaY > 0)) {
-						// the first item is showing, header has shown or pull
-						// down.
-						updateHeaderHeight(deltaY / OFFSET_RADIO);
-						// invokeOnScrolling();
-					} else if (mmListView.getLastVisiblePosition() == mTotalItemCount - 1
-							&& (mFooterView.getBottomMargin() > 0 || deltaY < 0)) {
-						// last item, already pulled up or want to pull up.
-						updateFooterHeight(-deltaY / OFFSET_RADIO);
+					int moveY = (int) ev.getY();
+					if (mIsRefreshable) {
+						if (!mIsRecored
+								&& mmListView.getFirstVisiblePosition() == 0) {
+							mIsRecored = true;
+							mStartY = moveY;
+						}
+						if (mState != REFRESHING && mIsRecored
+								&& mState != LOADING) {
+							if (mState == RELEASE_TO_REFRESH) {
+								mmListView.setSelection(0);
+								if (((moveY - mStartY) / RATIO < mHeaderHeight)
+										&& (moveY - mStartY) > 0) {
+									mState = PULL_TO_REFRESH;
+									changeHeaderViewByState();
+								} else if (moveY - mStartY <= 0) {
+									mState = DONE;
+									changeHeaderViewByState();
+								}
+							}
+							if (mState == PULL_TO_REFRESH) {
+								mmListView.setSelection(0);
+								if ((moveY - mStartY) / RATIO >= mHeaderHeight) {
+									mState = RELEASE_TO_REFRESH;
+									mIsBack = true;
+									changeHeaderViewByState();
+								} else if (moveY - mStartY <= 0) {
+									mState = DONE;
+									changeHeaderViewByState();
+								}
+							}
+							if (mState == DONE) {
+								if (moveY - mStartY > 0) {
+									mState = PULL_TO_REFRESH;
+									changeHeaderViewByState();
+								}
+							}
+							if (mState == PULL_TO_REFRESH) {
+								mHeader.setPadding(0, -1 * mHeaderHeight
+										+ (moveY - mStartY) / RATIO, 0, 0);
+							}
+							if (mState == RELEASE_TO_REFRESH) {
+								mHeader.setPadding(0, (moveY - mStartY) / RATIO
+										- mHeaderHeight, 0, 0);
+							}
+
+						}
+
 					}
 					break;
+
 				case MotionEvent.ACTION_UP:
-					
-					
-					break;
-				default:
-					mLastY = -1; // reset
-					if (mmListView.getFirstVisiblePosition() == 0) {
-						// invoke refresh
-						if (mEnablePullRefresh
-								&& mHeaderView.getVisiableHeight() > mHeaderViewHeight) {
-							mPullRefreshing = true;
-							mHeaderView
-									.setState(XListViewHeader.STATE_REFRESHING);
-							
-							
+					if (mState != REFRESHING && mState != LOADING) {
+						if (mState == PULL_TO_REFRESH) {
+							mState = DONE;
+							changeHeaderViewByState();
+						}
+						if (mState == RELEASE_TO_REFRESH) {
+							mState = REFRESHING;
+							changeHeaderViewByState();
+
 							ContentTask task = new ContentTask();
 							task.execute("asd");
-							
 
 						}
-						resetHeaderHeight();
-					} else if (mmListView.getLastVisiblePosition() == mTotalItemCount - 1) {
-						// invoke load more.
-						if (mEnablePullLoad
-								&& mFooterView.getBottomMargin() > PULL_LOAD_MORE_DELTA) {
-							showLongToast("在xiala ?？");
-
-						}
-						resetFooterHeight();
 					}
+					mIsRecored = false;
+					mIsBack = false;
 					break;
 				}
-				return onTouchEvent(ev);
+				return false;
+
 			}
 		});
-		// make sure XListViewFooter is the last footer view, and only add once.
-		if (mIsFooterReady == false) {
-			mIsFooterReady = true;
-			mmListView.addFooterView(mFooterView);
-		}
-		
+
 		mmListView.setAdapter(new BaseAdapter() {
 			class Holder {
 				public ImageView ivPic;
@@ -248,117 +276,140 @@ public class HairDoActivity extends BaseActivity   {
 
 	}
 
-	private void updateHeaderHeight(float delta) {
-		//Log.d("HEAD", "位置"+delta);
-		mHeaderView.setVisiableHeight((int) delta
-				+ mHeaderView.getVisiableHeight());
-		if (mEnablePullRefresh && !mPullRefreshing) { // 未处于刷新状态，更新箭头
-			if (mHeaderView.getVisiableHeight() > mHeaderViewHeight) {
-				mHeaderView.setState(XListViewHeader.STATE_READY);
-			} else {
-				mHeaderView.setState(XListViewHeader.STATE_NORMAL);
-			}
-		}
-		mmListView.setSelection(0); // scroll to top each time
-	}
-
-	/**
-	 * reset header view's height.
-	 */
-	private void resetHeaderHeight() {
-		int height = mHeaderView.getVisiableHeight();
-		if (height == 0) // not visible.
-			return;
-		// refreshing and header isn't shown fully. do nothing.
-		if (mPullRefreshing && height <= mHeaderViewHeight) {
-			return;
-		}
-		int finalHeight = 0; // default: scroll back to dismiss header.
-		// is refreshing, just scroll back to show all the header.
-		if (mPullRefreshing && height > mHeaderViewHeight) {
-			finalHeight = mHeaderViewHeight;
-		}
-		mScrollBack = SCROLLBACK_HEADER;
-		mScroller.startScroll(0, height, 0, finalHeight - height,
-				SCROLL_DURATION);
-		// trigger computeScroll
-		mHeaderView.setVisiableHeight(mScroller.getCurrY());
-		mmListView.invalidate();
-	}
-
-	private void updateFooterHeight(float delta) {
-		int height = mFooterView.getBottomMargin() + (int) delta;
-		if (mEnablePullLoad && !mPullLoading) {
-			if (height > PULL_LOAD_MORE_DELTA) { // height enough to invoke load
-													// more.
-				mFooterView.setState(XListViewFooter.STATE_READY);
-			} else {
-				mFooterView.setState(XListViewFooter.STATE_NORMAL);
-			}
-		}
-		mFooterView.setBottomMargin(height);
-
-		// setSelection(mTotalItemCount - 1); // scroll to bottom
-	}
-
-	private void resetFooterHeight() {
-		int bottomMargin = mFooterView.getBottomMargin();
-		if (bottomMargin > 0) {
-			mScrollBack = SCROLLBACK_FOOTER;
-			mScroller.startScroll(0, bottomMargin, 0, -bottomMargin,
-					SCROLL_DURATION);
-			mmListView.invalidate();
-		}
-	}
-	/**
-	 * stop refresh, reset header view.
-	 */
-	public void stopRefresh() {
-		if (mPullRefreshing == true) {
-			mPullRefreshing = false;
-			resetHeaderHeight();
-		}
-	}
-
-	/**
-	 * stop load more, reset footer view.
-	 */
-	public void stopLoadMore() {
-		if (mPullLoading == true) {
-			mPullLoading = false;
-			mFooterView.setState(XListViewFooter.STATE_NORMAL);
-		}
-	}
 	private void initWithContext(Context context) {
-		mScroller = new Scroller(context, new DecelerateInterpolator());
-		// XListView need the scroll event, and it will dispatch the event to
-		// user's listener (as a proxy).
-//		mmListView.setOnScrollListener(this);
 
-		// init header view
-		mHeaderView = new XListViewHeader(context);
-		mHeaderViewContent = (RelativeLayout) mHeaderView
-				.findViewById(R.id.xlistview_header_content);
-		mHeaderTimeView = (TextView) mHeaderView
-				.findViewById(R.id.xlistview_header_time);
-		mmListView.addHeaderView(mHeaderView);
+		mHeader =  inflater.inflate(R.layout.hairdo_pull_to_refreshing_header,
+				null);
+		mHtvTitle = (HandyTextView) mHeader
+				.findViewById(R.id.refreshing_header_htv_title);
+		mHtvTime = (HandyTextView) mHeader
+				.findViewById(R.id.refreshing_header_htv_time);
+		mIvArrow = (ImageView) mHeader
+				.findViewById(R.id.refreshing_header_iv_arrow);
+		mIvLoading = (ImageView) mHeader
+				.findViewById(R.id.refreshing_header_iv_loading);
+		mIvCancel = (ImageView) mHeader
+				.findViewById(R.id.refreshing_header_iv_cancel);
 
-		// init footer view
-		mFooterView = new XListViewFooter(context);
+		mIvCancel.setOnClickListener(new OnClickListener() {
 
-		// init header height
-		mHeaderView.getViewTreeObserver().addOnGlobalLayoutListener(
-				new ViewTreeObserver.OnGlobalLayoutListener() {
-					@Override
-					public void onGlobalLayout() {
-						mHeaderViewHeight = mHeaderViewContent.getHeight();
-						mHeaderView.getViewTreeObserver()
-								.removeGlobalOnLayoutListener(this);
-					}
-				});
+			@Override
+			public void onClick(View arg0) {
+				onRefreshComplete();
+			}
+		});
+
+		
+		int w = View.MeasureSpec.makeMeasureSpec(0,
+				View.MeasureSpec.UNSPECIFIED);
+		int h = View.MeasureSpec.makeMeasureSpec(0,
+				View.MeasureSpec.UNSPECIFIED);
+		mHeader.measure(w, h);
+		mHeaderHeight = mHeader.getMeasuredHeight()-Utility.Dp2Px(this, 180);
+
+		
+		mHeader.setPadding(0, -1 * mHeaderHeight, 0, 0);
+		mHeader.invalidate();
+		mmListView.addHeaderView(mHeader);
+		mHtvTitle.setText("下拉刷新");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日  HH:mm");
+		String date = format.format(new Date());
+		mHtvTime.setText("最后刷新: " + date);
+
+		mPullAnimation = new android.view.animation.RotateAnimation(0, -180,
+				RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+				RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+		mPullAnimation.setInterpolator(new LinearInterpolator());
+		mPullAnimation.setDuration(250);
+		mPullAnimation.setFillAfter(true);
+
+		mReverseAnimation = new android.view.animation.RotateAnimation(-180, 0,
+				RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+				RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+		mReverseAnimation.setInterpolator(new LinearInterpolator());
+		mReverseAnimation.setDuration(200);
+		mReverseAnimation.setFillAfter(true);
+
+		mLoadingAnimation = AnimationUtils.loadAnimation(context,
+				R.anim.loading);
+
+		mState = DONE;
+		mIsRefreshable = true;
+		mIsCancelable = true;
+		changeHeaderViewByState();
+	}
+	@SuppressLint("SimpleDateFormat")
+	public void onRefreshComplete() {
+		mState = DONE;
+		SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日  HH:mm");
+		String date = format.format(new Date());
+		mHtvTime.setText("最后刷新: " + date);
+		changeHeaderViewByState();
 	}
 
-	 private class ContentTask extends AsyncTask<String, Integer, String> {
+
+	private void changeHeaderViewByState() {
+		switch (mState) {
+		case RELEASE_TO_REFRESH:
+			mIvArrow.setVisibility(View.VISIBLE);
+			mIvLoading.setVisibility(View.GONE);
+			mHtvTitle.setVisibility(View.VISIBLE);
+			mHtvTime.setVisibility(View.VISIBLE);
+			mIvCancel.setVisibility(View.GONE);
+			mIvArrow.clearAnimation();
+			mIvArrow.startAnimation(mPullAnimation);
+			mIvLoading.clearAnimation();
+			mHtvTitle.setText("松开刷新");
+			break;
+		case PULL_TO_REFRESH:
+			mIvArrow.setVisibility(View.VISIBLE);
+			mIvLoading.setVisibility(View.GONE);
+			mHtvTitle.setVisibility(View.VISIBLE);
+			mHtvTime.setVisibility(View.VISIBLE);
+			mIvCancel.setVisibility(View.GONE);
+			mIvLoading.clearAnimation();
+			mIvArrow.clearAnimation();
+			if (mIsBack) {
+				mIsBack = false;
+				mIvArrow.clearAnimation();
+				mIvArrow.startAnimation(mReverseAnimation);
+				mHtvTitle.setText("下拉刷新");
+			} else {
+				mHtvTitle.setText("下拉刷新");
+			}
+			break;
+
+		case REFRESHING:
+			mHeader.setPadding(0, 0, 0, 0);
+			mIvLoading.setVisibility(View.VISIBLE);
+			mIvArrow.setVisibility(View.GONE);
+			mIvLoading.clearAnimation();
+			mIvLoading.startAnimation(mLoadingAnimation);
+			mIvArrow.clearAnimation();
+			mHtvTitle.setText("正在刷新...");
+			mHtvTime.setVisibility(View.VISIBLE);
+			if (mIsCancelable) {
+				mIvCancel.setVisibility(View.VISIBLE);
+			} else {
+				mIvCancel.setVisibility(View.GONE);
+			}
+
+			break;
+		case DONE:
+			mHeader.setPadding(0, -1 * mHeaderHeight, 0, 0);
+
+			mIvLoading.setVisibility(View.GONE);
+			mIvArrow.clearAnimation();
+			mIvLoading.clearAnimation();
+			mIvArrow.setImageResource(R.drawable.ic_pulltorefresh_arrow);
+			mHtvTitle.setText("下拉刷新");
+			mHtvTime.setVisibility(View.VISIBLE);
+			mIvCancel.setVisibility(View.GONE);
+			break;
+		}
+	}
+
+	private class ContentTask extends AsyncTask<String, Integer, String> {
 
 		@Override
 		protected String doInBackground(String... params) {
@@ -374,12 +425,10 @@ public class HairDoActivity extends BaseActivity   {
 		@Override
 		protected void onPostExecute(String result) {
 			showLongToast("执行完毕啦");
-			stopRefresh();
+			onRefreshComplete();
 			super.onPostExecute(result);
 		}
 
-	
-		 
-	 }
+	}
 
 }

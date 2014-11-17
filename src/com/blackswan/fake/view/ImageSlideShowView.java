@@ -18,7 +18,9 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -55,7 +57,7 @@ public class ImageSlideShowView extends FrameLayout {
 	// 自动轮播的时间间隔
 	private final static int TIME_INTERVAL = 5;
 	// 自动轮播启用开关
-	private final static boolean isAutoPlay = true;
+	private final static boolean isAutoPlay = false;
 
 	// 自定义轮播图的资源
 	private String[] imageUrls;
@@ -176,7 +178,14 @@ public class ImageSlideShowView extends FrameLayout {
 
 		viewPager = (ViewPager) findViewById(R.id.viewPager);
 		viewPager.setFocusable(true);
-
+		viewPager.setOnTouchListener(new View.OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent ev) {
+				Log.d("viewPager", "x="+ev.getX()+"Y="+ev.getY());
+				return false;
+			}
+		});
 		viewPager.setAdapter(new MyPagerAdapter());
 		viewPager.setOnPageChangeListener(new MyPageChangeListener());
 	}
@@ -245,26 +254,26 @@ public class ImageSlideShowView extends FrameLayout {
 
 		@Override
 		public void onPageScrollStateChanged(int arg0) {
-			switch (arg0) {
-			case 1:// 手势滑动，空闲中
-				isAutoPlay = false;
-				break;
-			case 2:// 界面切换中
-				isAutoPlay = true;
-				break;
-			case 0:// 滑动结束，即切换完毕或者加载完毕
-					// 当前为最后一张，此时从右向左滑，则切换到第一张
-				if (viewPager.getCurrentItem() == viewPager.getAdapter()
-						.getCount() - 1 && !isAutoPlay) {
-					viewPager.setCurrentItem(0);
-				}
-				// 当前为第一张，此时从左向右滑，则切换到最后一张
-				else if (viewPager.getCurrentItem() == 0 && !isAutoPlay) {
-					viewPager
-							.setCurrentItem(viewPager.getAdapter().getCount() - 1);
-				}
-				break;
-			}
+//			switch (arg0) {
+//			case 1:// 手势滑动，空闲中
+//				isAutoPlay = false;
+//				break;
+//			case 2:// 界面切换中
+//				isAutoPlay = true;
+//				break;
+//			case 0:// 滑动结束，即切换完毕或者加载完毕
+//					// 当前为最后一张，此时从右向左滑，则切换到第一张
+//				if (viewPager.getCurrentItem() == viewPager.getAdapter()
+//						.getCount() - 1 && !isAutoPlay) {
+//					viewPager.setCurrentItem(0);
+//				}
+//				// 当前为第一张，此时从左向右滑，则切换到最后一张
+//				else if (viewPager.getCurrentItem() == 0 && !isAutoPlay) {
+//					viewPager
+//							.setCurrentItem(viewPager.getAdapter().getCount() - 1);
+//				}
+//				break;
+//			}
 		}
 
 		@Override
@@ -334,10 +343,10 @@ public class ImageSlideShowView extends FrameLayout {
 				// 这里一般调用服务端接口获取一组轮播图片，下面是从百度找的几个图片
 
 				imageUrls = new String[] {
-						"http://img2.imgtn.bdimg.com/it/u=318344986,440289376&fm=15&gp=0.jpg",
-						"http://img4.imgtn.bdimg.com/it/u=4018453288,1043235808&fm=15&gp=0.jpg",
-						"http://img4.imgtn.bdimg.com/it/u=515781013,1720396803&fm=15&gp=0.jpg",
-						"http://img1.imgtn.bdimg.com/it/u=3533422861,846355294&fm=15&gp=0.jpg" };
+						"http://d.hiphotos.baidu.com/image/w%3D230/sign=e454affe72cf3bc7e800caefe101babd/43a7d933c895d1432e16b7d071f082025baf07e4.jpg",
+						"http://a.hiphotos.baidu.com/image/w%3D230/sign=e8782c1e96cad1c8d0bbfb244f3e67c4/d50735fae6cd7b89466706b20c2442a7d9330ef3.jpg",
+						"http://imgt6.bdstatic.com/it/u=2,795295787&fm=25&gp=0.jpg",
+						"http://c.hiphotos.baidu.com/image/w%3D230/sign=6bfbe73d79ec54e741ec1d1d89399bfd/d058ccbf6c81800a531ce30db33533fa828b4733.jpg" };
 				return true;
 			} catch (Exception e) {
 				e.printStackTrace();
