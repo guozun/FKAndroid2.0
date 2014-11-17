@@ -1,150 +1,385 @@
 package com.blackswan.fake.activity;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-import android.database.DataSetObserver;
+import me.maxwin.view.XListViewFooter;
+import me.maxwin.view.XListViewHeader;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.ListFragment;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
+import android.view.ViewTreeObserver;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.Scroller;
+import android.widget.TextView;
 
 import com.blackswan.fake.R;
 import com.blackswan.fake.base.BaseActivity;
-import com.blackswan.fake.base.HairdoWaterfallFragment;
+import com.huewu.pla.lib.MultiColumnListView;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
+public class HairDoActivity extends BaseActivity   {
 
-public class HairDoActivity extends BaseActivity {
-	private ViewPager mViewPager;
-	private FragmentPagerAdapter mAdapter;
-	private List<Fragment> mFragments = new ArrayList<Fragment>();
+	LinkedList<String> imageList = new LinkedList<String>();
+	private DisplayImageOptions options;
+	private LayoutInflater inflater;
 
-	/**
-	 * bar四个按钮
-	 */
-	private FrameLayout mTabBtnLongHair;
-	private FrameLayout mTabBtnShortHair;
-	private FrameLayout mTabBtnMiddleHair;
-	private FrameLayout mTabBtnManHair;
+	MultiColumnListView mmListView;
+
+	private Scroller mScroller; // used for scroll back
+	private float mLastY = -1; // save event y
+
+	// -- header view
+	private XListViewHeader mHeaderView;
+	// header view content, use it to calculate the Header's height. And hide it
+	// when disable pull refresh.
+	private RelativeLayout mHeaderViewContent;
+	private TextView mHeaderTimeView;
+	private int mHeaderViewHeight; // header view's height
+	private boolean mEnablePullRefresh = true;
+	private boolean mPullRefreshing = false; // is refreashing.
+
+	// -- footer view
+	private XListViewFooter mFooterView;
+	private boolean mEnablePullLoad = true;	//允许 上拉 使能
+	private boolean mPullLoading  ;	
+	private boolean mIsFooterReady = false;
+
+	// total list items, used to detect is at the bottom of listview.
+	private int mTotalItemCount;
+
+	// for mScroller, scroll back from header or footer.
+	private int mScrollBack;
+	private final static int SCROLLBACK_HEADER = 0;
+	private final static int SCROLLBACK_FOOTER = 1;
+	private final static int SCROLL_DURATION = 400; // scroll back duration
+
+	private final static float OFFSET_RADIO = 1.8f; // support iOS like pull
+													// feature.
+	private final static int PULL_LOAD_MORE_DELTA = 50; // when pull up >= 50px
+
+	// at bottom, trigger
+	// load more.
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_hairdo);
-		
-		
-		mViewPager = (ViewPager) findViewById(R.id.id_hairdo_waterfall);
-		this.initViews();
-		
-		mAdapter = new FragmentPagerAdapter(getSupportFragmentManager())
-		{
+		inflater = getLayoutInflater();
+		options = new DisplayImageOptions.Builder()
 
-			@Override
-			public int getCount()
-			{
-				return mFragments.size();
-			}
+		.cacheInMemory(true).cacheOnDisk(true).considerExifParams(true)
+				.imageScaleType(ImageScaleType.EXACTLY)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
+		initViews();
 
-			@Override
-			public Fragment getItem(int arg0)
-			{
-				return mFragments.get(arg0);
-			}
-		};
-		mViewPager.setAdapter(mAdapter);
-		
-//		mViewPager.setOnPageChangeListener(new OnPageChangeListener()
-//		{
-//
-//			private int currentIndex;
-//
-//			@Override
-//			public void onPageSelected(int position)
-//			{
-//				
-//		
-//
-//				currentIndex = position;
-//			}
-//
-//			@Override
-//			public void onPageScrolled(int arg0, float arg1, int arg2)
-//			{
-//
-//			}
-//
-//			@Override
-//			public void onPageScrollStateChanged(int arg0)
-//			{
-//			}
-//		});
 	}
 
 	@Override
 	protected void initEvents() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	protected void initViews() {
+		
+		imageList
+				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043531502.jpg");
+		imageList
+				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043532264.jpg");
+		imageList
+				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043533581.jpg");
+		imageList
+				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043533571.jpg");
+		imageList
+				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043534672.jpg");
+		imageList
+				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043534854.jpg");
+		imageList
+				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043535929.jpg");
+		imageList
+				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043535784.jpg");
+		imageList
+				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043536626.jpg");
+		imageList
+				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043536244.jpg");
+		mmListView = (MultiColumnListView) findViewById(R.id.hairdo_mm_list_view);
+		initWithContext(this);
+		mmListView.setOnTouchListener(new View.OnTouchListener() {
 
-		mTabBtnLongHair = (FrameLayout) findViewById(R.id.id_hairdo_tab_longhair);
-		mTabBtnShortHair = (FrameLayout) findViewById(R.id.id_hairdo_tab_shorthair);
-		mTabBtnMiddleHair = (FrameLayout) findViewById(R.id.id_hairdo_tab_middlehair);
-		mTabBtnManHair = (FrameLayout) findViewById(R.id.id_hairdo_tab_manhair);
+			@Override
+			public boolean onTouch(View v, MotionEvent ev) {
+				if (mLastY == -1) {
+					mLastY = ev.getRawY();
+				}
+
+				switch (ev.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					mLastY = ev.getRawY();
+					break;
+				case MotionEvent.ACTION_MOVE:
+					final float deltaY = ev.getRawY() - mLastY;
+					mLastY = ev.getRawY();
+					if (mmListView.getFirstVisiblePosition() == 0
+							&& (mHeaderView.getVisiableHeight() > 0 || deltaY > 0)) {
+						// the first item is showing, header has shown or pull
+						// down.
+						updateHeaderHeight(deltaY / OFFSET_RADIO);
+						// invokeOnScrolling();
+					} else if (mmListView.getLastVisiblePosition() == mTotalItemCount - 1
+							&& (mFooterView.getBottomMargin() > 0 || deltaY < 0)) {
+						// last item, already pulled up or want to pull up.
+						updateFooterHeight(-deltaY / OFFSET_RADIO);
+					}
+					break;
+				case MotionEvent.ACTION_UP:
+					
+					
+					break;
+				default:
+					mLastY = -1; // reset
+					if (mmListView.getFirstVisiblePosition() == 0) {
+						// invoke refresh
+						if (mEnablePullRefresh
+								&& mHeaderView.getVisiableHeight() > mHeaderViewHeight) {
+							mPullRefreshing = true;
+							mHeaderView
+									.setState(XListViewHeader.STATE_REFRESHING);
+							
+							
+							ContentTask task = new ContentTask();
+							task.execute("asd");
+							
+
+						}
+						resetHeaderHeight();
+					} else if (mmListView.getLastVisiblePosition() == mTotalItemCount - 1) {
+						// invoke load more.
+						if (mEnablePullLoad
+								&& mFooterView.getBottomMargin() > PULL_LOAD_MORE_DELTA) {
+							showLongToast("在xiala ?？");
+
+						}
+						resetFooterHeight();
+					}
+					break;
+				}
+				return onTouchEvent(ev);
+			}
+		});
+		// make sure XListViewFooter is the last footer view, and only add once.
+		if (mIsFooterReady == false) {
+			mIsFooterReady = true;
+			mmListView.addFooterView(mFooterView);
+		}
 		
-		ArrayList<String> imageList = new ArrayList<String>();
-		imageList.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043531502.jpg");
-		imageList.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043532264.jpg");
-		imageList.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043533581.jpg");
-		imageList.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043533571.jpg");
-		imageList.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043534672.jpg");
-		imageList.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043534854.jpg");
-		imageList.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043535929.jpg");
-		imageList.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043535784.jpg");
-		imageList.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043536626.jpg");
-		imageList.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043536244.jpg");
-		ArrayList<String> imageList2 = new ArrayList<String>();
-		imageList2.add("http://g.hiphotos.baidu.com/image/pic/item/024f78f0f736afc397250d54b019ebc4b74512d1.jpg");
-		imageList2.add("http://a.hiphotos.baidu.com/image/pic/item/fd039245d688d43f670949ff7f1ed21b0ef43b1f.jpg");
-		imageList2.add("http://imgt6.bdstatic.com/it/u=2,838971799&fm=25&gp=0.jpg");
-		imageList2.add("http://e.hiphotos.baidu.com/image/pic/item/0823dd54564e925895e4edec9e82d158cdbf4edb.jpg");
-		imageList2.add("http://e.hiphotos.baidu.com/image/w%3D230/sign=ebd694fe72cf3bc7e800caefe102babd/43a7d933c895d14321948cd071f082025baf0766.jpg");
-		imageList2.add("http://a.hiphotos.baidu.com/image/w%3D230/sign=1574a37722a446237ecaa261a8237246/faf2b2119313b07eb2d689050ed7912397dd8c50.jpg");
-		imageList2.add("http://f.hiphotos.baidu.com/image/w%3D230/sign=5d2d573c259759ee4a5067c882fa434e/b7003af33a87e95060fdc05d13385343fbf2b41c.jpg");
-		imageList2.add("http://f.hiphotos.baidu.com/image/w%3D230/sign=4f6d050978f40ad115e4c0e0672c1151/1b4c510fd9f9d72a254f222cd72a2834349bbbd3.jpg");
-		imageList2.add("http://f.hiphotos.baidu.com/image/w%3D230/sign=30d5494b23a446237ecaa261a8237246/faf2b2119313b07e977763390fd7912397dd8c3c.jpg");
-		imageList2.add("http://c.hiphotos.baidu.com/image/w%3D230/sign=c399a7ed0bfa513d51aa6bdd0d6d554c/37d3d539b6003af36891ee51362ac65c1038b6d3.jpg");
-		ArrayList<String> imageList3 = new ArrayList<String>();
-		imageList3.add("http://a.hiphotos.baidu.com/image/pic/item/cf1b9d16fdfaaf51ab6a81a98f5494eef01f7a1e.jpg");
-		imageList3.add("http://f.hiphotos.baidu.com/image/pic/item/91529822720e0cf3f21c638f0946f21fbf09aade.jpg");
-		imageList3.add("http://a.hiphotos.baidu.com/image/w%3D230/sign=6f067309cbfcc3ceb4c0ce30a245d6b7/4afbfbedab64034f50e63d2dacc379310a551df5.jpg");
-		imageList3.add("http://h.hiphotos.baidu.com/image/w%3D230/sign=b4c85699d258ccbf1bbcb23929d8bcd4/a5c27d1ed21b0ef41cc36775dec451da81cb3ef5.jpg");
-		imageList3.add("http://f.hiphotos.baidu.com/image/pic/item/f9dcd100baa1cd11a7efaa37ba12c8fcc3ce2d48.jpg");
-		imageList3.add("http://b.hiphotos.baidu.com/image/w%3D230/sign=b870d426223fb80e0cd166d406d02ffb/b2de9c82d158ccbfd5186d2d1ad8bc3eb1354105.jpg");
-		imageList3.add("http://h.hiphotos.baidu.com/image/pic/item/18d8bc3eb13533fa3d124b39abd3fd1f41345b05.jpg");
-		imageList3.add("http://g.hiphotos.baidu.com/image/pic/item/77c6a7efce1b9d1663294276f0deb48f8c54643f.jpg");
-		imageList3.add("http://e.hiphotos.baidu.com/image/w%3D230/sign=5d51dedd818ba61edfeecf2c713497cc/80cb39dbb6fd52663c72e403a818972bd4073648.jpg");
-		
-		mFragments.add(new HairdoWaterfallFragment(imageList));
-		mFragments.add(new HairdoWaterfallFragment(imageList2));
-		mFragments.add(new HairdoWaterfallFragment(imageList2));
-		mFragments.add(new HairdoWaterfallFragment(imageList3));
-		
-//		mFragments.add(tab02);
-//		mFragments.add(tab03);
-//		mFragments.add(tab04);
+		mmListView.setAdapter(new BaseAdapter() {
+			class Holder {
+				public ImageView ivPic;
+				public ImageView ivUp;
+				public ImageView ivDown;
+				public TextView tvUp;
+				public TextView tvDown;
+			}
+
+			@Override
+			public int getCount() {
+				return imageList.size();
+			}
+
+			@Override
+			public Object getItem(int arg0) {
+				return null;
+			}
+
+			@Override
+			public long getItemId(int arg0) {
+				return 0;
+			}
+
+			@Override
+			public View getView(final int position, View view, ViewGroup group) {
+				final Holder holder;
+				// 得到View
+				if (view == null) {
+					holder = new Holder();
+					view = inflater.inflate(R.layout.item_hairdo_waterfall,
+							group, false);
+					holder.ivPic = (ImageView) view
+							.findViewById(R.id.iv_hairdo_item_picture);
+					holder.tvUp = (TextView) view
+							.findViewById(R.id.tv_hairdo_item_good);
+					holder.tvDown = (TextView) view
+							.findViewById(R.id.tv_hairdo_item_bad);
+					view.setTag(holder);
+				} else {
+					holder = (Holder) view.getTag();
+				}
+
+				String url = imageList.get(position);
+				ImageLoader.getInstance().displayImage(url, holder.ivPic,
+						options);
+				holder.tvUp.setText("10");
+				holder.tvDown.setText("100");
+
+				holder.ivPic.setOnClickListener(new View.OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+
+					}
+				});
+
+				return view;
+			}
+		});
 
 	}
+
+	private void updateHeaderHeight(float delta) {
+		//Log.d("HEAD", "位置"+delta);
+		mHeaderView.setVisiableHeight((int) delta
+				+ mHeaderView.getVisiableHeight());
+		if (mEnablePullRefresh && !mPullRefreshing) { // 未处于刷新状态，更新箭头
+			if (mHeaderView.getVisiableHeight() > mHeaderViewHeight) {
+				mHeaderView.setState(XListViewHeader.STATE_READY);
+			} else {
+				mHeaderView.setState(XListViewHeader.STATE_NORMAL);
+			}
+		}
+		mmListView.setSelection(0); // scroll to top each time
+	}
+
+	/**
+	 * reset header view's height.
+	 */
+	private void resetHeaderHeight() {
+		int height = mHeaderView.getVisiableHeight();
+		if (height == 0) // not visible.
+			return;
+		// refreshing and header isn't shown fully. do nothing.
+		if (mPullRefreshing && height <= mHeaderViewHeight) {
+			return;
+		}
+		int finalHeight = 0; // default: scroll back to dismiss header.
+		// is refreshing, just scroll back to show all the header.
+		if (mPullRefreshing && height > mHeaderViewHeight) {
+			finalHeight = mHeaderViewHeight;
+		}
+		mScrollBack = SCROLLBACK_HEADER;
+		mScroller.startScroll(0, height, 0, finalHeight - height,
+				SCROLL_DURATION);
+		// trigger computeScroll
+		mHeaderView.setVisiableHeight(mScroller.getCurrY());
+		mmListView.invalidate();
+	}
+
+	private void updateFooterHeight(float delta) {
+		int height = mFooterView.getBottomMargin() + (int) delta;
+		if (mEnablePullLoad && !mPullLoading) {
+			if (height > PULL_LOAD_MORE_DELTA) { // height enough to invoke load
+													// more.
+				mFooterView.setState(XListViewFooter.STATE_READY);
+			} else {
+				mFooterView.setState(XListViewFooter.STATE_NORMAL);
+			}
+		}
+		mFooterView.setBottomMargin(height);
+
+		// setSelection(mTotalItemCount - 1); // scroll to bottom
+	}
+
+	private void resetFooterHeight() {
+		int bottomMargin = mFooterView.getBottomMargin();
+		if (bottomMargin > 0) {
+			mScrollBack = SCROLLBACK_FOOTER;
+			mScroller.startScroll(0, bottomMargin, 0, -bottomMargin,
+					SCROLL_DURATION);
+			mmListView.invalidate();
+		}
+	}
+	/**
+	 * stop refresh, reset header view.
+	 */
+	public void stopRefresh() {
+		if (mPullRefreshing == true) {
+			mPullRefreshing = false;
+			resetHeaderHeight();
+		}
+	}
+
+	/**
+	 * stop load more, reset footer view.
+	 */
+	public void stopLoadMore() {
+		if (mPullLoading == true) {
+			mPullLoading = false;
+			mFooterView.setState(XListViewFooter.STATE_NORMAL);
+		}
+	}
+	private void initWithContext(Context context) {
+		mScroller = new Scroller(context, new DecelerateInterpolator());
+		// XListView need the scroll event, and it will dispatch the event to
+		// user's listener (as a proxy).
+//		mmListView.setOnScrollListener(this);
+
+		// init header view
+		mHeaderView = new XListViewHeader(context);
+		mHeaderViewContent = (RelativeLayout) mHeaderView
+				.findViewById(R.id.xlistview_header_content);
+		mHeaderTimeView = (TextView) mHeaderView
+				.findViewById(R.id.xlistview_header_time);
+		mmListView.addHeaderView(mHeaderView);
+
+		// init footer view
+		mFooterView = new XListViewFooter(context);
+
+		// init header height
+		mHeaderView.getViewTreeObserver().addOnGlobalLayoutListener(
+				new ViewTreeObserver.OnGlobalLayoutListener() {
+					@Override
+					public void onGlobalLayout() {
+						mHeaderViewHeight = mHeaderViewContent.getHeight();
+						mHeaderView.getViewTreeObserver()
+								.removeGlobalOnLayoutListener(this);
+					}
+				});
+	}
+
+	 private class ContentTask extends AsyncTask<String, Integer, String> {
+
+		@Override
+		protected String doInBackground(String... params) {
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return "http://img0.bdstatic.com/img/image/qiuyi1111.jpg";
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			showLongToast("执行完毕啦");
+			stopRefresh();
+			super.onPostExecute(result);
+		}
+
+	
+		 
+	 }
 
 }

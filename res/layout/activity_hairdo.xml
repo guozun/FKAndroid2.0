@@ -46,14 +46,13 @@
             android:layout_width="fill_parent"
             android:layout_height="180dp" />
 
-        <include layout="@layout/hairdo_bar" />
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/id_hairdo_waterfall"
+        <com.huewu.pla.lib.MultiColumnListView
+            android:id="@+id/hairdo_mm_list_view"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-             >
-        </android.support.v4.view.ViewPager>
+            android:layout_height="0dp"
+            android:layout_weight="9"
+            />
+        
     </LinearLayout>
 
 </LinearLayout>
