@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blackswan.fake.R;
+import com.blackswan.fake.activity.useractivity.AlterSexActivity;
 import com.blackswan.fake.activity.useractivity.LoginActivity;
 import com.blackswan.fake.activity.useractivity.MyCollectActivity;
 import com.blackswan.fake.activity.useractivity.PersonalInfoActivity;
@@ -132,6 +133,7 @@ public class MyPageActivity extends BaseActivity {
 					startActivity(LoginActivity.class);
 				} else {
 					// 若已登入，我的预约详细信息刷新显示
+					startActivity(AlterSexActivity.class);
 				}
 
 			}

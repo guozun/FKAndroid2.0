@@ -67,8 +67,11 @@
             android:visibility="gone" />
     </LinearLayout>
 
-    <com.blackswan.fake.view.ImageSlideShowView
+        <com.blackswan.fake.view.HairdoSlideShowView
+        android:id="@+id/hairdoSlideShowView1"
         android:layout_width="fill_parent"
-        android:layout_height="180dp" />
+        android:layout_height="200dp"
+         >
+    </com.blackswan.fake.view.HairdoSlideShowView>
 
 </LinearLayout>

@@ -84,9 +84,9 @@
         <activity android:name="com.blackswan.fake.activity.AllDiscussionActivity"/>
         <activity android:name="com.blackswan.fake.activity.useractivity.AlterHeadActivity"/>
         <activity android:name="com.blackswan.fake.activity.useractivity.AlterNickNameActivity"/>
-        <activity android:name="com.blackswan.fake.activity.useractivity.AlterPhoneActivityvity"/>
+        <activity android:name="com.blackswan.fake.activity.useractivity.AlterPhoneActivity"/>
         <activity android:name="com.blackswan.fake.activity.useractivity.AlterPwdActivity"/>
-        <activity android:name="com.blackswan.fake.activity.useractivity.AlterSexActivityActivity"/>
+        <activity android:name="com.blackswan.fake.activity.useractivity.AlterSexActivity"/>
         <activity android:name="com.blackswan.fake.activity.ApraiseBarberActivity"/>
         <activity android:name="com.blackswan.fake.activity.BarberActivity"/>
         <activity android:name="com.blackswan.fake.barberactivity.BarberDetailsPageActivity"/>
