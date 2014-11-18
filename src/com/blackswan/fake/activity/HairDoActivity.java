@@ -118,6 +118,14 @@ public class HairDoActivity extends BaseActivity {
 		imageList
 				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043536244.jpg");
 		mmListView = (MultiColumnListView) findViewById(R.id.hairdo_mm_list_view);
+		findViewById(R.id.tv_hairdo_select).setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				//筛选
+				
+			}
+		});
 		initWithContext(this);
 		mmListView.setOnTouchListener(new View.OnTouchListener() {
 
