@@ -21,6 +21,9 @@ import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.SparseIntArray;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.huewu.pla.lib.internal.PLA_ListView;
@@ -90,6 +93,7 @@ public class MultiColumnListView extends PLA_ListView {
 			mColumns[i] = new Column(i);
 
 		mFixedColumn = new FixedColumn();
+
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -427,5 +431,6 @@ public class MultiColumnListView extends PLA_ListView {
 		}
 
 	}//end of class
+
 
 }//end of class

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,8 +28,8 @@ import android.widget.TextView;
 import com.blackswan.fake.R;
 import com.blackswan.fake.base.BaseActivity;
 import com.blackswan.fake.util.Utility;
+import com.blackswan.fake.view.HairdoSlideShowView;
 import com.blackswan.fake.view.HandyTextView;
-import com.blackswan.fake.view.ImageSlideShowView;
 import com.huewu.pla.lib.MultiColumnListView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -41,7 +42,7 @@ public class HairDoActivity extends BaseActivity {
 	private LayoutInflater inflater;
 
 	MultiColumnListView mmListView;
-
+	HairdoSlideShowView mHairdoSlideShowView;
 	// HeadView
 	private final static int RELEASE_TO_REFRESH = 0;
 	private final static int PULL_TO_REFRESH = 1;
@@ -50,7 +51,7 @@ public class HairDoActivity extends BaseActivity {
 	private final static int LOADING = 4;
 	private final static int RATIO = 3;
 
-	private View mHeader;
+	private LinearLayout mHeader;
 
 	private HandyTextView mHtvTitle;
 	private HandyTextView mHtvTime;
@@ -123,8 +124,8 @@ public class HairDoActivity extends BaseActivity {
 			@SuppressLint("ClickableViewAccessibility")
 			@Override
 			public boolean onTouch(View v, MotionEvent ev) {
+
 				int action = ev.getAction();
-Log.d("mmListView", "x="+ev.getX()+"Y="+ev.getY());
 				switch (action) {
 				case MotionEvent.ACTION_DOWN:
 					if (mIsRefreshable) {
@@ -134,7 +135,7 @@ Log.d("mmListView", "x="+ev.getX()+"Y="+ev.getY());
 							mStartY = (int) ev.getY();
 						}
 					}
-
+					Log.i("Mulit", "DOWN");
 					break;
 
 				case MotionEvent.ACTION_MOVE:
@@ -187,6 +188,7 @@ Log.d("mmListView", "x="+ev.getX()+"Y="+ev.getY());
 						}
 
 					}
+					Log.i("Mulit", "Move");
 					break;
 
 				case MotionEvent.ACTION_UP:
@@ -206,6 +208,7 @@ Log.d("mmListView", "x="+ev.getX()+"Y="+ev.getY());
 					}
 					mIsRecored = false;
 					mIsBack = false;
+					Log.i("Mulit", "Up");
 					break;
 				}
 				return false;
@@ -276,10 +279,35 @@ Log.d("mmListView", "x="+ev.getX()+"Y="+ev.getY());
 
 	}
 
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+		int action = event.getAction();
+
+		int position = mmListView.getFirstVisiblePosition();
+		if (position == 0) {
+			View view = mmListView.getChildAt(position);
+			Rect rect = new Rect();
+			// 获取view 相对父容器坐标系统中的位置
+			view.getHitRect(rect);
+			// 因为本身listView与DectorView也有边距
+			rect.top += mmListView.getTop();
+			rect.bottom += mmListView.getTop();
+
+			boolean contains = rect.contains((int) event.getX(),
+					(int) event.getY());
+			if (contains) {
+				mHairdoSlideShowView.dispatchTouchEvent(event);
+				return true;
+			}
+		}
+
+		return super.dispatchTouchEvent(event);
+	}
+
 	private void initWithContext(Context context) {
 
-		mHeader =  inflater.inflate(R.layout.hairdo_pull_to_refreshing_header,
-				null);
+		mHeader = (LinearLayout) inflater.inflate(
+				R.layout.hairdo_pull_to_refreshing_header, null);
 		mHtvTitle = (HandyTextView) mHeader
 				.findViewById(R.id.refreshing_header_htv_title);
 		mHtvTime = (HandyTextView) mHeader
@@ -290,7 +318,11 @@ Log.d("mmListView", "x="+ev.getX()+"Y="+ev.getY());
 				.findViewById(R.id.refreshing_header_iv_loading);
 		mIvCancel = (ImageView) mHeader
 				.findViewById(R.id.refreshing_header_iv_cancel);
-
+		mHairdoSlideShowView = new HairdoSlideShowView(context);
+		int hh = mScreenWidth * 618 / 1000;
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+				mScreenWidth, hh);
+		mHeader.addView(mHairdoSlideShowView, params);
 		mIvCancel.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -299,15 +331,13 @@ Log.d("mmListView", "x="+ev.getX()+"Y="+ev.getY());
 			}
 		});
 
-		
 		int w = View.MeasureSpec.makeMeasureSpec(0,
 				View.MeasureSpec.UNSPECIFIED);
 		int h = View.MeasureSpec.makeMeasureSpec(0,
 				View.MeasureSpec.UNSPECIFIED);
 		mHeader.measure(w, h);
-		mHeaderHeight = mHeader.getMeasuredHeight()-Utility.Dp2Px(this, 180);
+		mHeaderHeight = mHeader.getMeasuredHeight() - hh;
 
-		
 		mHeader.setPadding(0, -1 * mHeaderHeight, 0, 0);
 		mHeader.invalidate();
 		mmListView.addHeaderView(mHeader);
@@ -338,6 +368,7 @@ Log.d("mmListView", "x="+ev.getX()+"Y="+ev.getY());
 		mIsCancelable = true;
 		changeHeaderViewByState();
 	}
+
 	@SuppressLint("SimpleDateFormat")
 	public void onRefreshComplete() {
 		mState = DONE;
@@ -346,7 +377,6 @@ Log.d("mmListView", "x="+ev.getX()+"Y="+ev.getY());
 		mHtvTime.setText("最后刷新: " + date);
 		changeHeaderViewByState();
 	}
-
 
 	private void changeHeaderViewByState() {
 		switch (mState) {

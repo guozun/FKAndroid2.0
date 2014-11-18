@@ -277,7 +277,8 @@ ViewTreeObserver.OnGlobalLayoutListener, ViewTreeObserver.OnTouchModeChangeListe
      */
     private VelocityTracker mVelocityTracker;
 
-    /**
+
+	/**
      * Handles one frame of a fling
      */
     private FlingRunnable mFlingRunnable;

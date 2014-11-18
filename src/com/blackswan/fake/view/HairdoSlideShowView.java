@@ -56,11 +56,15 @@ public class HairdoSlideShowView extends RelativeLayout implements
 	private final int CHANGE_TIME = 1000;
 	private final int SCROLL_RADIO = 1;
 
-	private final int PERIOD_INIT = 0;
-	private final int PERIOD_DOWN = 1;
-	private final int PERIOD_SCROLL = 2;
+	public final int PERIOD_INIT = 0;
+	public final int PERIOD_DOWN = 1;
+	public final int PERIOD_SCROLL = 2;
 
 	private int Period = PERIOD_INIT; //
+
+	public int getPeriod() {
+		return Period;
+	}
 
 	public HairdoSlideShowView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -205,40 +209,7 @@ public class HairdoSlideShowView extends RelativeLayout implements
 		// invalidate();
 	}
 
-	private void scrollRight() {
-		int next = getNextPosition(false);
-		if (current) {
-			// Log.i("信息", "A在上面");
-			// A在上面,把A换到下面去
-			imgB.bringToFront();
-			// loader.displayImage(advers.get(currentItme).getImgUrl(), imgA,
-			// options);
-			// loader.displayImage(advers.get(next).getImgUrl(), imgB, options);
 
-			// imgA.setImageBitmap(imgCache[currentItme]);
-			imgB.setImageBitmap(imgCache[next]);
-			mScrollerA.startScroll(0, 0, -imgWidth / 2, 0, CHANGE_TIME);
-			mScrollerB.startScroll(imgWidth, 0, -imgWidth, 0, CHANGE_TIME);
-		} else {
-			// B在上面,把B换到下面去
-			// Log.i("信息", "B在上面");
-			// imgB.setImageBitmap(imgCache[currentItme]);
-			imgA.setImageBitmap(imgCache[next]);
-
-			imgA.bringToFront();
-			// loader.displayImage(advers.get(currentItme).getImgUrl(), imgB,
-			// options);
-			// loader.displayImage(advers.get(next).getImgUrl(), imgA, options);
-
-			mScrollerB.startScroll(0, 0, -imgWidth / 2, 0, CHANGE_TIME);
-			mScrollerA.startScroll(imgWidth, 0, -imgWidth, 0, CHANGE_TIME);
-		}
-		changeDrops(currentItme, next);
-		currentItme = next;
-		current = !current;
-
-		invalidate();
-	}
 
 	/**
 	 * 为图像位置动画 进行该次位置初始化
@@ -477,7 +448,7 @@ public class HairdoSlideShowView extends RelativeLayout implements
 				&& mScrollerB.isFinished()) {
 			Period = PERIOD_DOWN;
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -488,7 +459,7 @@ public class HairdoSlideShowView extends RelativeLayout implements
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		// 加上点击动作
-		return false;
+		return true;
 	}
 
 	@Override
@@ -509,8 +480,8 @@ public class HairdoSlideShowView extends RelativeLayout implements
 			int buff = (int) (distanceX / SCROLL_RADIO);
 			scrollTraceFiger(buff);
 			distanceSum += buff;
-			Log.i("", "onScroll");
 		}
+		Log.i("", "onScroll");
 		return true;
 	}
 
