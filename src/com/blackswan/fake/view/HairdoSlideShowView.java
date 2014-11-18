@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -48,9 +49,9 @@ public class HairdoSlideShowView extends RelativeLayout implements
 	private Boolean currentDirection;// true->右侧图片计入
 	private int currentItme = 0; // 当前页
 	private int nextItme = 0; // 期望的下一页页
-	private int distanceSum; // 当前移动距离之和
 	private int imgPositionA; // 记录imgA的坐标
 	private int imgPositionB; // 记录imgB的坐标
+	private int moveDistance; // 此次移动累计距离
 
 	private int imgWidth;
 	private final int CHANGE_TIME = 1000;
@@ -59,8 +60,10 @@ public class HairdoSlideShowView extends RelativeLayout implements
 	public final int PERIOD_INIT = 0;
 	public final int PERIOD_DOWN = 1;
 	public final int PERIOD_SCROLL = 2;
-
 	private int Period = PERIOD_INIT; //
+
+	private Handler handler;
+	private Runnable runnable;
 
 	public int getPeriod() {
 		return Period;
@@ -123,8 +126,24 @@ public class HairdoSlideShowView extends RelativeLayout implements
 				imgWidth = imgA.getWidth();
 			}
 		});
-	}
+		handler = new Handler();
+		runnable = new Runnable() {
+			@Override
+			public void run() {
+				initImgPosition(true);
+				finishImgScroll(true);
+				handler.postDelayed(this, 5000);
 
+			}
+		};
+		startAutoPlay();
+	}
+	private void stopAutoPlay(){
+		handler.removeCallbacks(runnable); 
+	}
+	private void startAutoPlay(){
+		handler.postDelayed(runnable, 5000);
+	}
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
 		return true;
@@ -136,13 +155,13 @@ public class HairdoSlideShowView extends RelativeLayout implements
 		if (mScrollerA.computeScrollOffset()) {
 			// 这里调用View的scrollTo()完成实际的滚动
 			imgA.scrollTo(mScrollerA.getCurrX(), mScrollerA.getCurrY());
-			Log.d("mScrollerA getCurrX", mScrollerA.getCurrX() + "");
+			// Log.d("mScrollerA getCurrX", mScrollerA.getCurrX() + "");
 		}
 		if (mScrollerB.computeScrollOffset()) {
 			// 这里调用View的scrollTo()完成实际的滚动
 			imgB.scrollTo(mScrollerB.getCurrX(), mScrollerB.getCurrY());
 			// Log.d("B", mScrollerB.getCurrX() + "+" + mScrollerB.getCurrY());
-			Log.i("mScrollerB getCurrX", mScrollerB.getCurrX() + "");
+			// Log.i("mScrollerB getCurrX", mScrollerB.getCurrX() + "");
 		}
 		// 必须调用该方法，否则不一定能看到滚动效果
 		postInvalidate();
@@ -204,12 +223,10 @@ public class HairdoSlideShowView extends RelativeLayout implements
 			Period = PERIOD_INIT;
 			finishImgScroll(currentDirection);
 		}
-		Log.d("A设置", imgPositionA + "");
-		Log.d("B设置", imgPositionB + "");
+		// Log.d("A设置", imgPositionA + "");
+		// Log.d("B设置", imgPositionB + "");
 		// invalidate();
 	}
-
-
 
 	/**
 	 * 为图像位置动画 进行该次位置初始化
@@ -252,8 +269,8 @@ public class HairdoSlideShowView extends RelativeLayout implements
 			imgA.scrollTo(imgPositionA, 0);
 		}
 		// invalidate();
-		Log.d("A初始化imgPositionA", imgPositionA + "");
-		Log.d("B初始化imgPositionB", imgPositionB + "");
+		// Log.d("A初始化imgPositionA", imgPositionA + "");
+		// Log.d("B初始化imgPositionB", imgPositionB + "");
 	}
 
 	/**
@@ -312,6 +329,47 @@ public class HairdoSlideShowView extends RelativeLayout implements
 		// Log.e("A时间", CHANGE_TIME * diffAx / imgWidth + "");
 		// Log.e("B时间", CHANGE_TIME * diffBx / imgWidth + "");
 
+	}
+
+	/**
+	 * 手指松了之后 完成图像的回滚，用于 滑动很小距离的时候
+	 * 
+	 * @param true->右边图片进入
+	 */
+	private void imgScrollBack(Boolean dir) {
+		int diffAx; // A的移动距离
+		int diffBx;
+		if (dir) {
+			if (current) {
+				// A为当前 右边B图片进入
+				diffAx = 0 - imgPositionA;
+				diffBx = -imgWidth - imgPositionB;
+			} else {
+				// B为当前 右边A图片进入
+				diffBx = 0 - imgPositionB;
+				diffAx = -imgWidth - imgPositionA;
+			}
+		} else {
+			if (current) {
+				// A为当前 左边边B图片进入
+				diffAx = 0 - imgPositionA;
+				diffBx = imgWidth - imgPositionB;
+			} else {
+				// B为当前 左边边A图片进入
+				diffBx = 0 - imgPositionB;
+				diffAx = imgWidth - imgPositionA;
+			}
+		}
+		int time = Math.min(Math.abs(diffAx), Math.abs(diffBx));
+		time = CHANGE_TIME * time / imgWidth;
+
+		mScrollerA.startScroll(imgPositionA, 0, diffAx, 0, time);
+		mScrollerB.startScroll(imgPositionB, 0, diffBx, 0, time);
+
+		// changeDrops(currentItme, nextItme);
+		// currentItme = nextItme;
+		// current = !current;
+		invalidate();
 	}
 
 	// 图像资源 一次性 全部加载
@@ -424,16 +482,22 @@ public class HairdoSlideShowView extends RelativeLayout implements
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
+		this.detector.onTouchEvent(event);
 		if (event.getAction() == MotionEvent.ACTION_UP) {
-			Log.i("", "Up");
+			// Log.i("", "Up");
 			if (PERIOD_SCROLL == Period) {
 				// 如果周期开始，该周期随着 手指抬起结束
 				Period = PERIOD_INIT;
+				// if (Math.abs(moveDistance) < 300) {
+				// imgScrollBack(currentDirection);
+				// } else {
+				startAutoPlay();
 				finishImgScroll(currentDirection);
-				return true;
+				// }
+
 			}
 		}
-		return this.detector.onTouchEvent(event);
+		return true;
 	}
 
 	@Override
@@ -443,7 +507,7 @@ public class HairdoSlideShowView extends RelativeLayout implements
 
 	@Override
 	public boolean onDown(MotionEvent e) {
-		Log.i("", "onDown");
+		// Log.i("", "onDown");
 		if (PERIOD_INIT == Period && mScrollerA.isFinished()
 				&& mScrollerB.isFinished()) {
 			Period = PERIOD_DOWN;
@@ -453,12 +517,13 @@ public class HairdoSlideShowView extends RelativeLayout implements
 
 	@Override
 	public void onShowPress(MotionEvent e) {
-		Log.i("", "onShowPress");
+		// Log.i("", "onShowPress");
 	}
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		// 加上点击动作
+		Log.i("", "onSingleTapUp" + currentItme);
 		return true;
 	}
 
@@ -466,36 +531,49 @@ public class HairdoSlideShowView extends RelativeLayout implements
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
 			float distanceY) {
 		if (PERIOD_DOWN == Period) {
-			distanceSum = 0;
 			// 根据方向给图像设定初始化
-			if (distanceX < 0) {
+			if (distanceX == 0) {
+				return false;
+			} else if (distanceX < 0) {
 				currentDirection = false;
 			} else {
 				currentDirection = true;
 			}
+			stopAutoPlay();
+			moveDistance = 0;
 			initImgPosition(currentDirection);
 			Period = PERIOD_SCROLL;
 		}
 		if (PERIOD_SCROLL == Period) {
 			int buff = (int) (distanceX / SCROLL_RADIO);
 			scrollTraceFiger(buff);
-			distanceSum += buff;
+			moveDistance += distanceX;
 		}
-		Log.i("", "onScroll");
+		// Log.i("", "onScroll" + distanceX);
 		return true;
 	}
 
 	@Override
 	public void onLongPress(MotionEvent e) {
-		Log.i("", "onLongPress");
+		// Log.i("", "onLongPress");
 
 	}
 
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-	
-		return true;
+		// Log.i(Period + "   Period", "onFling");
+		// Log.i(velocityX + "   velocityX", velocityX + "onFling");
+		// int dis = (int) Math.abs(e2.getX() - e1.getX());
+		// dis = imgWidth / dis;
+		if (PERIOD_SCROLL == Period) {
+			Period = PERIOD_INIT;
+			finishImgScroll(currentDirection);
+			startAutoPlay();
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

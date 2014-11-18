@@ -7,6 +7,15 @@ public class Advertisement implements Serializable {
 
 	private String imgUrl;
 	private String adverUrl;
+	private int duration;	//持续时间，该广告的展示时间
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
 
 	public String getImgUrl() {
 		return imgUrl;

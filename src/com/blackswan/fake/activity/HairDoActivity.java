@@ -135,7 +135,7 @@ public class HairDoActivity extends BaseActivity {
 							mStartY = (int) ev.getY();
 						}
 					}
-					Log.i("Mulit", "DOWN");
+					
 					break;
 
 				case MotionEvent.ACTION_MOVE:
@@ -188,7 +188,6 @@ public class HairDoActivity extends BaseActivity {
 						}
 
 					}
-					Log.i("Mulit", "Move");
 					break;
 
 				case MotionEvent.ACTION_UP:
@@ -208,7 +207,6 @@ public class HairDoActivity extends BaseActivity {
 					}
 					mIsRecored = false;
 					mIsBack = false;
-					Log.i("Mulit", "Up");
 					break;
 				}
 				return false;
@@ -279,9 +277,14 @@ public class HairDoActivity extends BaseActivity {
 
 	}
 
+	// protected View target;
+	protected float dispatchX;
+	protected float dispatchY;
+
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		int action = event.getAction();
+		// Log.d("", "dispatchTouchEvent x="+event.getX()+"   y="+event.getY());
 
 		int position = mmListView.getFirstVisiblePosition();
 		if (position == 0) {
@@ -296,12 +299,52 @@ public class HairDoActivity extends BaseActivity {
 			boolean contains = rect.contains((int) event.getX(),
 					(int) event.getY());
 			if (contains) {
-				mHairdoSlideShowView.dispatchTouchEvent(event);
-				return true;
+				switch (action) {
+				case MotionEvent.ACTION_DOWN:
+					dispatchX = event.getX();
+					dispatchY = event.getY();
+					mHairdoSlideShowView.dispatchTouchEvent(event);
+					break;
+				case MotionEvent.ACTION_MOVE:
+					if (//
+					Math.abs(dispatchX - event.getX())//
+					> //
+					Math.abs(dispatchY - event.getY())//
+					) //
+					{
+						mHairdoSlideShowView.dispatchTouchEvent(event);
+					}
+
+					break;
+
+				default:
+					mHairdoSlideShowView.dispatchTouchEvent(event);
+					break;
+				}
+
+				// if(mHairdoSlideShowView.getPeriod() !=
+				// mHairdoSlideShowView.PERIOD_INIT){
+				// return true;
+				// }
 			}
 		}
 
 		return super.dispatchTouchEvent(event);
+		/*
+		 * int action = event.getAction(); if (action ==
+		 * MotionEvent.ACTION_DOWN) { int position =
+		 * mmListView.getFirstVisiblePosition(); if (position == 0) { View view
+		 * = mmListView.getChildAt(position); Rect rect = new Rect(); // 获取view
+		 * 相对父容器坐标系统中的位置 view.getHitRect(rect); // 因为本身listView与DectorView也有边距
+		 * rect.top += mmListView.getTop(); rect.bottom += mmListView.getTop();
+		 * 
+		 * boolean contains = rect.contains((int) event.getX(), (int)
+		 * event.getY()); if (contains) { target = mHairdoSlideShowView; } else
+		 * { target = null; } } } if (target != null) {
+		 * target.dispatchTouchEvent(event); if (action == MotionEvent.ACTION_UP
+		 * || action == MotionEvent.ACTION_CANCEL) { target = null; } } return
+		 * super.dispatchTouchEvent(event);
+		 */
 	}
 
 	private void initWithContext(Context context) {
@@ -319,7 +362,7 @@ public class HairDoActivity extends BaseActivity {
 		mIvCancel = (ImageView) mHeader
 				.findViewById(R.id.refreshing_header_iv_cancel);
 		mHairdoSlideShowView = new HairdoSlideShowView(context);
-		int hh = mScreenWidth * 618 / 1000;
+		int hh = mScreenWidth * 9 / 16;// 按照 16:9分配该广告
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
 				mScreenWidth, hh);
 		mHeader.addView(mHairdoSlideShowView, params);
