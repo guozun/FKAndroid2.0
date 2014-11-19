@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_top_corner_no_bottom_line"
+        android:padding="10dp" >
+
+        <TextView
+            style="@style/style_hairdo_filter_dialog_text"
+            android:text="长发" />
+
+        <CheckBox
+            android:id="@+id/cb_hairdo_filter_dialog_Long"
+            style="@style/style_hairdo_filter_dialog_checkbox" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_no_corner_without_bottom"
+        android:padding="10dp" >
+
+        <TextView
+            style="@style/style_hairdo_filter_dialog_text"
+            android:text="中发" />
+
+        <CheckBox
+            android:id="@+id/cb_hairdo_filter_dialog_middle"
+            style="@style/style_hairdo_filter_dialog_checkbox" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_no_corner_without_bottom"
+        android:padding="10dp" >
+
+        <TextView
+            style="@style/style_hairdo_filter_dialog_text"
+            android:text="短发" />
+
+        <CheckBox
+            android:id="@+id/cb_hairdo_filter_dialog_short"
+            style="@style/style_hairdo_filter_dialog_checkbox" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_bottom_corner_no_top_line"
+        android:padding="10dp" >
+
+        <TextView
+            style="@style/style_hairdo_filter_dialog_text"
+            android:text="男发" />
+
+        <CheckBox
+            android:id="@+id/cb_hairdo_filter_dialog_man"
+            style="@style/style_hairdo_filter_dialog_checkbox" />
+    </RelativeLayout>
+
+</LinearLayout>

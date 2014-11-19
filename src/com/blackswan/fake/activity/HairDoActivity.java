@@ -8,14 +8,19 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
@@ -23,11 +28,14 @@ import android.view.animation.RotateAnimation;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.RelativeLayout.LayoutParams;
 
 import com.blackswan.fake.R;
+import com.blackswan.fake.adapter.HairdoHairFilterAdapter;
 import com.blackswan.fake.base.BaseActivity;
-import com.blackswan.fake.util.Utility;
 import com.blackswan.fake.view.HairdoSlideShowView;
 import com.blackswan.fake.view.HandyTextView;
 import com.huewu.pla.lib.MultiColumnListView;
@@ -40,7 +48,6 @@ public class HairDoActivity extends BaseActivity {
 	LinkedList<String> imageList = new LinkedList<String>();
 	private DisplayImageOptions options;
 	private LayoutInflater inflater;
-
 	MultiColumnListView mmListView;
 	HairdoSlideShowView mHairdoSlideShowView;
 	// HeadView
@@ -118,14 +125,14 @@ public class HairDoActivity extends BaseActivity {
 		imageList
 				.add("http://www.yjz9.com/uploadfile/2012/1219/20121219043536244.jpg");
 		mmListView = (MultiColumnListView) findViewById(R.id.hairdo_mm_list_view);
-		findViewById(R.id.tv_hairdo_select).setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				//筛选
-				
-			}
-		});
+		findViewById(R.id.tv_hairdo_select).setOnClickListener(
+				new View.OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						startActivity(HairdoFilterActivity.class);
+					}
+				});
 		initWithContext(this);
 		mmListView.setOnTouchListener(new View.OnTouchListener() {
 
@@ -143,7 +150,7 @@ public class HairDoActivity extends BaseActivity {
 							mStartY = (int) ev.getY();
 						}
 					}
-					
+
 					break;
 
 				case MotionEvent.ACTION_MOVE:

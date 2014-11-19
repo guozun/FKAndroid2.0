@@ -67,7 +67,7 @@ public class PersonalInfoActivity extends BaseActivity {
 						getPopupWindowInstance();
 						mPopupWindow
 								.setAnimationStyle(R.style.PopupAnimationPersonalinfo);
-						mPopupWindow
+						mPopupWindow 
 								.showAtLocation(
 										findViewById(R.id.id_personalinfo_layout_alterSex),
 										Gravity.BOTTOM, 0, 0);
