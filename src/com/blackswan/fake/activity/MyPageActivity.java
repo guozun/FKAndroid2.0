@@ -3,16 +3,12 @@ package com.blackswan.fake.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.crypto.spec.IvParameterSpec;
-
-import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.style.BulletSpan;
-import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
@@ -22,7 +18,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.blackswan.fake.R;
 import com.blackswan.fake.activity.useractivity.AlterSexActivity;
@@ -33,18 +28,22 @@ import com.blackswan.fake.adapter.NowOrderListFragment;
 import com.blackswan.fake.adapter.ToEvaluateFragment;
 import com.blackswan.fake.base.BaseActivity;
 import com.blackswan.fake.bean.UserInfo;
+import com.blackswan.fake.util.UserUtils;
 import com.blackswan.fake.util.Utility;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 public class MyPageActivity extends BaseActivity {
 	private DisplayImageOptions options;
+	private DisplayImageOptions headOptions;
 	// 用户信息
-	private UserInfo userInfo = new UserInfo("name", "183139087908", "123",
-			"简介",
-			"http://img0.bdstatic.com/img/image/shouye/mxlyfs-9632102318.jpg",
-			true);
+	private UserInfo userInfo = null;
+//			new UserInfo("name", "183139087908", "123",
+//			"简介",
+//			"http://img0.bdstatic.com/img/image/shouye/mxlyfs-9632102318.jpg",
+//			true);
 	// 我的头像
 	private ImageView myHeadImageView;
 	// 我的昵称栏
@@ -66,9 +65,15 @@ public class MyPageActivity extends BaseActivity {
 	private FragmentPagerAdapter mFragmentPagerAdapter;
 	private List<Fragment> mFragments = new ArrayList<Fragment>();
 
+	public final int CHANGED = 1;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		headOptions = new DisplayImageOptions.Builder().cacheInMemory(true)
+				.cacheOnDisk(false).considerExifParams(true)
+				.imageScaleType(ImageScaleType.EXACTLY)
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
 		options = new DisplayImageOptions.Builder().cacheInMemory(true)
 				.cacheOnDisk(true).considerExifParams(true)
 				.imageScaleType(ImageScaleType.EXACTLY)
@@ -78,7 +83,7 @@ public class MyPageActivity extends BaseActivity {
 		} else {
 			setContentView(R.layout.activity_mypage_nologin);
 		}
-		
+
 		initControl();
 	}
 
@@ -94,7 +99,7 @@ public class MyPageActivity extends BaseActivity {
 			myCollect = (Button) findViewById(R.id.bt_mypage_collect);
 			myTopic = (Button) findViewById(R.id.bt_mypage_topic);
 			myHairShow = (TextView) findViewById(R.id.tv_mypage_hairshow);
-			settingImageView = (ImageButton) findViewById(R.id.ib_mypage_detail);
+
 			mViewPager = (ViewPager) findViewById(R.id.id_mypager_viewpager);
 			cursor = new ImageView(this);
 			setLisentener();
@@ -115,15 +120,19 @@ public class MyPageActivity extends BaseActivity {
 	 * 为各个控件设置监听
 	 */
 	private void setLisentener() {
-		settingImageView.setOnClickListener(new OnClickListener() {
+		findViewById(R.id.ib_mypage_detail).setOnClickListener(
+				new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				Bundle b = new Bundle();
-				b.putSerializable("personinfo", userInfo);
-				startActivity(PersonalInfoActivity.class, b);
-			}
-		});
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(MyPageActivity.this,PersonalInfoActivity.class);
+						// Bundle b = new Bundle();
+						// b.putSerializable("personinfo", userInfo);
+						intent.putExtra("personinfo", userInfo);
+						// startActivity(PersonalInfoActivity.class, b);
+						startActivityForResult(intent, CHANGED);
+					}
+				});
 		myTopic.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -156,8 +165,7 @@ public class MyPageActivity extends BaseActivity {
 	@Override
 	protected void initViews() {
 
-		ImageLoader.getInstance().displayImage(userInfo.getHeadUrl(),
-				myHeadImageView, options);
+		setHeadView();
 		myName.setText(userInfo.getName());
 		myDisp.setText(userInfo.getDisp());
 
@@ -225,4 +233,58 @@ public class MyPageActivity extends BaseActivity {
 
 	}
 
+	protected void setHeadView() {
+		if (UserUtils.getUserHeadFromSD(this) == null) {
+			// 本地一没有图片，
+			// 该用户有头像
+			if (userInfo.getHeadUrl() != null
+					&& userInfo.getHeadUrl().trim() != "") {
+				// 从网络加载 ，并保存
+				ImageLoader.getInstance().displayImage(userInfo.getHeadUrl(),
+						myHeadImageView, headOptions,
+						new SimpleImageLoadingListener() {
+
+							@Override
+							public void onLoadingComplete(String imageUri,
+									View view, Bitmap loadedImage) {
+								// 加载完成后 保存图片
+								UserUtils.saveHeadPicToSD(MyPageActivity.this,
+										loadedImage);
+								super.onLoadingComplete(imageUri, view,
+										loadedImage);
+							}
+
+						});
+			}
+		} else {
+			myHeadImageView.setImageBitmap(UserUtils.getUserHeadFromSD(this));
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case CHANGED:
+			if (resultCode == RESULT_OK) {
+				if (data.getBooleanExtra(PersonalInfoActivity.CHANGE_HEAD,
+						false)) {
+					setHeadView();
+				}
+				 String nname = data.getStringExtra(PersonalInfoActivity.CHANGE_NAME);
+				if(nname!=null){
+					myName.setText(nname);
+				}
+//				data.get
+//				Boolean nsex = data.getBooleanExtra(PersonalInfoActivity.CHANGE_SEX,(Boolean) null);
+//				if(nsex!=null){
+//					
+//				}
+				
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
 }

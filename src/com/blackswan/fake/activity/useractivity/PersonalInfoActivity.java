@@ -1,28 +1,38 @@
 package com.blackswan.fake.activity.useractivity;
 
-import android.annotation.SuppressLint;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
-import android.text.style.BulletSpan;
+import android.os.Environment;
+import android.renderscript.Sampler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+
 import com.blackswan.fake.R;
 import com.blackswan.fake.base.BaseActivity;
 import com.blackswan.fake.bean.UserInfo;
+import com.blackswan.fake.dialog.AlterHeadPopup;
+import com.blackswan.fake.util.FileUtils;
+import com.blackswan.fake.util.UserUtils;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 public class PersonalInfoActivity extends BaseActivity {
 	private UserInfo user;
@@ -32,8 +42,22 @@ public class PersonalInfoActivity extends BaseActivity {
 	private TextView sex;
 	private TextView phone;
 	private PopupWindow mPopupWindow;
-	protected final int INTENT_NAME  = 1;
-	protected final int INTENT_PHONE  = 2;
+	protected final int INTENT_NAME = 1;
+	protected final int INTENT_PHONE = 2;
+	public final static int CODE_PHOTO = 3;
+	public final static int CODE_CAMERA = 4;
+	public final int CODE_PIC_DONE = 5;
+
+	public final static String HEAD_PATH = ".Head";
+	public final static String HEAD_NAME = "CropedHead.jpg";
+	public final static String HEAD_OLD_NAME = "OrignalHead.jpg";
+	
+	public final static String CHANGE_HEAD = "changeHead";
+	public final static String CHANGE_NAME = "changeName";
+	public final static String CHANGE_SEX = "changeSex";
+
+	//用于返回信息给 我的主页 
+	private Intent returnIntent = new Intent();
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -45,7 +69,8 @@ public class PersonalInfoActivity extends BaseActivity {
 		user = (UserInfo) data.getSerializable("personinfo");
 		options = new DisplayImageOptions.Builder()
 				.showImageOnLoading(R.drawable.bg_cover_userheader_outerpress)
-				.cacheInMemory(true).cacheOnDisk(true).considerExifParams(true)
+				.cacheInMemory(true).cacheOnDisk(false)
+				.considerExifParams(true)
 				.imageScaleType(ImageScaleType.EXACTLY)
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
 		setContentView(R.layout.activity_personalinfo);
@@ -60,14 +85,14 @@ public class PersonalInfoActivity extends BaseActivity {
 
 					@Override
 					public void onClick(View v) {
-						getPopupWindowInstance();
-						LinearLayout layout = (LinearLayout) LayoutInflater
-								.from(PersonalInfoActivity.this).inflate(
-										R.layout.activity_personalinfo, null);
+						// getPopupWindowInstance();
+						// LinearLayout layout = (LinearLayout) LayoutInflater
+						// .from(PersonalInfoActivity.this).inflate(
+						// R.layout.activity_personalinfo, null);
 						getPopupWindowInstance();
 						mPopupWindow
 								.setAnimationStyle(R.style.PopupAnimationPersonalinfo);
-						mPopupWindow 
+						mPopupWindow
 								.showAtLocation(
 										findViewById(R.id.id_personalinfo_layout_alterSex),
 										Gravity.BOTTOM, 0, 0);
@@ -77,62 +102,144 @@ public class PersonalInfoActivity extends BaseActivity {
 				});
 		findViewById(R.id.id_personalinfo_layout_alterName).setOnClickListener(
 				new View.OnClickListener() {
-					
+
 					@Override
 					public void onClick(View v) {
-						Intent intent = new Intent(); 
-						intent.setClass(PersonalInfoActivity.this,AlterNickNameActivity.class);
+						Intent intent = new Intent();
+						intent.setClass(PersonalInfoActivity.this,
+								AlterNickNameActivity.class);
 						intent.putExtra("name", user.getName());
 						startActivityForResult(intent, INTENT_NAME);
 					}
 				});
-		findViewById(R.id.id_personalinfo_layout_alterPhone).setOnClickListener(
-				new View.OnClickListener() {
+		findViewById(R.id.id_personalinfo_layout_alterPhone)
+				.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						Intent intent = new Intent(); 
-						intent.setClass(PersonalInfoActivity.this,AlterPhoneActivity.class);
+						Intent intent = new Intent();
+						intent.setClass(PersonalInfoActivity.this,
+								AlterPhoneActivity.class);
 						intent.putExtra("phone", user.getPhoneNumber());
 						startActivityForResult(intent, INTENT_PHONE);
 					}
 				});
+
 		findViewById(R.id.id_personalinfo_layout_alterHead).setOnClickListener(
 				new View.OnClickListener() {
+
 					@Override
 					public void onClick(View v) {
-				
-						//startActivity(AlterHeadActivity.class);
+						final AlterHeadPopup mAlterHeadPopup = new AlterHeadPopup(
+								PersonalInfoActivity.this, getWindow());
+						mAlterHeadPopup
+								.showPopupWindow(findViewById(R.id.id_personalinfo_layout_alterHead));
+
 					}
 				});
+		findViewById(R.id.iv_personalinfo_back).setOnClickListener(
+				new View.OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						setResult(RESULT_OK, returnIntent);
+						defaultFinish();
+					}
+				});
+
 		ivHead = (ImageView) findViewById(R.id.iv_personalinfo_head);
 		name = (TextView) findViewById(R.id.tv_personalinfo_name);
 		sex = (TextView) findViewById(R.id.tv_personalinfo_sex);
 		phone = (TextView) findViewById(R.id.tv_personalinfo_phone);
 
-		ImageLoader.getInstance().displayImage(user.getHeadUrl(), ivHead,
-				options);
+		if (UserUtils.getUserHeadFromSD(this) == null) {
+			// 本地一没有图片，
+			// 该用户有头像
+			if (user.getHeadUrl() != null && user.getHeadUrl().trim() != "") {
+				// 从网络加载 ，并保存
+				ImageLoader.getInstance().displayImage(user.getHeadUrl(),
+						ivHead, options, new SimpleImageLoadingListener() {
+
+							@Override
+							public void onLoadingComplete(String imageUri,
+									View view, Bitmap loadedImage) {
+								// 加载完成后 保存图片
+								UserUtils.saveHeadPicToSD(
+										PersonalInfoActivity.this, loadedImage);
+								super.onLoadingComplete(imageUri, view,
+										loadedImage);
+							}
+
+						});
+			}
+		} else {
+			ivHead.setImageBitmap(UserUtils.getUserHeadFromSD(this));
+		}
 
 		name.setText(user.getName());
 		sex.setText(user.getSexLocal());
 		phone.setText(user.getPhoneNumber());
 	}
 
-	
+	/**
+	 * 调用系统的裁剪
+	 * 
+	 * @param uri
+	 */
+	public void cropPhoto(Uri uri) {
+		Intent intent = new Intent("com.android.camera.action.CROP");
+		intent.setDataAndType(uri, "image/*");
+		intent.putExtra("crop", "true");
+		// aspectX aspectY 是宽高的比例
+		intent.putExtra("aspectX", 1);
+		intent.putExtra("aspectY", 1);
+		// outputX outputY 是裁剪图片宽高
+		intent.putExtra("outputX", 150);
+		intent.putExtra("outputY", 150);
+		intent.putExtra("return-data", true);
+		startActivityForResult(intent, CODE_PIC_DONE);
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 		case INTENT_NAME:
-			if(resultCode == Activity.RESULT_OK){
+			if (resultCode == Activity.RESULT_OK) {
 				Bundle b = data.getExtras();
-				//String nn = b.getString("newName");
+				// String nn = b.getString("newName");
 				String nn = b.getString("newName");
-				//TODO 向服务器上传,是否变化 判断
+				// TODO 向服务器上传,是否变化 判断
 				showLongToast("修改姓名成功");
 				name.setText(nn);
-				
+				returnIntent.putExtra(CHANGE_NAME, nn);
 			}
 			break;
-
+		case CODE_CAMERA:
+			if (resultCode == RESULT_OK) {
+				File temp = new File(
+						FileUtils.getDiskCacheDir(this, HEAD_PATH),
+						HEAD_OLD_NAME);
+				cropPhoto(Uri.fromFile(temp));// 裁剪图片
+			}
+			break;
+		case CODE_PHOTO:
+			if (resultCode == RESULT_OK) {
+				cropPhoto(data.getData());// 裁剪图片
+			}
+			break;
+		case CODE_PIC_DONE:
+			if (data != null) {
+				Bundle extras = data.getExtras();
+				Bitmap head = extras.getParcelable("data");
+				if (head != null) {
+					/**
+					 * TODO 上传服务器代码
+					 */
+					UserUtils.saveHeadPicToSD(this, head);// 保存在SD卡中
+					ivHead.setImageBitmap(head);// 用ImageView显示出来
+					returnIntent.putExtra(CHANGE_HEAD, true);
+				}
+			}
+			break;
 		default:
 			break;
 		}
@@ -232,6 +339,7 @@ public class PersonalInfoActivity extends BaseActivity {
 		user.setSex(s);
 
 		sex.setText(user.getSexLocal());
+		returnIntent.putExtra(CHANGE_SEX, s);
 		return true;
 	}
 
@@ -253,32 +361,6 @@ public class PersonalInfoActivity extends BaseActivity {
 
 	}
 
-	public void alterSex(View view) {
 
-	}
-
-	public void alterPassword(View view) {
-
-	}
-
-	public void upgrade(View view) {
-
-	}
-
-	public void about(View view) {
-
-	}
-
-	public void alterHead(View view) {
-
-	}
-
-	public void alterName(View view) {
-
-	}
-
-	public void alterPhone(View view) {
-
-	}
 
 }
