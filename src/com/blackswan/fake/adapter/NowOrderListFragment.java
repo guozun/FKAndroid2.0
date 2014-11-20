@@ -1,14 +1,10 @@
 package com.blackswan.fake.adapter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
@@ -22,11 +18,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blackswan.fake.R;
-import com.blackswan.fake.base.HairdoWaterfallFragment.WaterfallAdapter;
 import com.blackswan.fake.bean.NowOrder;
+import com.blackswan.fake.view.FakePullDrowListView;
 import com.blackswan.fake.view.FakeRefreshListView;
-import com.huewu.pla.lib.MultiColumnPullToRefreshListView;
-import com.huewu.pla.lib.MultiColumnPullToRefreshListView.OnRefreshListener;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
@@ -37,13 +31,13 @@ public class NowOrderListFragment extends Fragment {
 	private DisplayImageOptions options;
 	NowOrder order;
 	private LayoutInflater mInflater;
-	FakeRefreshListView mRefreshListView;
+	FakePullDrowListView mRefreshListView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		mRefreshListView = new FakeRefreshListView(getActivity());
+		mRefreshListView = new FakePullDrowListView(getActivity());
 
 		options = new DisplayImageOptions.Builder()
 				.showImageOnLoading(R.drawable.bg_cover_userheader_outerpress)
@@ -67,7 +61,7 @@ public class NowOrderListFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View viewroot = inflater.inflate(R.layout.fragment_pullto_refresh,
 				container, false);
-		mRefreshListView = (FakeRefreshListView) viewroot
+		mRefreshListView = (FakePullDrowListView) viewroot
 				.findViewById(R.id.fragment_pullto_fefresh);
 		mRefreshListView.setAdapter(new Adapter());
 		mRefreshListView.setOnRefreshListener(new FakeRefreshListView.OnRefreshListener() {

@@ -2,7 +2,9 @@ package com.blackswan.fake.view;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import com.blackswan.fake.R;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -13,6 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 
 public class FakeRefreshListView extends HandyListView
@@ -322,4 +325,6 @@ public class FakeRefreshListView extends HandyListView
 	public interface OnCancelListener {
 		public void onCancel();
 	}
+
+	
 }

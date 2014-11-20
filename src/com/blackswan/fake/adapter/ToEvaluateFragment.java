@@ -1,6 +1,7 @@
 package com.blackswan.fake.adapter;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import android.graphics.Bitmap;
@@ -19,10 +20,11 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blackswan.fake.R;
-import com.blackswan.fake.bean.NowOrder;
 import com.blackswan.fake.bean.ToEvaluateOrder;
+import com.blackswan.fake.view.FakePullDrowListView;
 import com.blackswan.fake.view.FakeRefreshListView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -32,30 +34,32 @@ public class ToEvaluateFragment extends Fragment {
 
 	// 图片加载配置
 	private DisplayImageOptions options;
-	List<ToEvaluateOrder> orders = new ArrayList<ToEvaluateOrder>();
+	LinkedList<ToEvaluateOrder> orders = new LinkedList<ToEvaluateOrder>();
 	private LayoutInflater mInflater;
-	FakeRefreshListView mRefreshListView;
+	FakePullDrowListView mRefreshListView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		mRefreshListView = new FakeRefreshListView(getActivity());
+		mRefreshListView = new FakePullDrowListView(getActivity());
 
 		options = new DisplayImageOptions.Builder()
 				.showImageOnLoading(R.drawable.bg_cover_userheader_outerpress)
 				.cacheInMemory(true).cacheOnDisk(true).considerExifParams(true)
 				.imageScaleType(ImageScaleType.EXACTLY)
 				.bitmapConfig(Bitmap.Config.RGB_565).build();
-
+		
 		// test data
-		ToEvaluateOrder order = new ToEvaluateOrder();
-		order.setBarberHeadUrl("http://img0.bdstatic.com/img/image/shouye/mxlss-13058626297.jpg");
-		order.setBarbershopName("高区审美店");
-		order.setBarberName("姓名");
-		order.setOperationName("烫发");
-		order.setOrderTime("2016-09-09");
-		orders.add(order);
+		for (int i = 0; i < 20; i++) {
+			ToEvaluateOrder order = new ToEvaluateOrder();
+			order.setBarberHeadUrl("http://img0.bdstatic.com/img/image/shouye/mxlss-13058626297.jpg");
+			order.setBarbershopName("高区审美店");
+			order.setBarberName("姓名"+i);
+			order.setOperationName("烫发");
+			order.setOrderTime("2016-09-09");
+			orders.add(order);
+		}
 	}
 
 	@Override
@@ -63,23 +67,50 @@ public class ToEvaluateFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View viewroot = inflater.inflate(R.layout.fragment_pullto_refresh,
 				container, false);
-		mRefreshListView = (FakeRefreshListView) viewroot
+		mRefreshListView = (FakePullDrowListView) viewroot
 				.findViewById(R.id.fragment_pullto_fefresh);
 		mRefreshListView.setAdapter(new Adapter());
-		mRefreshListView.setOnRefreshListener(new FakeRefreshListView.OnRefreshListener() {
+		mRefreshListView
+				.setOnRefreshListener(new FakeRefreshListView.OnRefreshListener() {
+					@Override
+					public void onRefresh() {
+						// 刷新
+					
+						 mRefreshListView.onRefreshComplete();
+					}
+				});
+		mRefreshListView
+				.setOnCancelListener(new FakeRefreshListView.OnCancelListener() {
+					@Override
+					public void onCancel() {
+						mRefreshListView.onRefreshComplete();
+					}
+				});
+		mRefreshListView.setmAddMoreListener(new FakePullDrowListView.AddMoreListener() {
+			
 			@Override
-			public void onRefresh() {
-				//刷新
-				//mRefreshListView.onRefreshComplete();
+			public void onAddMore() {
+				Toast.makeText(getActivity(), "开始加载更多", Toast.LENGTH_LONG).show();;
+				
+				mRefreshListView.onAddMoreComplete();
+				
 			}
 		});
-		mRefreshListView.setOnCancelListener(new FakeRefreshListView.OnCancelListener() {
+		mRefreshListView.setmPreAddMoreListener(new FakePullDrowListView.PreAddMoreListener() {
+			
 			@Override
-			public void onCancel() {
-				mRefreshListView.onRefreshComplete();
+			public void onPreAddMore() {
+				mRefreshListView.onPreAddMoreComplete();
+				Toast.makeText(getActivity(), "开始预加载加载更多", Toast.LENGTH_SHORT).show();;
+				
 			}
 		});
 		mInflater = inflater;
+		
+		//测试数据
+		mRefreshListView.setIsAddAll(false);
+		
+		
 		return viewroot;
 
 	}
@@ -106,7 +137,8 @@ public class ToEvaluateFragment extends Fragment {
 			ViewHolder holder = null;
 			if (convertView == null) {
 				holder = new ViewHolder();
-				convertView = mInflater.inflate(R.layout.item_to_eval_order, null);
+				convertView = mInflater.inflate(R.layout.item_to_eval_order,
+						null);
 				holder.ivBarberHead = (ImageView) convertView
 						.findViewById(R.id.iv_to_eval_head);
 				holder.time = (TextView) convertView
@@ -119,13 +151,14 @@ public class ToEvaluateFragment extends Fragment {
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			ImageLoader.getInstance().displayImage(orders.get(position).getBarberHeadUrl(),
+			ImageLoader.getInstance().displayImage(
+					orders.get(position).getBarberHeadUrl(),
 					holder.ivBarberHead, options);
 			holder.button.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					// TODO 挑战到评价页面
-					
+
 				}
 			});
 			holder.time.setText(orders.get(position).getOrderTime());

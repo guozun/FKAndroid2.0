@@ -39,11 +39,12 @@ public class MyPageActivity extends BaseActivity {
 	private DisplayImageOptions options;
 	private DisplayImageOptions headOptions;
 	// 用户信息
-	private UserInfo userInfo = null;
-//			new UserInfo("name", "183139087908", "123",
-//			"简介",
-//			"http://img0.bdstatic.com/img/image/shouye/mxlyfs-9632102318.jpg",
-//			true);
+	private UserInfo userInfo 
+	//= null;
+			=new UserInfo("name", "183139087908", "123",
+			"简介",
+			"http://img0.bdstatic.com/img/image/shouye/mxlyfs-9632102318.jpg",
+			true);
 	// 我的头像
 	private ImageView myHeadImageView;
 	// 我的昵称栏

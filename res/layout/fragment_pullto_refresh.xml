@@ -4,10 +4,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <com.blackswan.fake.view.FakeRefreshListView
+    <com.blackswan.fake.view.FakePullDrowListView
         android:id="@+id/fragment_pullto_fefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-    </com.blackswan.fake.view.FakeRefreshListView>
+    </com.blackswan.fake.view.FakePullDrowListView>
 
 </LinearLayout>

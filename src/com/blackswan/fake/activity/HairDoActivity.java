@@ -8,19 +8,13 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
@@ -28,20 +22,21 @@ import android.view.animation.RotateAnimation;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.RelativeLayout.LayoutParams;
 
 import com.blackswan.fake.R;
-import com.blackswan.fake.adapter.HairdoHairFilterAdapter;
 import com.blackswan.fake.base.BaseActivity;
 import com.blackswan.fake.view.HairdoSlideShowView;
 import com.blackswan.fake.view.HandyTextView;
+import com.blackswan.fake.view.ProgressWheel;
 import com.huewu.pla.lib.MultiColumnListView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener;
 
 public class HairDoActivity extends BaseActivity {
 
@@ -236,6 +231,7 @@ public class HairDoActivity extends BaseActivity {
 				public ImageView ivDown;
 				public TextView tvUp;
 				public TextView tvDown;
+				public ProgressWheel mProgressWheel;
 			}
 
 			@Override
@@ -267,6 +263,8 @@ public class HairDoActivity extends BaseActivity {
 							.findViewById(R.id.tv_hairdo_item_good);
 					holder.tvDown = (TextView) view
 							.findViewById(R.id.tv_hairdo_item_bad);
+					holder.mProgressWheel = (ProgressWheel) view
+							.findViewById(R.id.id_hairdo_waterfall_progress);
 					view.setTag(holder);
 				} else {
 					holder = (Holder) view.getTag();
@@ -274,7 +272,58 @@ public class HairDoActivity extends BaseActivity {
 
 				String url = imageList.get(position);
 				ImageLoader.getInstance().displayImage(url, holder.ivPic,
-						options);
+						options, new ImageLoadingListener() {
+
+							@Override
+							public void onLoadingStarted(String imageUri,
+									View view) {
+								// 这儿初先初始化出来image所占的位置的大小，先把瀑布流固定住，这样瀑布流就不会因为图片加载出来后大小变化了
+								RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) holder.ivPic
+										.getLayoutParams();
+								if (position == 0) {
+									lp.height = mScreenHeight / 4;
+									lp.width = mScreenWidth/2;
+								} else {
+									lp.height = mScreenHeight / 3;
+									lp.width = mScreenWidth/2;
+								}
+								holder.ivPic.setLayoutParams(lp);
+								holder.mProgressWheel
+										.setVisibility(View.VISIBLE);
+							}
+
+							@Override
+							public void onLoadingFailed(String imageUri,
+									View view, FailReason failReason) {
+								showLongToast("网络异常");
+								holder.mProgressWheel.setVisibility(View.GONE);
+							}
+
+							@Override
+							public void onLoadingComplete(String imageUri,
+									View view, Bitmap loadedImage) {
+								//holder.mProgressWheel.setVisibility(View.GONE);
+							}
+
+							@Override
+							public void onLoadingCancelled(String imageUri,
+									View view) {
+								holder.mProgressWheel.setVisibility(View.GONE);
+
+							}
+						}, new ImageLoadingProgressListener() {
+
+							@Override
+							public void onProgressUpdate(String imageUri,
+									View view, int current, int total) {
+								// if (current > 0 && current < 180) {
+								//
+								// }
+								holder.mProgressWheel.setProgress(current * 360
+										/ total);
+
+							}
+						});
 				holder.tvUp.setText("10");
 				holder.tvDown.setText("100");
 
@@ -498,6 +547,11 @@ public class HairDoActivity extends BaseActivity {
 	}
 
 	private class ContentTask extends AsyncTask<String, Integer, String> {
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+		}
 
 		@Override
 		protected String doInBackground(String... params) {
