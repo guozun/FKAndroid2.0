@@ -331,7 +331,7 @@ public class HairDoActivity extends BaseActivity {
 
 					@Override
 					public void onClick(View v) {
-
+						startActivity(HairDoDetailActivity.class);
 					}
 				});
 
