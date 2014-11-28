@@ -103,7 +103,7 @@
         <activity android:name="com.blackswan.fake.activity.DiscussionPageActivity" />
         <activity android:name="com.blackswan.fake.activity.FriendsPageActivity" />
         <activity android:name="com.blackswan.fake.activity.HomePageActivity" />
-        <activity android:name="com.blackswan.fake.activity.LoginActivity" />
+        <activity android:name="com.blackswan.fake.activity.useractivity.LoginActivity" />
         <activity android:name="com.blackswan.fake.activity.MainActivity" />
         <activity android:name="com.blackswan.fake.activity.MyCollectActivity" />
         <activity android:name="com.blackswan.fake.activity.MyPageActivity" />

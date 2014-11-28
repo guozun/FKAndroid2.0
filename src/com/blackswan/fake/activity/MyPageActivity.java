@@ -40,11 +40,11 @@ public class MyPageActivity extends BaseActivity {
 	private DisplayImageOptions headOptions;
 	// 用户信息
 	private UserInfo userInfo 
-	//= null;
-			=new UserInfo("name", "183139087908", "123",
-			"简介",
-			"http://img0.bdstatic.com/img/image/shouye/mxlyfs-9632102318.jpg",
-			true);
+	= null;
+//			=new UserInfo("name", "183139087908", "123",
+//			"简介",
+//			"http://img0.bdstatic.com/img/image/shouye/mxlyfs-9632102318.jpg",
+//			true);
 	// 我的头像
 	private ImageView myHeadImageView;
 	// 我的昵称栏
@@ -82,7 +82,7 @@ public class MyPageActivity extends BaseActivity {
 		if (userInfo != null) {
 			setContentView(R.layout.activity_mypage);
 		} else {
-			setContentView(R.layout.activity_mypage_nologin);
+			//setContentView(R.layout.activity_mypage_nologin);
 		}
 
 		initControl();
@@ -106,14 +106,15 @@ public class MyPageActivity extends BaseActivity {
 			setLisentener();
 			initViews();
 		} else {
-			Button login = (Button) findViewById(R.id.mypage_nologin_login);
-			login.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					// 去登陆
-					startActivity(LoginActivity.class);
-				}
-			});
+			startActivity(LoginActivity.class);
+			//Button login = (Button) findViewById(R.id.mypage_nologin_login);
+			//login.setOnClickListener(new View.OnClickListener() {
+//				@Override
+//				public void onClick(View v) {
+//					// 去登陆
+//					startActivity(LoginActivity.class);
+//				}
+//			});
 		}
 	}
 
